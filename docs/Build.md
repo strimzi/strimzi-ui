@@ -71,10 +71,10 @@ Webpack allows file specific loaders or utilities to be invoked as a part of the
 
 | Rule        | Plugin/loader(s)           | Purpose  |
 | ------------- | ------------- | -----:|
-| `/(\.css|.scss)$/`      | `style-loader` (dev only), `miniCssExtractPlugin.loader` (production only), `css-loader`, `sass-loader` | Handle scss/css loading/references. If dev mode, use `style-loader` for speed, else use `miniCssExtractPlugin.loader` (in combination with the `miniCssExtractPlugin` plugin) to produce/emit a css file |
+| `/(\.css\|.scss)$/`      | `style-loader` (dev only), `miniCssExtractPlugin.loader` (production only), `css-loader`, `sass-loader` | Handle scss/css loading/references. If dev mode, use `style-loader` for speed, else use `miniCssExtractPlugin.loader` (in combination with the `miniCssExtractPlugin` plugin) to produce/emit a css file |
 | `/(\.js)$/`      | `babel-loader` | Perform babel transpile on all JS files |
-| `/\.(woff(2)?|ttf|eot)$/`      | `file-loader` | For any font file, use file-loader to package the font to the `output.path` and replace/update any imports of those fonts to this location. These will be directed to a 'fonts' directory. |
-| `/\.(jpg|gif|png|svg)$/`      | `file-loader` | For any image file, use file-loader to package the image to the `output.path` and replace/update any imports of those images to this location. These will be directed to a 'images' directory. |
+| `/\.(woff(2)?\|ttf\|eot)$/`      | `file-loader` | For any font file, use file-loader to package the font to the `output.path` and replace/update any imports of those fonts to this location. These will be directed to a 'fonts' directory. |
+| `/\.(jpg\|gif\|png\|svg)$/`      | `file-loader` | For any image file, use file-loader to package the image to the `output.path` and replace/update any imports of those images to this location. These will be directed to a 'images' directory. |
 
 ##### Webpack plugins
 
@@ -103,13 +103,17 @@ These options will all be provided to the TerserPlugin via it's constructor
 #### Webpack output
 
 Given the above configuration, built output will be created in a `dist` directory. This will contain:
-
+```
 dist/
     index.html
     favicon.ico
     main.bundle.js
     <hash1>.bundle.js
     <hash2>.bundle.js
+    ....
+    main.bundle.js.gz
+    <hash1>.bundle.js.gz
+    <hash2>.bundle.js.gz
     ....
     styling.css
     images/
@@ -118,7 +122,7 @@ dist/
     fonts/
         font1.ttf
         ...
-  
+```
 
 #### Webpack dev server
 
@@ -132,7 +136,8 @@ To enable efficient development, this UI makes use of [webpack-dev-server](https
 | inline      | `true` | Enforce default setting, recommended when using `hot` reloading option |
 | hot      | `true` | Enables hot reloading of content when files change |
 | proxy      | TBD | Used to proxy requests for backend data when developing the UI |
-| overlay      | `{warnings: false, errors: true}` | In case of an error, show an overlay over the UI showing it |
+| overlay.warnings      | `false` | In case of an warning, do not show an overlay |
+| overlay.errors      | `true` | In case of an error, show an overlay over the UI showing it |
 
 ## UI build into Strimzi
 
