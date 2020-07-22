@@ -66,7 +66,7 @@ In addition to aliasing, the webpack configuration will be as follows:
 | resolve.alias      | Array of aliases | [See section above](#webpack-aliases) |
 | devServer      | Object | [See section below](#webpack-dev-server) |
 
-This configuration will be defined in separate files per build mode - ie one for `development` and one for `production` - to keep the configuration as minimal and readable as possible. Common configuration will be inherited/extended into these files.
+This configuration will be defined in separate files per build mode - ie one for `development` and one for `production` - to keep the configuration as minimal and readable as possible. Common configuration will be inherited/extended into these files. [See this section for more details](#ui-build-implementation).
 
 ##### Module rules
 
@@ -98,7 +98,7 @@ These options will all be provided to the TerserPlugin via it's constructor.
 | Option        | Value           | Purpose  |
 | ------------- | ------------- | -----:|
 | terserOptions.output.comments      | `false` | Remove all comments in the output |
-| terserOptions.output.preamble      | Strimzi copyright header | Adds the Strimzi header to the built JS output |
+| terserOptions.output.preamble      | [Strimzi header](../utils/constants.js) | Adds the Strimzi header to the built JS output |
 | terserOptions.keep_classnames      | `true` | Keep original class names |
 | terserOptions.keep_fnames      | `true` | Keep original function names |
 | terserOptions.mangle.safari10      | `true` | Works around known Safari issues |
@@ -141,6 +141,10 @@ To enable efficient development, this UI makes use of [webpack-dev-server](https
 | proxy      | TBD | Used to proxy requests for backend data when developing the UI |
 | overlay.warnings      | `false` | In case of an warning, do not show an overlay |
 | overlay.errors      | `true` | In case of an error, show an overlay over the UI showing it |
+
+### UI Build implementation
+
+The above UI build is implemented in the [`build directory`](../utils/build). It is broken down into common configuration (and a function that will return it and build constants), and individual use cases, such as dev and prod builds.
 
 ## UI build into Strimzi
 
