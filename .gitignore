@@ -4,6 +4,9 @@ node_modules/
 # built content
 dist/
 
+# test/supporting generated content
+generated/
+
 # misc
 .history
 .DS_Store

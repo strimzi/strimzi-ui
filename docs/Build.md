@@ -90,6 +90,7 @@ We also make use of the following plugins:
 | html-webpack-plugin      | Handles templating of built output into a provided index.html file |
 | mini-css-extract-plugin      | Compresses and emits a css file(s) containing all styling for the UI |
 | compression-webpack-plugin      | Compresses built output further using `gzip` algorithm, and emits these compressed files. Depending on headers provided by the browser, these gziped versions will be served to the browser, rather than the uncompressed versions |
+| webpack-bundle-analyzer      | At build time, produce a report regarding the JS bundle size (useful for understanding bloat and duplication). At dev build time this is an html file (which is then hosted by `webpack-dev-server`), and a json file at production build time. Each report is written to the `generated/bundle-analyser` directory |
 
 ##### Terser plugin configuration
 
@@ -118,7 +119,10 @@ dist/
     <hash1>.bundle.js.gz
     <hash2>.bundle.js.gz
     ....
-    styling.css
+    main.css
+    <hash1>.bundle.css
+    <hash2>.bundle.css
+    ...
     images/
         image1.svg
         ...
@@ -133,7 +137,7 @@ To enable efficient development, this UI makes use of [webpack-dev-server](https
 
 | Option        | Value           | Reason  |
 | ------------- | ------------- | -----:|
-| contentBase      | `dist` (via constant) | Source for static files. This is the built output directory, where static files will land as a part of the first build during dev start up |
+| contentBase      | [`dist` (via constant), `generated/bundle-analyser/bundles.html`] | Source for static files. This is the built output directory, where static files will land as a part of the first build during dev start up. In addition, include the output of `webpack-bundle-analyzer`, so a developer can access a `/bundles.html` file through `webpack-dev-server`, showing current bundle size/distribution |
 | watchContentBase      | `true` | Reload if a static file changes |
 | compress      | `true` | Serve all content via .gz files - makes rebuilds/hot changes faster to retrieve |
 | inline      | `true` | Enforce default setting, recommended when using `hot` reloading option |
@@ -141,6 +145,10 @@ To enable efficient development, this UI makes use of [webpack-dev-server](https
 | proxy      | TBD | Used to proxy requests for backend data when developing the UI |
 | overlay.warnings      | `false` | In case of an warning, do not show an overlay |
 | overlay.errors      | `true` | In case of an error, show an overlay over the UI showing it |
+| host      | `localhost` | The hostname to use for the server. Can be overridden using the `DEV_HOSTNAME` environment variable. |
+| port      | `8080` | The port to use for the server. Can be overridden using the `DEV_PORT` environment variable. |
+
+By default, `webpack-dev-server` will host the UI at `https://localhost:8080/`. Both the hostname and port can be overridden/changed via the `DEV_HOSTNAME` and `DEV_PORT` environment variables respectively.
 
 ### UI Build implementation
 
@@ -149,3 +157,4 @@ The above UI build is implemented in the [`build directory`](../utils/build). It
 ## UI build into Strimzi
 
 This section to be completed once build/packaging integration with Strimzi has been agreed upon.
+

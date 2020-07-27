@@ -3,7 +3,7 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import './index.css';
+import 'Styling';
 import image from 'Images/logo.png';
 
 window.addEventListener('load', () => {

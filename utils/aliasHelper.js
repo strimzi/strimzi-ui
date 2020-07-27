@@ -13,6 +13,7 @@ const moduleNames = fs.readdirSync(src);
 const relativeAliases = {
   'View': `./View.js`,
   'Model': `./Model.js`,
+  'Styling': `./Styling.scss`,
 };
 
 const modules = moduleNames.reduce((moduleConfig, name) => {

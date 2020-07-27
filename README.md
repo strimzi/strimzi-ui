@@ -25,7 +25,7 @@ npm install
 
 - `npm run start` - runs the UI in development mode
 - `npm run build` - builds the UI
-- `npm run clean` - deletes the build directory
+- `npm run clean` - deletes the build/generated content directories
 
 ## Implementation documentation
 
