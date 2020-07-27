@@ -3,9 +3,6 @@
   "private": true,
   "version": "0.0.1",
   "description": "Strimzi UI provides a way for managing Strimzi and Kafka clusters (+ other components) deployed by it using a graphical user interface.",
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
     "clean": "rm -rf dist/ && rm -rf generated/",
     "start": "webpack-dev-server --config utils/build/webpack.dev.js",

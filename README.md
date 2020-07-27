@@ -26,11 +26,13 @@ npm install
 - `npm run start` - runs the UI in development mode
 - `npm run build` - builds the UI
 - `npm run clean` - deletes the build/generated content directories
+- `npm run lint` - lints the codebase. See [`Linting`](./docs/Linting.md) for the individual linting steps
 
 ## Implementation documentation
 
 Further details around how this UI is implemented can be found below:
 
 - [Build](./docs/Build.md)
+- [Linting](./docs/Linting.md)
 
 

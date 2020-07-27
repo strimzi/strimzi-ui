@@ -5,7 +5,7 @@
 
 # Linting
 
-To maintain a consistent code style, as well as follow best practise, linting has been set up for this codebase. This document will cover what tools are used to lint this codebase, how they are configured, and what rules are in place to maintain a common style and approach.
+To maintain a consistent code style, as well as follow best practice, linting has been set up for this codebase. This document will cover what tools are used to lint this codebase, how they are configured, and what rules are in place to maintain a common style and approach.
 
 ## Tools used
 
