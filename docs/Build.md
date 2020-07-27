@@ -44,7 +44,7 @@ becomes
 import { myFunction } from 'MyModule'
 ```
 
-For convenience, all top level module directories will be automatically aliased via a helper in the webpack configuration, as well defining a view alias.
+For convenience, all top level module directories from `client` will be automatically aliased via a helper in the webpack configuration, as well defining a view alias.
 
 #### Webpack configuration and plugins
 
@@ -52,10 +52,11 @@ In addition to aliasing, the webpack configuration will be as follows:
 
 | Option        | Value           | Purpose  |
 | ------------- | ------------- | -----:|
-| entry      | `client/Bootstrap/index.js` | Build entry point. Note the `scss/css` is expected to be imported by individual view layer code, which is imported (directly or indirectly) from this file  |
-| mode      | `production` or `development` (via envar) | Build mode. If production, code will be minified and have developer helpers (warning etc) removed from the built output |
+| entry      | `client/Bootstrap/index.js` | Build entry point. *Note:* the `scss/css` is expected to be imported by individual view layer code, which is imported (directly or indirectly) from this file. Details to follow in Code Style approach documentation regarding this styling approach and why.  |
+| mode      | `production` or `development` (provided via config file used) | Build mode. If production, code will be minified and have developer helpers (warning etc) removed from the built output |
 | output.path      | `dist` (via constant) | All output to be placed in the `dist` directory |
-| output.publicPath      | `/` | The public path of static/public content included by Webpack. Is relative to the URL. |
+| output.publicPath      | `` (empty string) | The public path of static/public content included by Webpack. Is relative to the URL. |
+| output.filename       | `[name].bundle.js` | Name of the built entry bundle. Will be `main.bundle.js` once built as we have one entry point |
 | module.rules      | Array of rules - [see here for details](#module-rules) | Rules/tests to run on modules being built. Depending on the file being parsed, different transformations should be run |
 | plugins      | Array of plugins - [see here for details](#webpack-plugins) | Additional tools to customise the build to produce the required output |
 | optimization.minimize      | `true` if production build, else false | Use Webpack minimization only when performing a production build |
@@ -71,10 +72,10 @@ Webpack allows file specific loaders or utilities to be invoked as a part of the
 
 | Rule        | Plugin/loader(s)           | Purpose  |
 | ------------- | ------------- | -----:|
-| `/(\.css\|.scss)$/`      | `style-loader` (dev only), `miniCssExtractPlugin.loader` (production only), `css-loader`, `sass-loader` | Handle scss/css loading/references. If dev mode, use `style-loader` for speed, else use `miniCssExtractPlugin.loader` (in combination with the `miniCssExtractPlugin` plugin) to produce/emit a css file |
-| `/(\.js)$/`      | `babel-loader` | Perform babel transpile on all JS files |
-| `/\.(woff(2)?\|ttf\|eot)$/`      | `file-loader` | For any font file, use file-loader to package the font to the `output.path` and replace/update any imports of those fonts to this location. These will be directed to a 'fonts' directory. |
-| `/\.(jpg\|gif\|png\|svg)$/`      | `file-loader` | For any image file, use file-loader to package the image to the `output.path` and replace/update any imports of those images to this location. These will be directed to a 'images' directory. |
+| `/(\.css\|.scss)$/`      | `style-loader` (dev only), `miniCssExtractPlugin.loader` (production only), `css-loader`, `sass-loader` | Handle scss/css loading/references. If dev mode, use `style-loader` for speed, else use `miniCssExtractPlugin.loader` (in combination with the `miniCssExtractPlugin` plugin) to produce/emi css file(s) |
+| `/(\.js)$/`      | `babel-loader` | Perform babel transpile on all JS files. This will be configured with presets for recent browsers, and enable caching to improve build performance |
+| `/\.(woff(2)?\|ttf\|eot)$/`      | `file-loader` | For any font file, use file-loader to package the font to the `output.path` and replace/update any imports of those fonts to this location. These will be directed to a 'fonts' directory |
+| `/\.(jpg\|gif\|png\|svg)$/`      | `file-loader` | For any image file, use file-loader to package the image to the `output.path` and replace/update any imports of those images to this location. These will be directed to a 'images' directory |
 
 ##### Webpack plugins
 
@@ -82,20 +83,20 @@ We also make use of the following plugins:
 
 | Plugin        |  Responsibility  |
 | ------------- |  -----:|
-| TerserPlugin      |  When a production build, minimises the built output |
-| optimize-css-assets-webpack-plugin      | Minimises/dedupes css |
+| TerserPlugin      |  When a production build, minimises the built JS output |
+| optimize-css-assets-webpack-plugin      | Minimises/dedupes built css output |
 | html-webpack-plugin      | Handles templating of built output into a provided index.html file |
-| mini-css-extract-plugin      | Compresses and emits a css file containing all styling for the UI |
+| mini-css-extract-plugin      | Compresses and emits a css file(s) containing all styling for the UI |
 | compression-webpack-plugin      | Compresses built output further using `gzip` algorithm, and emits these compressed files. Depending on headers provided by the browser, these gziped versions will be served to the browser, rather than the uncompressed versions |
 
 ##### Terser plugin configuration
 
-These options will all be provided to the TerserPlugin via it's constructor
+These options will all be provided to the TerserPlugin via it's constructor.
 
 | Option        | Value           | Purpose  |
 | ------------- | ------------- | -----:|
-| extractComments      | true | Strip all comments from the build |
-| terserOptions.output.comments      | `/@license/i` | Keep licence comments in the output |
+| terserOptions.output.comments      | `false` | Remove all comments in the output |
+| terserOptions.output.preamble      | Strimzi copyright header | Adds the Strimzi header to the built JS output |
 | terserOptions.keep_classnames      | `true` | Keep original class names |
 | terserOptions.keep_fnames      | `true` | Keep original function names |
 | terserOptions.mangle.safari10      | `true` | Works around known Safari issues |
