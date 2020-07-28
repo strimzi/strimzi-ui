@@ -44,7 +44,7 @@ becomes
 import { myFunction } from 'MyModule'
 ```
 
-For convenience, all top level module directories from `client` will be automatically aliased via a helper in the webpack configuration, as well defining a view alias.
+For convenience, all top level module directories from `client` will be automatically aliased via a helper in the webpack configuration, as well defining a view, model and styling aliases.
 
 #### Webpack configuration and plugins
 
@@ -66,13 +66,15 @@ In addition to aliasing, the webpack configuration will be as follows:
 | resolve.alias      | Array of aliases | [See section above](#webpack-aliases) |
 | devServer      | Object | [See section below](#webpack-dev-server) |
 
+This configuration will be defined in separate files per build mode - ie one for `development` and one for `production` - to keep the configuration as minimal and readable as possible. Common configuration will be inherited/extended into these files.
+
 ##### Module rules
 
 Webpack allows file specific loaders or utilities to be invoked as a part of the build process. In the case of this build, these are as follows:
 
 | Rule        | Plugin/loader(s)           | Purpose  |
 | ------------- | ------------- | -----:|
-| `/(\.css\|.scss)$/`      | `style-loader` (dev only), `miniCssExtractPlugin.loader` (production only), `css-loader`, `sass-loader` | Handle scss/css loading/references. If dev mode, use `style-loader` for speed, else use `miniCssExtractPlugin.loader` (in combination with the `miniCssExtractPlugin` plugin) to produce/emi css file(s) |
+| `/(\.css\|.scss)$/`      | `style-loader` (dev only), `miniCssExtractPlugin.loader` (production only), `css-loader`, `sass-loader` | Handle scss/css loading/references. If dev mode, use `style-loader` for speed, else use `miniCssExtractPlugin.loader` (in combination with the `miniCssExtractPlugin` plugin) to produce/emit css file(s) |
 | `/(\.js)$/`      | `babel-loader` | Perform babel transpile on all JS files. This will be configured with presets for recent browsers, and enable caching to improve build performance |
 | `/\.(woff(2)?\|ttf\|eot)$/`      | `file-loader` | For any font file, use file-loader to package the font to the `output.path` and replace/update any imports of those fonts to this location. These will be directed to a 'fonts' directory |
 | `/\.(jpg\|gif\|png\|svg)$/`      | `file-loader` | For any image file, use file-loader to package the image to the `output.path` and replace/update any imports of those images to this location. These will be directed to a 'images' directory |
@@ -143,4 +145,3 @@ To enable efficient development, this UI makes use of [webpack-dev-server](https
 ## UI build into Strimzi
 
 This section to be completed once build/packaging integration with Strimzi has been agreed upon.
-
