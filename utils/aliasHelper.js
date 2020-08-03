@@ -11,9 +11,9 @@ const moduleNames = fs.readdirSync(src);
 
 // Aliases relative to the current file
 const relativeAliases = {
-  'View': `./View.js`,
-  'Model': `./Model.js`,
-  'Styling': `./Styling.scss`,
+  View: './View.js',
+  Model: './Model.js',
+  Styling: './Styling.scss',
 };
 
 const modules = moduleNames.reduce((moduleConfig, name) => {
@@ -32,9 +32,9 @@ const webpackAliases = Object.entries(modules).reduce(
     const { path } = value;
     return { ...aliases, [key]: path };
   },
-  {...relativeAliases}
+  { ...relativeAliases }
 );
 
 module.exports = {
-    webpackAliases
-}
+  webpackAliases,
+};

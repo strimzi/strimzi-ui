@@ -7,10 +7,10 @@ import 'Styling';
 import image from 'Images/logo.png';
 
 window.addEventListener('load', () => {
-    const root = document.querySelector('[id="root"]');
-    const img = document.createElement('img');
-    img.src = image;
-    img.alt = 'Strimzi logo';
-    root.append(img);
-    root.append(document.createTextNode('Welcome to the Strimzi UI'));
+  const root = document.querySelector('[id="root"]');
+  const img = document.createElement('img');
+  img.src = image;
+  img.alt = 'Strimzi logo';
+  root.append(img);
+  root.append(document.createTextNode('Welcome to the Strimzi UI'));
 });

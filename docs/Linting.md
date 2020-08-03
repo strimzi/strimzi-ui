@@ -57,6 +57,8 @@ The following must be present in all git commits made to this repository. These 
 
 These checks can only be run having made a `git commit`.
 
+_Important note_: If you run into issues with the `All commits must have a signed-off-by entry` rule, [see this troubleshooting item, which covers a workaround for a known bug.](../README.md#signed-off-by-reported-as-not-included-in-commit,-when-it-is-included)
+
 ### JS code
 
 These checks are enforced by `eslint`, and the configuration [here](../utils/linting/eslint.config.js).

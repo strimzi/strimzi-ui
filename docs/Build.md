@@ -1,3 +1,8 @@
+<!--
+ Copyright Strimzi authors.
+ License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
+-->
+
 # Build
 
 This documentation will cover both the [building of the UI code](#ui-build), and also how it is [built and integrated with Strimzi](#ui-build-into-strimzi).
@@ -50,21 +55,21 @@ For convenience, all top level module directories from `client` will be automati
 
 In addition to aliasing, the webpack configuration will be as follows:
 
-| Option        | Value           | Purpose  |
-| ------------- | ------------- | -----:|
-| entry      | `client/Bootstrap/index.js` | Build entry point. *Note:* the `scss/css` is expected to be imported by individual view layer code, which is imported (directly or indirectly) from this file. Details to follow in Code Style approach documentation regarding this styling approach and why.  |
-| mode      | `production` or `development` (provided via config file used) | Build mode. If production, code will be minified and have developer helpers (warnings etc) removed from the built output |
-| output.path      | `dist` (via constant) | All output to be placed in the `dist` directory |
-| output.publicPath      | `` (empty string) | The public path of static/public content included by Webpack. Is relative to the URL. |
-| output.filename       | `[name].bundle.js` | Name of the built entry bundle. Will be `main.bundle.js` once built as we have one entry point |
-| module.rules      | Array of rules - [see here for details](#module-rules) | Rules/tests to run on modules being built. Depending on the file being parsed, different transformations should be run |
-| plugins      | Array of plugins - [see here for details](#webpack-plugins) | Additional tools to customise the build to produce the required output |
-| optimization.minimize      | `true` if production build, else false | Use Webpack minimization only when performing a production build |
-| optimization.minimizer      | [[`TerserPlugin`](https://webpack.js.org/plugins/terser-webpack-plugin/) with [this configuration](#terser-plugin-configuration), `optimize-css-assets-webpack-plugin`] | When a production build, minimise the built output using TerserPlugin and optimize-css-assets-webpack-plugin |
-| optimization.splitChunks.chunks      | `all` | When building, check and chunk up code as much as possible, regardless of what/how it is used |
-| optimization.splitChunks.name      | `false` | Recommended setting - keeps chunk names consistent |
-| resolve.alias      | Array of aliases | [See section above](#webpack-aliases) |
-| devServer      | Object | [See section below](#webpack-dev-server) |
+| Option                          | Value                                                                                                                                                                   |                                                                                                                                                                                                                                                        Purpose |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| entry                           | `client/Bootstrap/index.js`                                                                                                                                             | Build entry point. _Note:_ the `scss/css` is expected to be imported by individual view layer code, which is imported (directly or indirectly) from this file. Details to follow in Code Style approach documentation regarding this styling approach and why. |
+| mode                            | `production` or `development` (provided via config file used)                                                                                                           |                                                                                                                                       Build mode. If production, code will be minified and have developer helpers (warnings etc) removed from the built output |
+| output.path                     | `dist` (via constant)                                                                                                                                                   |                                                                                                                                                                                                                All output to be placed in the `dist` directory |
+| output.publicPath               | `` (empty string) | The public path of static/public content included by Webpack. Is relative to the URL.                                                               |
+| output.filename                 | `[name].bundle.js`                                                                                                                                                      |                                                                                                                                                                 Name of the built entry bundle. Will be `main.bundle.js` once built as we have one entry point |
+| module.rules                    | Array of rules - [see here for details](#module-rules)                                                                                                                  |                                                                                                                                         Rules/tests to run on modules being built. Depending on the file being parsed, different transformations should be run |
+| plugins                         | Array of plugins - [see here for details](#webpack-plugins)                                                                                                             |                                                                                                                                                                                         Additional tools to customise the build to produce the required output |
+| optimization.minimize           | `true` if production build, else false                                                                                                                                  |                                                                                                                                                                                               Use Webpack minimization only when performing a production build |
+| optimization.minimizer          | [[`TerserPlugin`](https://webpack.js.org/plugins/terser-webpack-plugin/) with [this configuration](#terser-plugin-configuration), `optimize-css-assets-webpack-plugin`] |                                                                                                                                                   When a production build, minimise the built output using TerserPlugin and optimize-css-assets-webpack-plugin |
+| optimization.splitChunks.chunks | `all`                                                                                                                                                                   |                                                                                                                                                                  When building, check and chunk up code as much as possible, regardless of what/how it is used |
+| optimization.splitChunks.name   | `false`                                                                                                                                                                 |                                                                                                                                                                                                             Recommended setting - keeps chunk names consistent |
+| resolve.alias                   | Array of aliases                                                                                                                                                        |                                                                                                                                                                                                                          [See section above](#webpack-aliases) |
+| devServer                       | Object                                                                                                                                                                  |                                                                                                                                                                                                                       [See section below](#webpack-dev-server) |
 
 To keep the configuration as minimal and readable as possible, configuration will be defined in separate files per build mode - ie one for `development` and one for `production`. These configurations will extend a common configuration file. [See this section for more details](#ui-build-implementation).
 
@@ -72,12 +77,12 @@ To keep the configuration as minimal and readable as possible, configuration wil
 
 Webpack allows file specific loaders or utilities to be invoked as a part of the build process. In the case of this build, these are as follows:
 
-| Rule        | Plugin/loader(s)           | Purpose  |
-| ------------- | ------------- | -----:|
-| `/(\.css\|.scss)$/`      | `style-loader` (dev only), `miniCssExtractPlugin.loader` (production only), `css-loader`, `sass-loader` | Handle scss/css loading/references. If dev mode, use `style-loader` for speed, else use `miniCssExtractPlugin.loader` (in combination with the `miniCssExtractPlugin` plugin) to produce/emit css file(s) |
-| `/(\.js)$/`      | `babel-loader` | Perform babel transpile on all JS files. This will be configured with presets for recent browsers, and enable caching to improve build performance |
-| `/\.(woff(2)?\|ttf\|eot)$/`      | `file-loader` | For any font file, use file-loader to package the font to the `output.path` and replace/update any imports of those fonts to this location. These will be directed to a 'fonts' directory |
-| `/\.(jpg\|gif\|png\|svg)$/`      | `file-loader` | For any image file, use file-loader to package the image to the `output.path` and replace/update any imports of those images to this location. These will be directed to a 'images' directory |
+| Rule                        | Plugin/loader(s)                                                                                        |                                                                                                                                                                                                   Purpose |
+| --------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| `/(\.css\|.scss)$/`         | `style-loader` (dev only), `miniCssExtractPlugin.loader` (production only), `css-loader`, `sass-loader` | Handle scss/css loading/references. If dev mode, use `style-loader` for speed, else use `miniCssExtractPlugin.loader` (in combination with the `miniCssExtractPlugin` plugin) to produce/emit css file(s) |
+| `/(\.js)$/`                 | `babel-loader`                                                                                          |                                                        Perform babel transpile on all JS files. This will be configured with presets for recent browsers, and enable caching to improve build performance |
+| `/\.(woff(2)?\|ttf\|eot)$/` | `file-loader`                                                                                           |                 For any font file, use file-loader to package the font to the `output.path` and replace/update any imports of those fonts to this location. These will be directed to a 'fonts' directory |
+| `/\.(jpg\|gif\|png\|svg)$/` | `file-loader`                                                                                           |             For any image file, use file-loader to package the image to the `output.path` and replace/update any imports of those images to this location. These will be directed to a 'images' directory |
 
 The module loading rules will be provided via helper functions from a common configuration file, but allow for modification. [See this section for more details](#ui-build-implementation).
 
@@ -85,15 +90,15 @@ The module loading rules will be provided via helper functions from a common con
 
 We also make use of the following plugins:
 
-| Plugin        |  Responsibility  |
-| ------------- |  -----:|
-| TerserPlugin      |  When a production build, minimises the built JS output |
-| optimize-css-assets-webpack-plugin      | Minimises/dedupes built css output |
-| html-webpack-plugin      | Handles templating of built output into a provided index.html file |
-| mini-css-extract-plugin      | Compresses and emits a css file(s) containing all styling for the UI |
-| compression-webpack-plugin      | Compresses built output further using `gzip` algorithm, and emits these compressed files. Depending on headers provided by the browser, these gziped versions will be served to the browser, rather than the uncompressed versions |
-| webpack-bundle-analyzer      | At build time, produce a report regarding the JS bundle size (useful for understanding bloat and duplication). At dev build time this is an html file (which is then hosted by `webpack-dev-server`), and a json file at production build time. Each report is written to the `generated/bundle-analyser` directory |
-| BannerPlugin      | Used to add a copyright header to built css code. Other types handled by other plugins (eg TerserPlugin) |
+| Plugin                             |                                                                                                                                                                                                                                                                                                      Responsibility |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| TerserPlugin                       |                                                                                                                                                                                                                                                              When a production build, minimises the built JS output |
+| optimize-css-assets-webpack-plugin |                                                                                                                                                                                                                                                                                  Minimises/dedupes built css output |
+| html-webpack-plugin                |                                                                                                                                                                                                                                                  Handles templating of built output into a provided index.html file |
+| mini-css-extract-plugin            |                                                                                                                                                                                                                                                Compresses and emits a css file(s) containing all styling for the UI |
+| compression-webpack-plugin         |                                                                                  Compresses built output further using `gzip` algorithm, and emits these compressed files. Depending on headers provided by the browser, these gziped versions will be served to the browser, rather than the uncompressed versions |
+| webpack-bundle-analyzer            | At build time, produce a report regarding the JS bundle size (useful for understanding bloat and duplication). At dev build time this is an html file (which is then hosted by `webpack-dev-server`), and a json file at production build time. Each report is written to the `generated/bundle-analyser` directory |
+| BannerPlugin                       |                                                                                                                                                                                                            Used to add a copyright header to built css code. Other types handled by other plugins (eg TerserPlugin) |
 
 Where appropriate, plugins will be provided via helper functions from a common configuration file, but allow for modification to their configuration. [See this section for more details](#ui-build-implementation).
 
@@ -101,17 +106,18 @@ Where appropriate, plugins will be provided via helper functions from a common c
 
 These options will all be provided to the TerserPlugin via it's constructor.
 
-| Option        | Value           | Purpose  |
-| ------------- | ------------- | -----:|
-| terserOptions.output.comments      | `false` | Remove all comments in the output |
-| terserOptions.output.preamble      | [Strimzi header](../utils/constants.js) | Adds the Strimzi header to the built JS output |
-| terserOptions.keep_classnames      | `true` | Keep original class names |
-| terserOptions.keep_fnames      | `true` | Keep original function names |
-| terserOptions.mangle.safari10      | `true` | Works around known Safari issues |
+| Option                        | Value                                   |                                        Purpose |
+| ----------------------------- | --------------------------------------- | ---------------------------------------------: |
+| terserOptions.output.comments | `false`                                 |              Remove all comments in the output |
+| terserOptions.output.preamble | [Strimzi header](../utils/constants.js) | Adds the Strimzi header to the built JS output |
+| terserOptions.keep_classnames | `true`                                  |                      Keep original class names |
+| terserOptions.keep_fnames     | `true`                                  |                   Keep original function names |
+| terserOptions.mangle.safari10 | `true`                                  |               Works around known Safari issues |
 
 #### Webpack output
 
 Given the above configuration, built output will be created in a `dist` directory. This will contain:
+
 ```
 dist/
     index.html
@@ -140,18 +146,18 @@ dist/
 
 To enable efficient development, this UI makes use of [webpack-dev-server](https://webpack.js.org/configuration/dev-server/). This re-uses the above Webpack configuration, but adds helpful developer features, such as file watching and hot reloading of changes. When run, all content is built and served from memory, with static assets such as images being served from the configured public path. Configuration of the dev server is in the `devServer` section of the `webpack.config.js` file, and a brief summary of each option can be found below:
 
-| Option        | Value           | Reason  |
-| ------------- | ------------- | -----:|
+| Option           | Value                                                             |                                                                                                                                                                                                                                                                                                                            Reason |
+| ---------------- | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | contentBase      | [`dist` (via constant), `generated/bundle-analyser/bundles.html`] | Source for static files. This is the built output directory, where static files will land as a part of the first build during dev start up. In addition, include the output of `webpack-bundle-analyzer`, so a developer can access a `/bundles.html` file through `webpack-dev-server`, showing current bundle size/distribution |
-| watchContentBase      | `true` | Reload if a static file changes |
-| compress      | `true` | Serve all content via .gz files - makes rebuilds/hot changes faster to retrieve |
-| inline      | `true` | Enforce default setting, recommended when using `hot` reloading option |
-| hot      | `true` | Enables hot reloading of content when files change |
-| proxy      | TBD | Used to proxy requests for backend data when developing the UI |
-| overlay.warnings      | `false` | In case of an warning, do not show an overlay |
-| overlay.errors      | `true` | In case of an error, show an overlay over the UI showing it |
-| host      | `localhost` | The hostname to use for the server. Can be overridden using the `DEV_HOSTNAME` environment variable. |
-| port      | `8080` | The port to use for the server. Can be overridden using the `DEV_PORT` environment variable. |
+| watchContentBase | `true`                                                            |                                                                                                                                                                                                                                                                                                   Reload if a static file changes |
+| compress         | `true`                                                            |                                                                                                                                                                                                                                                   Serve all content via .gz files - makes rebuilds/hot changes faster to retrieve |
+| inline           | `true`                                                            |                                                                                                                                                                                                                                                            Enforce default setting, recommended when using `hot` reloading option |
+| hot              | `true`                                                            |                                                                                                                                                                                                                                                                                Enables hot reloading of content when files change |
+| proxy            | TBD                                                               |                                                                                                                                                                                                                                                                    Used to proxy requests for backend data when developing the UI |
+| overlay.warnings | `false`                                                           |                                                                                                                                                                                                                                                                                     In case of an warning, do not show an overlay |
+| overlay.errors   | `true`                                                            |                                                                                                                                                                                                                                                                       In case of an error, show an overlay over the UI showing it |
+| host             | `localhost`                                                       |                                                                                                                                                                                                                              The hostname to use for the server. Can be overridden using the `DEV_HOSTNAME` environment variable. |
+| port             | `8080`                                                            |                                                                                                                                                                                                                                      The port to use for the server. Can be overridden using the `DEV_PORT` environment variable. |
 
 By default, `webpack-dev-server` will host the UI at `https://localhost:8080/`. Both the hostname and port can be overridden/changed via the `DEV_HOSTNAME` and `DEV_PORT` environment variables respectively.
 
@@ -162,4 +168,3 @@ The above UI build is implemented in the [`build directory`](../utils/build). It
 ## UI build into Strimzi
 
 This section to be completed once build/packaging integration with Strimzi has been agreed upon.
-

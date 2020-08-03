@@ -3,12 +3,12 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-#root {
-    font-family: 'Nunito', 'Open Sans', sans-serif;
-    color: #182C46;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 98vh;
+.root {
+  align-items: center;
+  color: #182c46;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Nunito', 'Open Sans', sans-serif;
+  height: 98vh;
+  justify-content: center;
 }
