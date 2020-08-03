@@ -91,6 +91,7 @@ We also make use of the following plugins:
 | mini-css-extract-plugin      | Compresses and emits a css file(s) containing all styling for the UI |
 | compression-webpack-plugin      | Compresses built output further using `gzip` algorithm, and emits these compressed files. Depending on headers provided by the browser, these gziped versions will be served to the browser, rather than the uncompressed versions |
 | webpack-bundle-analyzer      | At build time, produce a report regarding the JS bundle size (useful for understanding bloat and duplication). At dev build time this is an html file (which is then hosted by `webpack-dev-server`), and a json file at production build time. Each report is written to the `generated/bundle-analyser` directory |
+| BannerPlugin      | Used to add a copyright header to built css code. Other types handled by other plugins (eg TerserPlugin) |
 
 ##### Terser plugin configuration
 

@@ -7,6 +7,7 @@
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
+const { BannerPlugin } = require('webpack');
 
 const {
     returnWebpackConfigFor,
@@ -68,6 +69,12 @@ const prodSpecificConfig = {
             algorithm: 'gzip', // compress via gzip
             threshold: 0, // applies to all files
             minRatio: 0.8 // keep compressed file if smaller by this %
+        }),
+        // add copyright to css files(other files already have the header)
+        new BannerPlugin({
+            banner: `${STRIMZI_HEADER}`,
+            test: /.css/,
+            raw: true
         }),
         // include default bundle analysis
         withWebpackBundleAnalyzerPlugin()
