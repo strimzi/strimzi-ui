@@ -1,0 +1,8 @@
+# Documentation 
+
+This directory contains all documentation relating to the whole repository. For convenience, links to all documentation are available below:
+
+## Contents
+
+- [Architecture](./Architecture.md)
+- [Build](./Build.md)

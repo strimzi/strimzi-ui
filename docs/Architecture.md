@@ -11,16 +11,17 @@ This document will cover the core Architectural decisions made for this UI, how 
   - [Development and test](#development-and-test-topology)
 - [Transport layer](#transport-layer)
 - [Strimzi integration](#strimzi-integration)
-- [Code structure](#code-structure)
-  - [Directory structure](#directory-structure)
-  - [`Element`, `Group`, `Panel`, `Bootstrap` component pattern](#element-group-panel-bootstrap-component-pattern)
-  - [Swap-able view layers](#swap-able-view-layers)
 - [Implementation details](#implementation-details)
   - [Front end (client)](#client)
+    - [Technologies used](#technologies-used)
     - [Routing and navigation model](#routing-and-navigation)
     - [Component topology](#component-topology)
   - [Back end (server)](#server)
   - [Configuration and feature flagging](#configuration-and-feature-flagging)
+- [Code structure](#code-structure)
+  - [Directory structure](#directory-structure)
+  - [`Element`, `Group`, `Panel`, `Bootstrap` component pattern](#element-group-panel-bootstrap-component-pattern)
+  - [Swap-able view layers](#swap-able-view-layers)
 - [Supporting utilities and tools](#supporting-utilities-and-tools)
   - [Storybook](#storybook)
   - [Mock admin server](#mock-admin-server)
@@ -86,17 +87,11 @@ Further details will be added to this section once https://github.com/strimzi/pr
 
 This will be completed once https://github.com/strimzi/proposals/pull/6 has been finalized.
 
-### Code Structure
-
-#### Directory structure
-
-#### Element Group Panel Bootstrap component pattern
-
-#### Swap-able view layers
-
 ### Implementation details
 
 #### Client
+
+##### Technologies used
 
 ##### Routing and navigation
 
@@ -107,6 +102,28 @@ This will be completed once https://github.com/strimzi/proposals/pull/6 has been
 Further details will be added to this section once https://github.com/strimzi/proposals/pull/6 and https://github.com/strimzi/proposals/pull/9 have been finalized.
 
 #### Configuration and feature flagging
+
+### Code Structure
+
+To support the goals of extensibility and aid consistency across the code base, the code in this repository has been arranged in an opinionated manner. This section will detail that structure, and why it has been set up in this way.
+
+#### Directory structure
+
+UI codebases tend to contain a large number of files, so sensible organisation not only keeps the code neat and tidy, but can help provide context for what particular areas do/are responsible for.  The following covers what directories exist in the root of this repository, and what they contain:
+
+| Directory        | Contains           |
+| ------------- | ------------- |
+| client        | All code served to the browser           |
+| docs        | All 'repository level' documentation          |
+| docs/assets        | Assets used to support documentation - images etc          |
+| server        | All code related to the UI server implementation           |
+| utils        | Utility code and configuration used by both client and server           |
+
+As mentioned in the Code Style document (https://github.com/strimzi/strimzi-ui/issues/4), all of these directories will contain a README file providing further details on what they contain.
+
+#### Element Group Panel Bootstrap component pattern
+
+#### Swap-able view layers
 
 ### Supporting utilities and tools
 
