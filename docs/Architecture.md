@@ -13,7 +13,8 @@ This document will cover the core Architectural decisions made for this UI, how 
 - [Strimzi integration](#strimzi-integration)
 - [Implementation details](#implementation-details)
   - [Front end (client)](#client)
-    - [Technologies used](#technologies-used)
+    - [Technologies and patterns used](#technologies-and-patterns-used)
+    - [File name conventions](#file-name-conventions)
     - [Routing and navigation model](#routing-and-navigation)
     - [Component topology](#component-topology)
   - [Back end (server)](#server)
@@ -40,9 +41,9 @@ In addition, we have set the following behaviours/goals/considerations for all d
 
 ### Security
 
-The UI will include a (configurable - including off) security model, which will map authenticated users to roles (with authorizations associated), and thus reflect in what they can access and do in the UI itself. 
+The UI will include a (configurable - including off) security model, which will map authenticated users to roles (with authorizations associated), and thus reflect in what they can access and do in the UI itself.
 
-Further details will be added to this section once https://github.com/strimzi/proposals/pull/6 and https://github.com/strimzi/proposals/pull/9 have been finalized.
+Further details will be added to this section once https://github.com/strimzi/proposals/pull/13, https://github.com/strimzi/proposals/pull/6 and https://github.com/strimzi/proposals/pull/9 have been finalized.
 
 ### Topology
 
@@ -50,9 +51,9 @@ The following section will detail how the UI in this repository integrates with 
 
 #### Production topology
 
-*Further details will be added to this section once https://github.com/strimzi/proposals/pull/6 has been finalized.*
+_Further details will be added to this section once https://github.com/strimzi/proposals/pull/6 has been finalized._
 
-*Proposal*: The UI when deployed as a part of Strimzi could look as follows:
+_Proposal_: The UI when deployed as a part of Strimzi could look as follows:
 
 ![Production topology](./assets/ProductionTopology.png)
 
@@ -89,13 +90,52 @@ This will be completed once https://github.com/strimzi/proposals/pull/6 has been
 
 ### Implementation details
 
+This section will detail implementation and design choices made for both the [client](#client) and the [server](#server) for this UI.
+
 #### Client
 
-##### Technologies used
+This section will detail the high level design choices made when designing and implementing this UI.
+
+##### Technologies and patterns used
+
+A modern UI is made up of and enabled by many different technologies and implementation patterns. This section will detail what tools have been used to implement this UI, with a brief rationale to why.
+
+This UI makes use of:
+
+- The [Model View Controller (MVC)](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) design pattern: this pattern encourages the separation of business, rendering and (flow of) control logic. This fits naturally with UI implementations, where rendering, dealing with user action and modification of state are all separate concerns.
+- [React](https://reactjs.org/) to implement the UI, due to it's declarative and composable approach to implementing UIs. In particular, we will leverage:
+  - Functional React components: enforces a functional style to component writing, and avoid common pitfalls of class based component implementations - such as misuse of lifecycle methods
+  - React Context: to provide state management/access
+  - React Hooks: to enable shareable common logic across components
+- [Sass](https://sass-lang.com/) for styling. This adds a number of helpful features on top of the core css language to commonise and speed up style implementation
+- Webpack and Babel for building/treeshaking and transpiling the UI, and enabling day to day development. See [the build documentation](./Build.md#ui-build) for further details on build choices and setup.
+- [`Barrel files`](https://basarat.gitbook.io/typescript/main-1/barrel) and named exports. Barrel files (when combined with [Webpack aliases](./Build.md#webpack-aliases)) allow for many components/modules/functions/constants which are related to be imported and used via one import statement. This relies on exported components/modules/functions/constants to be individually named so they can be imported directly.
+
+##### File name conventions
+
+As mentioned above, the Strimzi-ui, inspired by the MVC pattern, separates business logic from rendering logic. This means a component's logic will be split across multiple files. In addition, for capabilities such as [Swap-able view layers](#swap-able-view-layers) to work, file names need to be known and consistent. Thus, a set of file name conventions should be followed to not only enable these capabilities, but also to standardise and make the codebase more approachable.
+
+| Filename                                     | Contains/used for                                                                                                                                                                                                     | Alias (if available) |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| `index.js`                                   | Barrel file. Used to export components/functions.                                                                                                                                                                     |                      |
+| `View.<suffix>.js` / `View.js`               | Contains React component rendering logic. This can have a view layer suffix if different view layer implementations are required [(see table for details)](#swap-able-view-layers). Should be a functional component. | View                 |
+| `Styling.<suffix>.(s)css` / `Styling.(s)css` | Styling code. This can have a view layer suffix if different view layer implementations are required [(see table for details)](#swap-able-view-layers).                                                               | Styling              |
+| `Model.js`                                   | Business logic, implemented as a React Hook.                                                                                                                                                                          | Model                |
+| `Context.js`                                 | React Context component implementation. See the [Contexts](../client/Contexts/README.md) for details.                                                                                                                 | Contexts             |
+| `Hook.js`                                    | React custom hook implementation. See the [Hooks](../client/Hooks/README.md) for details.                                                                                                                             | Hooks                |
+| `<name>.feature`                             | Feature (spec) file for this component. Used to describe the behaviours of the component in user stories/goals.                                                                                                       |                      |
+| `<name>.steps.js`                            | Test file used to implement the `<name>.feature` file                                                                                                                                                                 |                      |
+| `<name>.spec.js`                             | (Unit) test file for component/utility it sits in.                                                                                                                                                                    |                      |
+| `<name>.stories.js`                          | [Storybook](#storybook) story implementation. Required for all components.                                                                                                                                            |                      |
+| `<name>.assets.js`                           | Common utility code - for use in tests, storybook. Can also define (and have as a part of the exported content) constant values                                                                                       |                      |
 
 ##### Routing and navigation
 
+This section to follow in a future PR.
+
 ##### Component topology
+
+This section to follow in a future PR.
 
 #### Server
 
@@ -103,39 +143,101 @@ Further details will be added to this section once https://github.com/strimzi/pr
 
 #### Configuration and feature flagging
 
+This section to follow in a future PR.
+
 ### Code Structure
 
 To support the goals of extensibility and aid consistency across the code base, the code in this repository has been arranged in an opinionated manner. This section will detail that structure, and why it has been set up in this way.
 
 #### Directory structure
 
-UI codebases tend to contain a large number of files, so sensible organisation not only keeps the code neat and tidy, but can help provide context for what particular areas do/are responsible for.  The following covers what directories exist in the root of this repository, and what they contain:
+UI codebases tend to contain a large number of files, so sensible organisation not only keeps the code neat and tidy, but can help provide context for what particular areas do/are responsible for. The following covers what directories exist in the root of this repository, and their content:
 
-| Directory        | Contains           |
-| ------------- | ------------- |
-| client        | All code served to the browser           |
-| docs        | All 'repository level' documentation          |
-| docs/assets        | Assets used to support documentation - images etc          |
-| server        | All code related to the UI server implementation           |
-| utils        | Utility code and configuration used by both client and server           |
+| Directory     | Contains                                                                                  |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| client/\*     | All code served to the browser                                                            |
+| docs          | All 'repository level' documentation                                                      |
+| docs/assets   | Assets used to support documentation - images etc                                         |
+| server/\*     | All code related to the UI server implementation                                          |
+| utils         | Utility code and configuration used by both client and server, and to support development |
+| utils/build   | Build implementation and configuration                                                    |
+| utils/headers | Copyright header statements                                                               |
+| utils/linting | Code style, linting and formatting configuration and supporting code                      |
 
-As mentioned in the Code Style document (https://github.com/strimzi/strimzi-ui/issues/4), all of these directories will contain a README file providing further details on what they contain.
+As mentioned in the Code Style document (https://github.com/strimzi/strimzi-ui/issues/4), all of these directories will include a README file providing further details on what they contain.
 
-#### Element Group Panel Bootstrap component pattern
+#### `Element` `Group` `Panel` `Bootstrap` component pattern
+
+React provides a declarative approach to building UIs by describing and defining UIs and their behaviours as composable components. Given a React component represents a composable UI capability, any and all components could be used in any scenario equally and repeatedly, regardless of if they represent a single line of text, or a whole page. This is one of React's great strengths. However, depending on the behaviour the component provides, and what properties and or context it needs to function, not all components when used in reality can be composed like this. Likewise, when implementing new elements of UI, it often is very easy to implement what you see in one monolithic component, rather than consider all the behaviours (thus components) that make up that UI. Finally, depending on the role these components play in the UI, further considerations, such as how and what they require to be tested should be tested also need to be contemplated.
+
+To combat these cases, the React components written to implement this UI have been deliberately classified into one of the four types, encapsulating their purpose, behaviour, usage, and how they are tested. This thus helps keep components composable and correctly scoped at design time, easy to develop/maintain when implemented, and ultimately help enable a good and consistent user experience. These types are detailed below:
+
+- [`Element`](../client/Element) are simple presentational components, taking only React `properties` as input
+- [`Group`](../client/Group) contain one to many `Element` components, and may also contain a Model to provide business logic
+- [`Panel`](../client/Panel) components contain zero to many `Element` and/or `Group` components. These typically will represent a page, and will have a Model to manage it's state
+- [`Bootstrap`](../client/Bootstrap) components bootstrap the UI - they set up state management, clients, and other top level UI items so the rest of the UI can operate
+
+The READMEs for each of these component types will cover the expectations from an implementation, test and usage point of view.
 
 #### Swap-able view layers
 
+One of the areas of extensibility this UI offers is that of the View layer implementation it uses. This allows the Strimzi-ui to quickly change it's look and feel if a user needs it to, while maintaining the same core business and backend logic that make the UI work. Implemented view layer implementations for the Strimzi-ui are detailed below, along with what environment variable (`VL`) value would need to be provided to build the UI using a particular View layer implementation:
+
+| Framework/Library used in view layer                        | Environment variable value `VL` | Code suffix       | Default (if environment variable not provided/all components have view layer provided) |
+| ----------------------------------------------------------- | ------------------------------- | ----------------- | -------------------------------------------------------------------------------------- |
+| [Carbon design system](https://www.carbondesignsystem.com/) | `CARBON`                        | `*.carbon.js`     | ✅                                                                                     |
+| [PatternFly](https://www.patternfly.org/v4/)                | `PATTERNFLY`                    | `*.patternfly.js` |                                                                                        |
+
+This dynamic view layer capability is possible due to our [Webpack Aliasing strategy](./Build.md#webpack-aliases), and [React Hooks](https://reactjs.org/docs/hooks-intro.html#motivation).
+
+React Hooks enable the sharing of common business logic between React components, without tightly coupling the given business logic to the rendering logic. The intent of Hooks are to share common utility logic between components, such as state management or translation tools. We use [(and have implemented our own)](../client/Hooks/README.md) hooks not only for this purpose, but to also provide business logic to components that need them in a `Model` hook. The `Model` hook owns all state management and business logic for a given component, and returns to the `View` layer any information it needs to render a result (in a reducer esq manner). Given a `Model` hook owning a component's state and logic, any number of `View` layer implementations could make use of that `Model`.
+
+These `View` layer implementations are expected to implement Framework specific rendering code, including importing any required styling, for the given component. Do note, if a component is either visually identical across all implementations, or only ever used in one framework, only one `View` layer implementation needs to be provided (and the View alias is not required).
+
+Given N `View` layer implementations for a component, we at build/development time use [a View Webpack alias](./Build.md#webpack-aliases) to then abstract these layers, and decide which is used in the UI. The provided `VL` environment variable value maps to a suffix, that is then substituted dynamically into the View Webpack alias. As an example, given a `Group` component `Bar`, it would contain the following files:
+
+```
+Group/
+  Bar/
+    index.js
+    View.carbon.js
+    Styling.carbon.scss
+    View.patternfly.js
+    Styling.patternfly.scss
+    Model.js
+    ...
+```
+
+At build time, the exported [`View` alias](./Build.md#webpack-aliases) used in `index.js`:
+
+```
+export * from 'View';
+```
+
+... will resolve to either one of `View.carbon.js` or `View.patternfly.js` (depending on the value of `VL`). In addition to the `View` alias, a `Styling` alias also will be provided, and is expected to be used to abstract between different (s)css implementations between the view layers.
+
+When used in other components, this would (in combination with the `Group`) alias mean a developer would use `Bar` in their code as follows:
+
+```
+...
+import { Bar } from 'Groups';
+...
+```
+
+Note that due to the aliases that the implementation details are completely abstracted. In addition, the `VL` environment variable value is also used to enable and disable framework specific linting and format rules.
+
+For this capability to work, [file name conventions](#file-name-conventions) need to be followed (so the aliases align with file names), and the properties/behaviours exposed by components should align: all that should be different should be how a capability is rendered - not it's capability. If different behaviours are required, different components should be implemented to provide these.
+
+_Note_: Implementation of this will follow in a future PR.
+
 ### Supporting utilities and tools
+
+To support development and test of the Strimzi UI, a number of tools and utilities are used. This section will detail those tools, what they are used for, and high level configuration and setup choices.
 
 #### Storybook
 
+This section to follow in a future PR.
+
 #### Mock admin server
 
-
-
-
-
-
-
-
-
+This section to follow in a future PR.
