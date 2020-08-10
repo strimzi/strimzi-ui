@@ -53,7 +53,7 @@ In addition to aliasing, the webpack configuration will be as follows:
 | Option        | Value           | Purpose  |
 | ------------- | ------------- | -----:|
 | entry      | `client/Bootstrap/index.js` | Build entry point. *Note:* the `scss/css` is expected to be imported by individual view layer code, which is imported (directly or indirectly) from this file. Details to follow in Code Style approach documentation regarding this styling approach and why.  |
-| mode      | `production` or `development` (provided via config file used) | Build mode. If production, code will be minified and have developer helpers (warning etc) removed from the built output |
+| mode      | `production` or `development` (provided via config file used) | Build mode. If production, code will be minified and have developer helpers (warnings etc) removed from the built output |
 | output.path      | `dist` (via constant) | All output to be placed in the `dist` directory |
 | output.publicPath      | `` (empty string) | The public path of static/public content included by Webpack. Is relative to the URL. |
 | output.filename       | `[name].bundle.js` | Name of the built entry bundle. Will be `main.bundle.js` once built as we have one entry point |
@@ -66,7 +66,7 @@ In addition to aliasing, the webpack configuration will be as follows:
 | resolve.alias      | Array of aliases | [See section above](#webpack-aliases) |
 | devServer      | Object | [See section below](#webpack-dev-server) |
 
-This configuration will be defined in separate files per build mode - ie one for `development` and one for `production` - to keep the configuration as minimal and readable as possible. Common configuration will be inherited/extended into these files. [See this section for more details](#ui-build-implementation).
+To keep the configuration as minimal and readable as possible, configuration will be defined in separate files per build mode - ie one for `development` and one for `production`. These configurations will extend a common configuration file. [See this section for more details](#ui-build-implementation).
 
 ##### Module rules
 
@@ -78,6 +78,8 @@ Webpack allows file specific loaders or utilities to be invoked as a part of the
 | `/(\.js)$/`      | `babel-loader` | Perform babel transpile on all JS files. This will be configured with presets for recent browsers, and enable caching to improve build performance |
 | `/\.(woff(2)?\|ttf\|eot)$/`      | `file-loader` | For any font file, use file-loader to package the font to the `output.path` and replace/update any imports of those fonts to this location. These will be directed to a 'fonts' directory |
 | `/\.(jpg\|gif\|png\|svg)$/`      | `file-loader` | For any image file, use file-loader to package the image to the `output.path` and replace/update any imports of those images to this location. These will be directed to a 'images' directory |
+
+The module loading rules will be provided via helper functions from a common configuration file, but allow for modification. [See this section for more details](#ui-build-implementation).
 
 ##### Webpack plugins
 
@@ -92,6 +94,8 @@ We also make use of the following plugins:
 | compression-webpack-plugin      | Compresses built output further using `gzip` algorithm, and emits these compressed files. Depending on headers provided by the browser, these gziped versions will be served to the browser, rather than the uncompressed versions |
 | webpack-bundle-analyzer      | At build time, produce a report regarding the JS bundle size (useful for understanding bloat and duplication). At dev build time this is an html file (which is then hosted by `webpack-dev-server`), and a json file at production build time. Each report is written to the `generated/bundle-analyser` directory |
 | BannerPlugin      | Used to add a copyright header to built css code. Other types handled by other plugins (eg TerserPlugin) |
+
+Where appropriate, plugins will be provided via helper functions from a common configuration file, but allow for modification to their configuration. [See this section for more details](#ui-build-implementation).
 
 ##### Terser plugin configuration
 
@@ -153,7 +157,7 @@ By default, `webpack-dev-server` will host the UI at `https://localhost:8080/`. 
 
 ### UI Build implementation
 
-The above UI build is implemented in the [`build directory`](../utils/build). It is broken down into common configuration (and a function that will return it and build constants), and individual use cases, such as dev and prod builds.
+The above UI build is implemented in the [`build directory`](../utils/build). It is broken down into common configuration (and a function that will return it, helper functions and build constants), and individual use cases, such as dev and prod builds.
 
 ## UI build into Strimzi
 

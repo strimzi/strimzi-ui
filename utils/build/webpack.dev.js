@@ -3,15 +3,42 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-const { returnWebpackConfigFor, plugins, CONSTANTS } = require('./webpack.common.js');
-const { withMiniCssExtractPlugin, withWebpackBundleAnalyzerPlugin } = plugins;
-const {DEVELOPMENT, BUILD_DIR, BUNDLE_ANALYSER_DIR} = CONSTANTS;
+const {
+    returnBasicConfigMergedWith,
+    plugins,
+    moduleLoaders,
+    CONSTANTS
+} = require('./webpack.common.js');
+const {
+    withHTMLPlugin,
+    withMiniCssExtractPlugin,
+    withWebpackBundleAnalyzerPlugin
+} = plugins;
+const {
+    withStylingModuleLoader,
+    withJSModuleLoader,
+    withFontModuleLoader,
+    withImageModuleLoader
+} = moduleLoaders;
+const {
+    DEVELOPMENT,
+    BUILD_DIR,
+    BUNDLE_ANALYSER_DIR
+} = CONSTANTS;
 
 const devHostname = process.env.DEV_HOSTNAME || 'localhost';
 const devPort = process.env.DEV_PORT || 8080;
 
 const devSpecificConfig = {
+    mode: DEVELOPMENT,
+    module: {
+        rules: [withStylingModuleLoader(['style-loader']), withJSModuleLoader(),
+            withFontModuleLoader(),
+            withImageModuleLoader(),
+        ]
+    },
     plugins: [
+        withHTMLPlugin(),
         withMiniCssExtractPlugin({
             hmr: true // enable hmr as well as standard config
         }),
@@ -35,4 +62,4 @@ const devSpecificConfig = {
     }
 };
 
-module.exports = returnWebpackConfigFor(DEVELOPMENT, devSpecificConfig);
+module.exports = returnBasicConfigMergedWith(devSpecificConfig);

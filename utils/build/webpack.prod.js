@@ -7,18 +7,29 @@
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
-const { BannerPlugin } = require('webpack');
+const {
+    BannerPlugin
+} = require('webpack');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const {
-    returnWebpackConfigFor,
+    returnBasicConfigMergedWith,
     plugins,
+    moduleLoaders,
     CONSTANTS
 } = require('./webpack.common.js');
 const {
     STRIMZI_HEADER
 } = require('../constants.js');
 const {
+    withStylingModuleLoader,
+    withJSModuleLoader,
+    withFontModuleLoader,
+    withImageModuleLoader
+} = moduleLoaders;
+const {
     withHTMLPlugin,
+    withMiniCssExtractPlugin,
     withWebpackBundleAnalyzerPlugin
 } = plugins;
 
@@ -27,6 +38,16 @@ const {
 } = CONSTANTS;
 
 const prodSpecificConfig = {
+    mode: PRODUCTION,
+    module: {
+        rules: [withStylingModuleLoader([{
+                loader: MiniCssExtractPlugin.loader
+            }]),
+            withJSModuleLoader(),
+            withFontModuleLoader(),
+            withImageModuleLoader(),
+        ]
+    },
     optimization: {
         minimize: true,
         minimizer: [
@@ -62,6 +83,7 @@ const prodSpecificConfig = {
                 useShortDoctype: true
             }
         }),
+        withMiniCssExtractPlugin(),
         // gzip compress all built js output
         new CompressionPlugin({
             test: /\\*\.js$/, // apply only on js files
@@ -81,4 +103,4 @@ const prodSpecificConfig = {
     ]
 };
 
-module.exports = returnWebpackConfigFor(PRODUCTION, prodSpecificConfig);
+module.exports = returnBasicConfigMergedWith(prodSpecificConfig);

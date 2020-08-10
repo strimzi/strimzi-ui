@@ -11,7 +11,6 @@ const {
     DEVELOPMENT
 } = require('../constants.js');
 const babelPresets = require('./babelPresets.js');
-const mergeWith = require('lodash.mergewith');
 
 // constants
 const UI_TITLE = 'Strimzi UI';
@@ -50,101 +49,93 @@ const withWebpackBundleAnalyzerPlugin = returnPluginWithConfig(BundleAnalyzerPlu
     openAnalyzer: false // do not auto open analyser tool
 });
 
-/**
- * merge doesnt combine arrays nicely - ie index 0 will overwrite existing index 0. Thus, if an array, merge all entries and reduce by 
- * name so we get a single set of unique object entries. If not an array, return undefined, and normal merge behaviour will trigger.
- */
-const configurationCombiner = (objValue, srcValue) => {
-    let combinedResult = undefined;
-    if (Array.isArray(objValue) && Array.isArray(srcValue)) {
-        combinedResult = Array.from( // get an arrray from
-            new Map( // a map which is given an array of key value pairs from
-                objValue.concat(srcValue) // merging the current array and the new array we are combining
-                .map(content => ([content.constructor.name, content]))) // using the name of the value as the key, and itself as the value
-            .values()); //and get the may as an iterable so it can be converted to an array
-    }
-    return combinedResult;
-};
+// common rules configuration
+const returnModuleRuleWithConfig = (defaultConfig = {}, defaultUse = []) => (customUse = [], customConfig = {}) => ({
+    ...defaultConfig,
+    ...customConfig,
+    use: [...customUse, ...defaultUse]
+});
 
-// exported helper function - returns common configuration, merged (via lodash) with any provided options. Provided options take precedence
-const returnWebpackConfigFor = (buildMode = DEVELOPMENT, customConfigurationForBuildMode = {}) => mergeWith({
+// you will need to provide either style-loader or MiniCssExtractPlugin.loader if prod
+const withStylingModuleLoader = returnModuleRuleWithConfig({
+    test: /(\.css|.scss)$/,
+    sideEffects: true, // the css loader requires sideEffects true, else no built css is emitted
+}, [{
+    loader: 'css-loader',
+},
+{
+    loader: 'sass-loader',
+    options: {
+        sassOptions: {
+            includePaths: ['node_modules'],
+        },
+    },
+},]);
+
+const withJSModuleLoader = returnModuleRuleWithConfig({
+    test: /\.(jsx|js)?$/,
+    exclude: /(node_modules)/,
+}, [{
+    loader: 'babel-loader',
+    options: {
+        cacheDirectory: true,
+        presets: babelPresets,
+    },
+}, ]);
+
+const withFontModuleLoader = returnModuleRuleWithConfig({
+    test: /\.(woff(2)?|ttf|eot)$/,
+}, [{
+    loader: 'file-loader',
+    options: {
+        name: '[name].[ext]',
+        publicPath: '/fonts/',
+        outputPath: 'fonts/',
+    },
+}, ]);
+
+const withImageModuleLoader = returnModuleRuleWithConfig({
+    test: /\.(jpg|gif|png|svg)$/,
+}, [{
+    loader: 'file-loader',
+    options: {
+        publicPath: '/images/',
+        outputPath: 'images/',
+    },
+}, ]);
+
+// exported helper function - returns common configuration, merged via object spread. Provided options take precedence
+const returnBasicConfigMergedWith = (customConfigurationForBuildMode = {}) => ({
     entry: `${BOOTSTRAP_DIR}/index.js`,
-    mode: buildMode === PRODUCTION ? PRODUCTION : DEVELOPMENT,
     output: {
         path: BUILD_DIR,
         publicPath: '',
         filename: '[name].bundle.js',
     },
     module: {
-        rules: [{
-                test: /(\.css|.scss)$/,
-                sideEffects: true, // the css loader requires sideEffects true, else no built css is emitted
-                use: [
-                    // if production, use the loader from MiniCssExtractPlugin - else style-loader (for hmr/speed). Done here (rather than individual files) for ease of merging given this one delta.
-                    buildMode === PRODUCTION ? {
-                        loader: MiniCssExtractPlugin.loader,
-                    } : 'style-loader',
-                    {
-                        loader: 'css-loader',
-                    },
-                    {
-                        loader: 'sass-loader',
-                        options: {
-                            sassOptions: {
-                                includePaths: ['node_modules'],
-                            },
-                        },
-                    },
-                ],
-            }, {
-                test: /\.(jsx|js)?$/,
-                exclude: /(node_modules)/,
-                use: [{
-                    loader: 'babel-loader',
-                    options: {
-                        cacheDirectory: true,
-                        presets: babelPresets,
-                    },
-                }, ],
-            },
-            {
-                test: /\.(woff(2)?|ttf|eot)$/,
-                use: [{
-                    loader: 'file-loader',
-                    options: {
-                        name: '[name].[ext]',
-                        publicPath: '/fonts/',
-                        outputPath: 'fonts/',
-                    },
-                }, ],
-            },
-            {
-                test: /\.(jpg|gif|png|svg)$/,
-                use: [{
-                    loader: 'file-loader',
-                    options: {
-                        publicPath: '/images/',
-                        outputPath: 'images/',
-                    },
-                }, ],
-            },
-        ]
+        // given the dynamic nature of rules and configuration, none a re provided by default. Use the exported `moduleLoaders` to return loaders with some default configs
+        rules: []
     },
-    plugins: [
-        withHTMLPlugin(),
-        withMiniCssExtractPlugin(),
-    ],
+        // given different build modes will require different plugins/plugin configuration, none are provided by default. Use the exported `plugins` for commonly used plugins with default configuration
+    plugins: [],
     resolve: {
         alias: webpackAliases
-    }
-}, customConfigurationForBuildMode, configurationCombiner);
+    },
+    ...customConfigurationForBuildMode
+});
 
 module.exports = {
-    returnWebpackConfigFor,
+    returnBasicConfigMergedWith,
     plugins: {
         withHTMLPlugin,
         withMiniCssExtractPlugin,
         withWebpackBundleAnalyzerPlugin
+    },
+    moduleLoaders: {
+        withStylingModuleLoader,
+        withJSModuleLoader,
+        withFontModuleLoader,
+        withImageModuleLoader
     },
     CONSTANTS: {
         UI_TITLE,
