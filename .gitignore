@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+# built content
+dist/
+
+# test/supporting generated content
+generated/
+
+# misc
+.history
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.npmrc
+.eslintcache
+
+#IDEs
+.vscode/
+.idea/
