@@ -1,15 +1,10 @@
-<!--
- Copyright Strimzi authors.
- License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
--->
-
 # Build
 
 This documentation will cover both the [building of the UI code](#ui-build), and also how it is [built and integrated with Strimzi](#ui-build-into-strimzi).
 
 ## UI build
 
-This UI is built using two tools, [Babel](https://babeljs.io/) and [Webpack](https://webpack.js.org/). Webpack acts as our main build and bundling tool, while Babel acts as a transpiler - meaning the UI codebase can make use of the latest and greatest ECMAscript syntax, and Babel will polyfill where appropriate to provide cross browser support. The below will detail choices we have made regarding how the build works, configuration and considerations to be aware of, and the end output. The aim of this stack is to have a fast and efficient built for day to day development, but also the smallest possible built bundles so users do not need to wait a long time for all required assets to be retrieved by their browser.
+This UI is built using two tools, [Babel](https://babeljs.io/) and [Webpack](https://webpack.js.org/). Webpack acts as our main build and bundling tool, while Babel acts as a transpiler - meaning the UI codebase can make use of the latest and greatest ECMAscript syntax, and Babel will polyfill where appropriate to provide cross browser support. The below will detail choices we have made regarding how the build works, configuration and considerations to be aware of, and the end output. The aim of this stack is to have a fast and efficient build for day to day development, but also the smallest possible built bundles so users do not need to wait a long time for all required assets to be retrieved by their browser.
 
 ### Treeshaking
 

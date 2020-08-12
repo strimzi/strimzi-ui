@@ -1,8 +1,3 @@
-<!--
- Copyright Strimzi authors.
- License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
--->
-
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Twitter Follow](https://img.shields.io/twitter/follow/strimziio.svg?style=social&label=Follow&style=for-the-badge)](https://twitter.com/strimziio)
 
@@ -42,7 +37,7 @@ Further details around how this UI is implemented can be found below:
 - [Build](./docs/Build.md)
 - [Linting](./docs/Linting.md)
 
-### Troubleshooting
+### Known issues
 
 #### `Signed-off-by` reported as not included in commit, when it is included
 

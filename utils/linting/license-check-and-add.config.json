@@ -1,6 +1,6 @@
 {
   "license": "./utils/headers/StrimziHeader.txt",
-  "ignore": [".**", ".git/**", "./utils/headers"],
+  "ignore": [".**", ".git/**", "./utils/headers", "**.md"],
   "licenseFormats": {
     "js|css|scss": {
       "prepend": "/*",
@@ -9,7 +9,7 @@
         "prepend": " * "
       }
     },
-    "html|md|svg": {
+    "html|svg": {
       "prepend": "<!-- ",
       "append": "-->",
       "eachLine": {

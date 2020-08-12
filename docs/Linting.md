@@ -1,8 +1,3 @@
-<!--
- Copyright Strimzi authors.
- License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
--->
-
 # Linting
 
 To maintain a consistent code style, as well as follow best practice, linting has been set up for this codebase. This document will cover what tools are used to lint this codebase, how they are configured, and what rules are in place to maintain a common style and approach.

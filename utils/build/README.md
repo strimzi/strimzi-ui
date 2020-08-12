@@ -1,8 +1,3 @@
-<!--
- Copyright Strimzi authors.
- License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
--->
-
 # Build
 
 This directory contains code relating to the building of the UI at dev and production build time. [Full details on how the build has been set up can be found here.](../../docs/Build.md). The intent is as much configuration is shared as possible from `webpack.common.js`, and the function it exports, `returnBasicConfigMergedWith`. This allows the various build modes to define (in an additive manner) just the configuration they need to, thus keeping the configuration purposeful/readable both in that file, and in common. If a new build mode is added, it should follow the form set by the `webpack.dev.js` and `webpack.prod.js`.
