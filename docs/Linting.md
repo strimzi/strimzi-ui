@@ -22,7 +22,7 @@ All configuration and any implementation for linting in this codebase is availab
 
 ## Linting rules
 
-This section will detail the rules implemented across the codebase, and a rationale to why these rules have been chosen. Apart from the [Git commit checks](#Git-commit-checks), all linting will occur pre commit, via a Husky hook ([`husky` config for this available here](../utils/linting/husky.config.js)). Alternatively, a developer can run these pre commit checks by running:
+This section will detail the rules implemented across the codebase, and a rationale to why these rules have been chosen. Apart from the [Git commit checks](#Git-commit-checks), all linting will occur pre commit, via a Husky hook ([`husky` config for this available here](../utils/linting/husky.config.js)) which will make use of [`lint-staged`](https://github.com/okonet/lint-staged) to lint only changes staged to be included in a given commit ([`lint-staged configuration available here`](../utils/linting/lint-staged.config.js)). Alternatively, a developer can run these pre commit checks by running:
 
 ```
 npm run lint
@@ -52,7 +52,7 @@ The following must be present in all git commits made to this repository. These 
 
 These checks can only be run having made a `git commit`.
 
-_Important note_: If you run into issues with the `All commits must have a signed-off-by entry` rule, [see this troubleshooting item, which covers a workaround for a known bug.](../README.md#signed-off-by-reported-as-not-included-in-commit,-when-it-is-included)
+_Important note_: If you run into issues with the `All commits must have a signed-off-by entry` rule, [see this known issue, which covers a workaround for a known bug.](../README.md#signed-off-by-reported-as-not-included-in-commit,-when-it-is-included)
 
 ### JS code
 

@@ -5,7 +5,7 @@
 
 // https://github.com/typicode/husky#supported-hooks
 const config = {
-  'pre-commit': 'npm run lint && git add .', // run the lint, and include any auto fixes
+  'pre-commit': 'lint-staged --config ./utils/linting/lint-staged.config.js',
   'commit-msg': 'commitlint -E HUSKY_GIT_PARAMS',
 };
 
