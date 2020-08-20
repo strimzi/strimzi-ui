@@ -5,7 +5,7 @@ This directory contains code relating to the building of the UI at dev and produ
 ## Files
 
 - `webpack.common.js` - contains common webpack configuration and helper functions. These are:
-  - `returnBasicConfigMergedWith` - a function which returns common configuration options. Any of these can be overriden if required. Check the file for parameters/usage.
+  - `returnBasicConfigMergedWith` - a function which returns common configuration options. Any of these can be overridden if required. Check the file for parameters/usage.
   - `moduleLoaders` - an object containing functions that will return module loading rules. These should be called when defining a build mode's `module.rules` value. The functions provided allow for custom values to be provided - see `webpack.common.js` for usage. Any common loaders should be provided/used this way, as it allows easy modification/extension, while keeping a sensible set of default values.
   - `plugins` - an object which contains functions which return the various plugins used across more than one build mode, with a common minimum configuration. These should be imported and called in a build mode's `plugins` array, with custom config passed to suit that mode. Any common plugins should be provided/used this way, as it allows easy modification/extension, while keeping a sensible set of default values.
   - `CONSTANTS` - an object which contains useful values for use in any build mode

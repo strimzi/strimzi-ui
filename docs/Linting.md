@@ -1,11 +1,6 @@
-<!--
- Copyright Strimzi authors.
- License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
--->
-
 # Linting
 
-To maintain a consistent code style, as well as follow best practise, linting has been set up for this codebase. This document will cover what tools are used to lint this codebase, how they are configured, and what rules are in place to maintain a common style and approach.
+To maintain a consistent code style, as well as follow best practice, linting has been set up for this codebase. This document will cover what tools are used to lint this codebase, how they are configured, and what rules are in place to maintain a common style and approach.
 
 ## Tools used
 
@@ -27,7 +22,7 @@ All configuration and any implementation for linting in this codebase is availab
 
 ## Linting rules
 
-This section will detail the rules implemented across the codebase, and a rationale to why these rules have been chosen. Apart from the [Git commit checks](#Git-commit-checks), all linting will occur pre commit, via a Husky hook ([`husky` config for this available here](../utils/linting/husky.config.js)). Alternatively, a developer can run these pre commit checks by running:
+This section will detail the rules implemented across the codebase, and a rationale to why these rules have been chosen. Apart from the [Git commit checks](#Git-commit-checks), all linting will occur pre commit, via a Husky hook ([`husky` config for this available here](../utils/linting/husky.config.js)) which will make use of [`lint-staged`](https://github.com/okonet/lint-staged) to lint only changes staged to be included in a given commit ([`lint-staged configuration available here`](../utils/linting/lint-staged.config.js)). Alternatively, a developer can run these pre commit checks by running:
 
 ```
 npm run lint
@@ -56,6 +51,8 @@ The following must be present in all git commits made to this repository. These 
 | All commits must have a signed-off-by entry | Required as an acknowledgement that the changes provided in that commit are the authors' own work, and that they have the permission to contribute this change |
 
 These checks can only be run having made a `git commit`.
+
+_Important note_: If you run into issues with the `All commits must have a signed-off-by entry` rule, [see this known issue, which covers a workaround for a known bug.](../README.md#signed-off-by-reported-as-not-included-in-commit,-when-it-is-included)
 
 ### JS code
 

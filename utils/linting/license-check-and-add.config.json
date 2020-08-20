@@ -1,0 +1,25 @@
+{
+  "license": "./utils/headers/StrimziHeader.txt",
+  "ignore": [".**", ".git/**", "./utils/headers", "**.md"],
+  "licenseFormats": {
+    "js|css|scss": {
+      "prepend": "/*",
+      "append": " */",
+      "eachLine": {
+        "prepend": " * "
+      }
+    },
+    "html|svg": {
+      "prepend": "<!-- ",
+      "append": "-->",
+      "eachLine": {
+        "prepend": " "
+      }
+    },
+    "dotfiles|prettierignore": {
+      "eachLine": {
+        "prepend": "# "
+      }
+    }
+  }
+}
