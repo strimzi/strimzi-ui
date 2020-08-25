@@ -29,7 +29,7 @@ This document will cover the core Architectural decisions made for this UI, how 
 
 ### Overview and objectives
 
-The purpose of this UI is to provide a user of Strimzi a delightful Kafka administration user experience. To achieve this, focus of course needs to be placed on things like the design to make the UI intuitive to use. However, user experience is more than just the design: it also is the code, and it's ability to enable those experiences. The following documentation will detail the deliberate design, engineering and behavioural choices made to achieve this objective.
+The purpose of this UI is to provide a user of Strimzi a web UI for Kafka administration. To achieve this, focus of course needs to be placed on things like the design to make the UI intuitive to use. However, user experience is more than just the design: it also is the code, and it's ability to enable those experiences. The following documentation will detail the deliberate design, engineering and behavioural choices made to achieve this objective.
 
 In addition, we have set the following behaviours/goals/considerations for all development done in this repository:
 
@@ -172,9 +172,9 @@ React provides a declarative approach to building UIs by describing and defining
 
 To combat these cases, the React components written to implement this UI have been deliberately classified into one of the four types, encapsulating their purpose, behaviour, usage, and how they are tested. This thus helps keep components composable and correctly scoped at design time, easy to develop/maintain when implemented, and ultimately help enable a good and consistent user experience. These types are detailed below:
 
-- [`Element`](../client/Element) are simple presentational components, taking only React `properties` as input
-- [`Group`](../client/Group) contain one to many `Element` components, and may also contain a Model to provide business logic
-- [`Panel`](../client/Panel) components contain zero to many `Element` and/or `Group` components. These typically will represent a page, and will have a Model to manage it's state
+- [`Element`](../client/Elements) are simple presentational components, taking only React `properties` as input
+- [`Group`](../client/Groups) contain one to many `Element` components, and may also contain a Model to provide business logic
+- [`Panel`](../client/Panels) components contain zero to many `Element` and/or `Group` components. These typically will represent a page, and will have a Model to manage it's state
 - [`Bootstrap`](../client/Bootstrap) components bootstrap the UI - they set up state management, clients, and other top level UI items so the rest of the UI can operate
 
 The READMEs for each of these component types will cover the expectations from an implementation, test and usage point of view.
@@ -197,7 +197,7 @@ These `View` layer implementations are expected to implement Framework specific 
 Given N `View` layer implementations for a component, we at build/development time use [a View Webpack alias](./Build.md#webpack-aliases) to then abstract these layers, and decide which is used in the UI. The provided `VL` environment variable value maps to a suffix, that is then substituted dynamically into the View Webpack alias. As an example, given a `Group` component `Bar`, it would contain the following files:
 
 ```
-Group/
+Groups/
   Bar/
     index.js
     View.carbon.js
