@@ -28,4 +28,4 @@ Where:
 
 ## Available contexts
 
-Contexts to be added here on implementation, with summary of purpose/usage and a link to it's README.
+- [`Introspect`](./Introspect/README.md) - responsible for fetching, parsing and providing the UI with the supported capabilities of the backend GraphQL server
