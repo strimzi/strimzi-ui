@@ -34,6 +34,7 @@ If you run into any issues while working in this repo, please check out [the tro
 
 Further details around how this UI is implemented can be found below:
 
+- [Architecture](./docs/Architecture.md)
 - [Build](./docs/Build.md)
 - [Linting](./docs/Linting.md)
 

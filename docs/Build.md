@@ -21,7 +21,33 @@ Webpack (and it's plugins) are highly customisable. This section will detail the
 
 The UI makes extensive use of Webpack's [alias](https://webpack.js.org/configuration/resolve/#resolvealias) features. This is done for two reasons:
 
-1. It allows for abstraction at build time. By importing view layers via an alias the resolution of that alias can be changed at build time, enabling the ability to swap view layer implementations without needing to make changes in the production code.
+1. It allows for abstraction at build time. By importing view layers via an alias the resolution of that alias can be changed at build time, enabling the ability to swap view layer implementations without needing to make changes in the production code. For instance:
+
+- If a component has [multiple view layer implementations](./Architecture.md#swap-able-view-layers):
+
+```
+  ...
+  View.carbon.js
+  View.patternfly.js
+  ...
+```
+
+- And the component exports itself via the View alias:
+
+```
+export * from 'View'
+```
+
+- And the View alias is defined as follows:
+
+```
+...
+    View: `./View.${VL_SUFFIX}.js`
+...
+```
+
+where `VL_SUFFIX` is a suffix, in this case mapping to in this case either `carbon` or `patternfly`. At build time, one of the two layers is resolved, and thus available for use elsewhere.
+
 2. It makes importing code far cleaner and easier. For example, a traditional import of a module in another directory:
 
 ```
@@ -44,7 +70,7 @@ becomes
 import { myFunction } from 'MyModule'
 ```
 
-For convenience, all top level module directories from `client` will be automatically aliased via a helper in the webpack configuration, as well defining a view, model and styling aliases.
+For convenience, all top level module directories from `client` will be automatically aliased via a helper in the webpack configuration, as well defining dynamic view and styling aliases as described above, as well as an alias for model code.
 
 #### Webpack configuration and plugins
 
@@ -162,4 +188,4 @@ The above UI build is implemented in the [`build directory`](../utils/build). It
 
 ## UI build into Strimzi
 
-This section to be completed once build/packaging integration with Strimzi has been agreed upon.
+This will be completed once https://github.com/strimzi/proposals/pull/6 has been finalized.
