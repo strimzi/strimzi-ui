@@ -18,11 +18,43 @@ The properties expected by this component are as follows:
 
 Additional properties to follow in a later PR.
 
+## Provided helpers/state to components on render
+
+When a route is accessed, a component (as per the configuration provided via [props](#Properties)) will be rendered by the Navigation component. As a part of this rendering, a number of helper functions, as well as navigation state, will be passed to that rendered component via a `navigationState` property (as well as any other defined properties to pass as [as per that page's configuration](../../Pages/README.md#page-metadata-schema)). This allows the Navigation to own/manage navigation state and functionality, but still allow any rendered components the ability to access or make changes to the navigation they need. The snippet below details the content of the `navigationState` property:
+
+```
+{
+    state: {
+        path: {
+            ':name': 'myTopic',
+            ...
+        },
+        query: {
+            showSlideout: 'true',
+            ...
+        }
+    },
+    goBack: () => ...,
+    hasRoute: (route) => ...,
+    renderLinkTo: (route, [pathParams, [queryParams]]) => ...,
+    goTo: (route, [pathParams, [queryParams]]) => ...
+}
+
+```
+
+Where:
+
+- `state` contains the current navigation state a component may be interested in, including:
+  - `path` are the path parameters in the current URL. The keys are path parameter names, as defined in the route
+  - `query` are any query parameters present in the current URL
+- `goBack` is a function to go back to the previous page Strimzi-ui page (if the previous page is a Strimzi-ui page - if not returns to `/`)
+- `hasRoute` is a function that returns `true`/`false` if the route provided by parameter exists/has been created by the Navigation. This could be called to inform if `renderLinkTo` or `goTo` need to be called (if a route/page does or does not exist). `route` is the string provided in page metadata
+- `renderLinkTo` is a function that returns JSX for a clickable link which is rendered in the page which will redirect. The parameters provided will set where the link goes. This is preferred over using a standard anchor element as these (pending attributes) could cause an un-needed full page redirect. `route` is the string provided in page metadata
+- `goTo` is a function that will programmatically redirect/update the URL to the provided values (as if the user had clicked a link to change page). `route` is the string provided in page metadata
+
 ## Example usage
 
 To follow in a later PR.
-
-_Note/To do_: Describe/define how path parameters, as well as helper functions, such as 'go back to the previous Strimzi ui page', 'go to this page by ID', or 'is this page available by ID', are passed to pages mounted by the router.
 
 ## Route configuration processing
 
@@ -31,10 +63,9 @@ As mentioned, this component takes in [configuration](../../Pages/README.md) whi
 ```
 {
     Homepage: {
-        contentComponent: HomePageComponent,
+        contentComponent: HomePageComponent, // synchronous import - meaning it will be included in the core bundle returned to the user
         contexts: [
             {
-                id: 'Home',
                 path: '/homepage'
                 name: 'HOME_TRANSLATION_KEY', // when translated will map to the string 'Home'
                 feature_flag: 'PAGE.HOME',
@@ -50,10 +81,9 @@ As mentioned, this component takes in [configuration](../../Pages/README.md) whi
         ]
     },
     ConsumerGroups: {
-        contentComponent: () => import('Panels/ConsumerGroups'), // async import
+        contentComponent: () => import('Panels/ConsumerGroups'), // async import - returned when accessed/needed for the first time
         contexts: [
             {
-                id: 'ConsumerGroups.Cluster',
                 path: '/consumergroups'
                 name: 'CONSUMER_GROUPS_TRANSLATION_KEY', // when translated will map to the string 'Consumer Groups'
                 feature_flag: 'PAGE.CONSUMER_GROUPS',
@@ -73,7 +103,6 @@ As mentioned, this component takes in [configuration](../../Pages/README.md) whi
                 }
             },
             {
-                id: 'ConsumerGroups.Topic',
                 path: '/topic/:name/consumergroups'
                 name: 'CONSUMER_GROUPS_TRANSLATION_KEY', // when translated will map to the string 'Consumer Groups'
                 feature_flag: 'PAGE.TOPIC.CONSUMER_GROUPS',
@@ -99,7 +128,6 @@ As mentioned, this component takes in [configuration](../../Pages/README.md) whi
         contentComponent: () => import('Panels/Topics'), // async import
         contexts: [
             {
-                id: 'Topics',
                 path: '/topics'
                 name: 'TOPICS_TRANSLATION_KEY', // when translated will map to the string 'Topic'
                 feature_flag: 'PAGE.TOPICS',
@@ -122,7 +150,6 @@ As mentioned, this component takes in [configuration](../../Pages/README.md) whi
         contentComponent: () => import('Panels/TopicsEdit'), // async import
         contexts: [
             {
-                id: 'Topics.Edit',
                 path: '/topics/:name/edit'
                 name: 'TOPICS_EDIT_TRANSLATION_KEY', // when translated will map to the string 'Edit topic ${name}' - where name is the value from the path parameter :name
                 feature_flag: 'PAGE.TOPICS.EDIT',

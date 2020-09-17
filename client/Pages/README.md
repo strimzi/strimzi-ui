@@ -11,7 +11,6 @@ export const Topic { // for purposes of example, a Topic page/capability
     contentComponent: () => import('Panel/Topic') // reference to the panel being used for this capability - this is an aysnc example
     contexts: [ // all the contexts or scenarios that panel component is used in
         {
-            id: 'TOPICS.EDIT',
             path: '/topics/edit',
             name: 'TOPICS_EDIT_NAME_TRANSLATION_KEY',
             feature_flag: 'PAGE.TOPICS.EDIT',
@@ -32,7 +31,6 @@ export const Topic { // for purposes of example, a Topic page/capability
             }
         },
         {
-            id: 'TOPICS.LIST',
             path: '/topics',
             name: 'TOPICS_NAME_TRANSLATION_KEY',
             feature_flag: 'PAGE.TOPICS',
@@ -57,8 +55,7 @@ export const Topic { // for purposes of example, a Topic page/capability
 Where:
 
 - `contentComponent` - binds a panel to each page `context` in the contexts array. This can ether be a module (meaning the panel will be included in the main bundle) or a function, which will then be integrated with React Suspense/Lazy to asynchronously load the panel when required
-- `contexts[X].id` - ID for this context. Used by other contexts to reference each other (in cases of redirection, checking if this context is available for this user etc)
-- `contexts[X].path` - path/location of this page. No two `contexts` should have the same path
+- `contexts[X].path` - path/location of this page. Used as a unique identifier, two `contexts` should have the same path.
 - `contexts[X].name` - translation key which maps to the name for this page, which will be shown (as required) by the navigation
 - `contexts[X].feature_flag` - the feature flag to check for to enable or disable this page - more details to follow in/as a part of https://github.com/strimzi/strimzi-ui/issues/13
 - `contexts[X].order` - numeric value to enable sorting if when processed there are peers to this page, and a specific ordering is desired
