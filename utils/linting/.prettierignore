@@ -3,4 +3,5 @@
 # prettier ignore file - files/directories to be excluded
 dist/
 generated/
-utils/linting/.eslintignore
+coverage/
+.*

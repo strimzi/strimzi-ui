@@ -45,16 +45,40 @@ test assets, such as `describe`, `it` and `expect`:
 - `client/Hooks`
 - `client/Contexts`
 
+#### File structure
+
+TDD tests should live in a '\_\_tests\_\_' folder next to the component they are testing.
+
+- MyComponent
+  - MyComponent.ts
+  - \_\_tests\_\_
+    - MyComponent.spec.ts
+
 ### Behavioural Driven Development
 
 Code in the following directories are expected to be driven by behavioural
-driven deveopment. They use _Jest_ as a test runner, using standard Jest test
-assets, such as `describe`, `it` and `expect`, and _RTL_ to mount and interact
-with React component code:
+driven deveopment. They use _Jest_ as a test runner, with _jest-cucumber-fusion_
+to link jest and cucumber. Jest `expects` and all aspects of `RTL` can still be
+used to test React code:
 
 - `client/Elements`
 - `client/Groups`
 - `client/Panels`
+
+Common step definitions should be defined in `uits/test/support/common_stepdefs.ts`.
+
+#### File structure
+
+BDD tests should have a feature file that live in the root of the
+'\_\_tests\_\_' folder of the component they are testing. With the step
+definitions defined in a `step_definitions` folder.
+
+- MyComponent
+  - MyComponent.ts
+  - \_\_tests\_\_
+    - MyComponent.feature
+    - step_definitions
+      - MyComponent.steps.ts
 
 ### Server Testing
 

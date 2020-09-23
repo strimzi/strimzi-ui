@@ -2,7 +2,7 @@
   "license": "./utils/headers/StrimziHeader.txt",
   "ignore": [".**", ".git/**", "./utils/headers", "**.md", "**.pptx"],
   "licenseFormats": {
-    "js|css|scss": {
+    "js|ts|tsx|css|scss": {
       "prepend": "/*",
       "append": " */",
       "eachLine": {
@@ -16,7 +16,7 @@
         "prepend": " "
       }
     },
-    "dotfiles|prettierignore": {
+    "dotfiles|prettierignore|feature": {
       "eachLine": {
         "prepend": "# "
       }

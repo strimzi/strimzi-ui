@@ -16,6 +16,9 @@ const relativeAliases = {
   Styling: './Styling.scss',
 };
 
+const relativeMocks = Object.keys(relativeAliases).join('|');
+const ignoredBinaries = ['png', 'svg', 'ico', 'scss'].join('|');
+
 const modules = moduleNames.reduce((moduleConfig, name) => {
   const currentModule = {
     path: path.resolve(__dirname, `../client/${name}`),
@@ -35,6 +38,20 @@ const webpackAliases = Object.entries(modules).reduce(
   { ...relativeAliases }
 );
 
+const jestModuleMapper = Object.values(modules).reduce(
+  (mapping, currentModule) => {
+    const {
+      mapper: { regex, path },
+    } = currentModule;
+    return { ...mapping, [regex]: path };
+  },
+  {
+    [`^(${relativeMocks})(.*)$`]: '<rootDir>/utils/test/mockfile.util.js',
+    [`^.+\\.(${ignoredBinaries})$`]: '<rootDir>/utils/test/mockfile.util.js',
+  }
+);
+
 module.exports = {
   webpackAliases,
+  jestModuleMapper,
 };

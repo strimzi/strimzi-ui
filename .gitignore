@@ -8,6 +8,7 @@ dist/
 
 # test/supporting generated content
 generated/
+coverage/
 
 # misc
 .history

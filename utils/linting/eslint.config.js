@@ -23,6 +23,8 @@ module.exports = {
     browser: true,
     node: true,
     es6: true,
+    'jest/globals': true,
+    'cypress/globals': true,
   },
   // extend recommended rule sets - combine with prettier config, which must go last to work properly
   extends: rulesets.concat(['prettier']),
@@ -33,7 +35,7 @@ module.exports = {
     },
     sourceType: 'module',
   },
-  plugins: ['react'],
+  plugins: ['react', 'jest', 'cypress'],
   // detect and use the version of react installed to guide rules used
   settings: {
     react: {
