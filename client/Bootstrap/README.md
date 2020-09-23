@@ -6,7 +6,7 @@ While it's own directory, the code in this directory should be tested and develo
 
 ## Test approach
 
-To be defined in https://github.com/strimzi/strimzi-ui/issues/7
+Bootstrap should be tested in a behavioural manor. See [Behavioural test style](../../docs/Test.md#behavioural-test-style).
 
 ## Expected files
 

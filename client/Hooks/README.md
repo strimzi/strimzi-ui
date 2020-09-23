@@ -4,7 +4,7 @@ This directory contains all re-usable custom [React Hooks](https://reactjs.org/d
 
 ## Test approach
 
-To be defined in https://github.com/strimzi/strimzi-ui/issues/7
+Elements should be tested in a functional manor. See [Functional test style](../../docs/Test.md#functional-test-style).
 
 ## Expected files
 

@@ -4,7 +4,7 @@ A `Panel` component represents a top level element of a UI - the primary/signifi
 
 ## Test approach
 
-To be defined in https://github.com/strimzi/strimzi-ui/issues/7
+Elements should be tested in a behavioural manor. See [Behavioural test style](../../docs/Test.md#behavioural-test-style).
 
 ## Expected files
 
