@@ -4,7 +4,7 @@
 
 ## Test approach
 
-Elements should be tested in a behavioural manor. See [Behavioural test style](../../docs/Test.md#behavioural-test-style).
+Bootstrap should be tested in a behavioural manor. See [Behavioural Driven Development](../../docs/Test.md#style-of-test).
 
 ## Expected files
 

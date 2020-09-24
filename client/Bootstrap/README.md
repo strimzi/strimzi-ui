@@ -6,7 +6,7 @@ While it's own directory, the code in this directory should be tested and develo
 
 ## Test approach
 
-Bootstrap should be tested in a behavioural manor. See [Behavioural test style](../../docs/Test.md#behavioural-test-style).
+Bootstrap should be tested in a behavioural manor. See [Behavioural Driven Development](../../docs/Test.md#style-of-test).
 
 ## Expected files
 

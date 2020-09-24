@@ -6,7 +6,7 @@ It is expected that when used in production Context Provider(s) will be used by 
 
 ## Test approach
 
-Elements should be tested in a functional manor. See [Functional test style](../../docs/Test.md#functional-test-style).
+Elements should be tested in a functional manor. See [Test Driven Development](../../docs/Test.md#style-of-test).
 
 ## Expected files
 

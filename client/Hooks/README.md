@@ -4,7 +4,7 @@ This directory contains all re-usable custom [React Hooks](https://reactjs.org/d
 
 ## Test approach
 
-Elements should be tested in a functional manor. See [Functional test style](../../docs/Test.md#functional-test-style).
+Elements should be tested in a functional manor. See [Test Driven Development](../../docs/Test.md#style-of-test).
 
 ## Expected files
 

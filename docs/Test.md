@@ -15,38 +15,42 @@ rationale for these are detailed below.
 
 ## Style of test
 
-We have two styles of test - `Behavioural` and `Functional`.
+We have two approaches of testing at the unit level - `Behavioural driven development`
+and standard `Test driven development`.
 
-`Behavioural` tests focus on exactly that - behaviour. They do not target
-individual functons, but instead test an end to end behaviour (and all the
-functions which contribute to it), and validate that for a given set of actions
-or inputs, that the expected output/end goal is met. These behaviours should
-focus on the user of the component. Depending on the type of code being
-developed, the user may be another developer (using the component for example)
-or the end user of the UI.
+`Behavioural driven development` tests focus on exactly that - behaviour. They
+do not target individual functons, but instead test an end to end behaviour
+(and all the functions which contribute to it), and validate that for a given
+set of actions or inputs, that the expected output/end goal is met. These
+behaviours should focus on the user of the component. Depending on the type of
+code being developed, the user may be another developer (using the component
+for example) or the end user of the UI.
 
-`Functional` tests conversely target individual functions in a more traditional
-unit test style - validating that for a given input, the expected output is
-returned.
+`Test driven development` tests conversely target individual functions in a
+more traditional unit test style - validating that for a given input, the
+expected output is returned.
+
+Both styles of test should live in the same directory as the components they
+are testing.
 
 Depending on the code being covered, the tools used to enable these test styles
 may be different, as detailed below.
 
-### Functional test style
+### Test Driven Development
 
-Code in the following directories are expected to be tested by `functional`
-test methods, using _Jest_ as a test runner, using standard Jest test assets,
-such as `describe`, `it` and `expect`:
+Code in the following directories are expected to be driven by standard test
+driven development. They use _Jest_ as a test runner, using standard Jest
+test assets, such as `describe`, `it` and `expect`:
 
 - `client/Hooks`
 - `client/Contexts`
 
-### Behavioural test style
+### Behavioural Driven Development
 
-Code in the following directories are expected to be tested by `behavioural`
-test methods, using _Jest_ as a test runner, using standard Jest test assets,
-such as `describe`, `it` and `expect`, and _RTL_ to mount and interact with
-React component code:
+Code in the following directories are expected to be driven by behavioural
+driven deveopment. They use _Jest_ as a test runner, using standard Jest test
+assets, such as `describe`, `it` and `expect`, and _RTL_ to mount and interact
+with React component code:
 
 - `client/Elements`
 - `client/Groups`
@@ -91,7 +95,7 @@ confirm the test is clean and will be reliable:
   1. Perform any required setup
   2. Perform an action (or actions)
   3. Assert the result
-  4. Perform any required tidyup
+  4. Perform any required clean up
 
 ## Code coverage
 
