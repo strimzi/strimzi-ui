@@ -13,14 +13,20 @@ This document will cover the core Architectural decisions made for this UI, how 
 - [Strimzi integration](#strimzi-integration)
 - [Implementation details](#implementation-details)
   - [Front end (client)](#client)
-    - [Technologies and patterns used](#technologies-and-patterns-used)
+    - [Technologies and patterns used](#client-technologies-and-patterns-used)
     - [File name conventions](#file-name-conventions)
     - [Routing and navigation model](#routing-and-navigation)
     - [GraphQL Introspection](#introspection)
     - [Component topology](#component-topology)
   - [Back end (server)](#server)
+    - [Technologies and patterns used](#server-technologies-and-patterns-used)
+    - [`Router`, `Controller`, `Data` pattern](#router-controller-data-pattern)
   - [Entity model](#entity-model)
   - [Configuration and feature flagging](#configuration-and-feature-flagging)
+    - [Configuration types and usage](#configuration-types-and-usage)
+    - [Client specific configuration](#client-configuration)
+    - [Server specific configuration](#server-configuration)
+    - [Feature flags](#feature-flags)
 - [Code structure](#code-structure)
   - [Directory structure](#directory-structure)
   - [`Element`, `Group`, `Panel`, `Bootstrap` component pattern](#element-group-panel-bootstrap-component-pattern)
@@ -98,7 +104,7 @@ This section will detail implementation and design choices made for both the [cl
 
 This section will detail the high level design choices made when designing and implementing this UI.
 
-##### Technologies and patterns used
+##### Client Technologies and patterns used
 
 A modern UI is made up of and enabled by many different technologies and implementation patterns. This section will detail what tools have been used to implement this UI, with a brief rationale to why.
 
@@ -119,20 +125,23 @@ This UI makes use of:
 
 As mentioned above, the Strimzi-ui, inspired by the MVC pattern, separates business logic from rendering logic. This means a component's logic will be split across multiple files. In addition, for capabilities such as [swappable view layers](#swappable-view-layers) to work, file names need to be known and consistent. Thus, a set of file name conventions should be followed to not only enable these capabilities, but also to standardise and make the codebase more approachable.
 
-| Filename                                     | Contains/used for                                                                                                                                                                                                     | Alias (if available) |
-| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| `index.js`                                   | Barrel file. Used to export modules/components/functions.                                                                                                                                                             |                      |
-| `View.<suffix>.js` / `View.js`               | Contains React component rendering logic. This can have a view layer suffix if different view layer implementations are required [(see table for details)](#swappable-view-layers). Should be a functional component. | View                 |
-| `Styling.<suffix>.(s)css` / `Styling.(s)css` | Styling code. This can have a view layer suffix if different view layer implementations are required [(see table for details)](#swappable-view-layers).                                                               | Styling              |
-| `Model.js`                                   | Business logic, implemented as a React Hook.                                                                                                                                                                          | Model                |
-| `Context.js`                                 | React Context component implementation. See the [Contexts](../client/Contexts/README.md) for details.                                                                                                                 | Contexts             |
-| `Hook.js`                                    | React custom hook implementation. See the [Hooks](../client/Hooks/README.md) for details.                                                                                                                             | Hooks                |
-| `<name>.feature`                             | Feature (spec) file for this component. Used to describe the behaviours of the component in user stories/goals.                                                                                                       |                      |
-| `<name>.steps.js`                            | Test file used to implement the `<name>.feature` file.                                                                                                                                                                |                      |
-| `<name>.spec.js`                             | (Unit) test file for component/utility it sits in.                                                                                                                                                                    |                      |
-| `<name>.stories.js`                          | [Storybook](#storybook) story implementation. Required for all components.                                                                                                                                            |                      |
-| `<name>.assets.js`                           | Common utility code - for use in tests, storybook. Can also define (and have as a part of the exported content) constant values.                                                                                      |                      |
-| `<name>.page.js`                             | Page metadata module. Should only be present in the `Client/Pages` directory. See [here for more details](../client/Pages/README.md).                                                                                 | Pages                |
+| Filename                                     | Contains/used for                                                                                                                                                                                                                                                  | Alias (if available) |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------- |
+| `index.js`                                   | Barrel file. Used to export modules/components/functions.                                                                                                                                                                                                          |                      |
+| `View.<suffix>.js` / `View.js`               | Contains React component rendering logic. This can have a view layer suffix if different view layer implementations are required [(see table for details)](#swap-able-view-layers). Should be a functional component.                                              | View                 |
+| `Styling.<suffix>.(s)css` / `Styling.(s)css` | Styling code. This can have a view layer suffix if different view layer implementations are required [(see table for details)](#swap-able-view-layers).                                                                                                            | Styling              |
+| `Model.js`                                   | Business logic, implemented as a React Hook.                                                                                                                                                                                                                       | Model                |
+| `Context.js`                                 | React Context component implementation. See the [Contexts](../client/Contexts/README.md) for details.                                                                                                                                                              | Contexts             |
+| `Hook.js`                                    | React custom hook implementation. See the [Hooks](../client/Hooks/README.md) for details.                                                                                                                                                                          | Hooks                |
+| `<name>.feature`                             | Feature (spec) file for this component. Used to describe the behaviours of the component in user stories/goals.                                                                                                                                                    |                      |
+| `<name>.steps.js`                            | Test file used to implement the `<name>.feature` file.                                                                                                                                                                                                             |                      |
+| `<name>.spec.js`                             | (Unit) test file for component/utility it sits in.                                                                                                                                                                                                                 |                      |
+| `<name>.stories.js`                          | [Storybook](#storybook) story implementation. Required for all components.                                                                                                                                                                                         |                      |
+| `<name>.assets.js`                           | Common utility code - for use in tests, storybook. Can also define (and have as a part of the exported content) constant values.                                                                                                                                   |                      |
+| `<name>.page.js`                             | Page metadata module. Should only be present in the `Client/Pages` directory. See [here for more details](../client/Pages/README.md).                                                                                                                              | Pages                |
+| `router.js`                                  | UI server express logic. Maps a context route or routes to a `controller` to perform the request. See [here for more details.](#router-controller-data-pattern)                                                                                                    |                      |
+| `controller.js`                              | UI server business logic. Performs an action given an HTTP/WS request from a `router`. If the action is to return data, its should do so using a structure defined in a corresponding `data.js` file. See [here for more details](#router-controller-data-pattern) |                      |
+| `data.js`                                    | UI server data response shapes/helper logic. Where a controller wants to return a response, the shape/logic to produce that shape should be defined here. See [here for more details](#router-controller-data-pattern)                                             |                      |
 
 ##### Routing and navigation
 
@@ -163,7 +172,53 @@ This section to follow in a future PR.
 
 #### Server
 
-Further details will be added to this section once https://github.com/strimzi/proposals/pull/6 and https://github.com/strimzi/proposals/pull/9 have been finalized, under issue https://github.com/strimzi/strimzi-ui/issues/16 .
+This section will detail the purpose and implementation choices made around the Strimzi ui's UI server.
+
+##### Server Technologies and patterns used
+
+The server, like the client code, makes use of a number of technologies and pattern(s). These are detailed below, along with a summary to what they provide.
+
+- The node.js http(s) server modules ([http module](https://nodejs.org/api/http.html), [https module](https://nodejs.org/api/https.html)) to provide the core of the server, which can be configured as required given [the provided configuration](#configuration-and-feature-flagging)
+- [Redis](https://redis.io/) to provide (ephemeral) session persistance
+- [express](https://expressjs.com/) to provide routing and middleware support for a given http(s) server. Some of the middleware will include:
+  - [Helmet](https://helmetjs.github.io/) to provide common/best practice HTTP header security options/settings
+  - [express-session](https://github.com/expressjs/session) and [connect-redis](https://github.com/tj/connect-redis) for session management and simple Redis integration
+  - [body-parser](https://github.com/expressjs/body-parser) and [cookie-parser](https://github.com/expressjs/cookie-parser) for additional request parsing and sanitisation
+- [node-http-proxy](https://github.com/http-party/node-http-proxy) to provide HTTP and WS proxy support
+- Code, defined in modules based on their responsibility, further separated into a [`Router`, `Controller`, `Data` pattern](#router-controller-data-pattern), a form of the [Model View Controller (MVC)](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) design pattern for keeping express, business, and additional data fetching logic separate
+
+##### `Router`, `Controller`, `Data` pattern
+
+The UI server has been split into separate modules to deliberately separate the different types of logic/areas of responsibility. These modules, their responsibilities and configuration details are listed below.
+
+| Module  | Responsibility                                                                                                                                                                                                                                                      | Configuration key (`modules.<name>`) | Context root |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ------------ |
+| api     | Event handlers which will proxy GraphQL requests onto `Strimzi-admin`                                                                                                                                                                                               | APIRouter                            | `/api`       |
+| config  | Event handlers which provide a GraphQL API to retrieve all Strimzi-ui configuration values                                                                                                                                                                          | ConfigRouter                         | `/config`    |
+| core    | The core Express server, responsible for bringing in all other modules, providing logging and auth checking capabilities as well common security settings. This is always enabled/present.                                                                          | N/A                                  | N/A          |
+| client  | Event handlers for serving the built client code to a web browser (the content of `dist/client`). Not enabled in dev mode, as `webpack-dev-server` will host client content.                                                                                        | ClientRouter                         | `/`          |
+| mockapi | A mock implementation of the `Strimzi-admin` server. In addition to the implementation of the `Strimzi-admin` api, it also will provide additional dev/test handlers which can control server behaviour. Used in development and test scenarios, not in production. | MockAPIRouter                        | `/api`       |
+| log     | Event handlers for client logging delivery                                                                                                                                                                                                                          | LogRouter                            | `/log`       |
+
+The modules themselves are split into a number of files, each of which are responsible for one aspect of handling a request. These responsibilities and files are:
+
+- `router` - express server logic to tie a route to a handler, defined in a `controller`. The core express server will interact with the `router` only. This keeps all express logic in one file
+- `controller` - any business logic which should run when a root is called. This takes the form of an [`express middleware` function.](https://expressjs.com/en/guide/writing-middleware.html)
+- `data` - if the controller needs to return data, those shapes should be defined in `data` files, which are returned/used by the `controller`
+
+Thus, a module (`foo`) which contributes to the UI server would look as follows in the repository:
+
+```
+server/
+  foo/
+    index.js
+    router.js
+    controller.js
+    data.js
+    ...
+```
+
+As mentioned, the core module will import and interact with any other module's `router` via the `index.js` barrel file. Further details of this interaction can be found in [the core module's README.](../server/core/README.md)
 
 #### Entity model
 
@@ -191,7 +246,52 @@ _Note_: Implementation to follow in a later PR.
 
 #### Configuration and feature flagging
 
-This section to follow in a future PR/as a part of https://github.com/strimzi/strimzi-ui/issues/13 .
+This section will detail the approach to how configuration is handled and used in the Strimzi-ui. The intent of having this configuration strategy is to allow for the flexibility to dynamically change and alter the functionality and capability of the UI with minimal/no code changes required.
+
+##### Configuration types and usage
+
+All configuration fundamentally are key value pairs, which enables the abstraction of the value, and where it is used. These values are either known constants in advance, or need to be derived at runtime based on the environment. Depending on the use case (eg [feature flags](#feature-flags)), these values may be structured/heavily nested. For simplicity, all configuration in the Strimzi-ui is catagorised into one of two types:
+
+- `static values` - where the value is known in advance/can be defined literally
+- `runtime values` - where the value needs to be calculated at 'runtime'
+
+All configuration for the Strimzi-ui is defined in the [config](../config) directory.
+
+In the case of `static` configuration values, these are defined literally as required. In the case of `runtime` configuration values, these are also defined in the config directory. However, these are defined as functions rather than values, which will be invoked at _server_ runtime. These functions will have access to configuration (in read only form) and other process information (eg environment variables), and thus be able to return the required value based on the current operating environment. The intent is that the result of the function will be the value available to the rest of the UI.
+
+Once all callbacks have been executed, the _server_ will reduce and own the current configuration state. A 'critical' subset of this information will then be included in the returned `index.html` when a user requests the UI, with the rest of the configuration being accessible at the `/config` endpoint via GraphQL queries.
+
+##### Client configuration
+
+Additional content to follow in a future PR/as a part of https://github.com/strimzi/strimzi-ui/issues/13 .
+
+##### Server configuration
+
+The UI server will primarily be configured at runtime via a provided JSON file. This could be a file on the file system, but is expected to be when deployed as a part of Strimzi to be a mounted configmap, the content of which is defined by the operator deploying it. The file will then be watched by the server, and configuration will refresh as the file changes.
+
+Configuration options for the server include:
+
+| Configuration                | Required | Default                                                                                                          | Purpose                                                                                                                                                                                |
+| ---------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| authentication.strategy      | No       | `none`                                                                                                           | What authentication strategy to use to authenticate users. See [the security section](#security) for details of the available options.                                                 |
+| authentication.configuration | No       | `{}`                                                                                                             | Any additional configuration required for the provided authentication strategy `authentication.strategy` . See [the security section](#security) for details of the available options. |
+| client.configOverrides       | No       | `{}`                                                                                                             | Overrides to send to the client. See [client configuration for further details](#client-configuration). These values will take precedence over any others provided.                    |
+| client.transport.cert        | No       | N/A - if one of `client.transport.cert` or `client.transport.key` are not provided, server will be HTTP          | PEM certificate presented to browsers on connecting to the UI server.                                                                                                                  |
+| client.transport.key         | No       | N/A - if one of `client.transport.cert` or `client.transport.key` are not provided, server will be HTTP          | PEM certificate private key for the certificate provided in `client.transport.cert`.                                                                                                   |
+| client.transport.ciphers     | No       | default set from [node's tls module](https://nodejs.org/api/tls.html#tls_modifying_the_default_tls_cipher_suite) | TLS ciphers used/supported by the HTTPS server for client negotiation. Only applies if starting an HTTPS server.                                                                       |
+| client.transport.minTLS      | No       | `TLSv1.2`                                                                                                        | Minimum TLS version supported by the server. Only applies if starting an HTTPS server. Set to `TLSv1.2` for browser compatibility.                                                     |
+| modules                      | No       | Object - [enabled modules and configuration can be found here](##router-controller-data-pattern)                 | The modules which are either enabled or disabled.                                                                                                                                      |
+| logging                      | No       | TBD                                                                                                              | Logging configuration settings. Format to be defined in https://github.com/strimzi/strimzi-ui/issues/24                                                                                |
+| proxy.transport.cert         | No       | If not provided, SSL certificate validation of the upstream admin server is disabled                             | CA certificate in PEM format of the backend admin server api requests are to be sent to.                                                                                               |
+| proxy.hostname               | Yes      | N/A                                                                                                              | The hostname of the admin server to send api requests to.                                                                                                                              |
+| proxy.port                   | Yes      | N/A                                                                                                              | The port of the admin server to send api requests to.                                                                                                                                  |
+| featureFlags                 | No       | `{}`                                                                                                             | Feature flag overrides to set. The configuration is as per the format specified [here](#feature-flags). These values will take precedence over any others provided.                    |
+
+[As mentioned in the usage section](#configuration-types-and-usage)], having loaded the server configuration, this will be reduced and served by the server to the client. The reduced result is also available to the server.
+
+##### Feature flags
+
+Additional content to follow in a future PR/as a part of https://github.com/strimzi/strimzi-ui/issues/13 .
 
 ### Code Structure
 
@@ -203,6 +303,7 @@ UI codebases tend to contain a large number of files, so sensible organisation n
 
 | Directory     | Contains                                                                                  |
 | ------------- | ----------------------------------------------------------------------------------------- |
+| config        | All configuration options available in the UI (both client and server side)               |
 | client/\*     | All code served to the browser                                                            |
 | docs          | All 'repository level' documentation                                                      |
 | docs/assets   | Assets used to support documentation - images etc                                         |
@@ -300,4 +401,8 @@ The addons included in the Strimzi UI Storybook configuration include:
 
 #### Mock admin server
 
-This section to follow in a future PR/as a part of https://github.com/strimzi/strimzi-ui/issues/15 .
+A helpful tool to aid UI development is the ability to have a representative mock backend available locally to develop against and control at test time. The Strimzi-ui features such a server, and this section will provide further details on it.
+
+Given the modular and configurable nature of the UI Server, the same [server code base](#server) will be re used for the purposes of hosting this mock `Strimzi-admin` capability, in a [second running instance, proxied to by the UI Server.](#development-and-test-topology) This second instance will be proxied to via the `proxy.hostname` and `proxy.port` configuration values, as a real `Strimzi-admin` backend instance would be when deployed in production (thus using the UI server fully as well).
+
+In this instance, rather than the normal `api` module, the `mockapi` module will be used, [details of which may be found here.](../server/mockapi/README.md)

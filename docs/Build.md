@@ -1,10 +1,10 @@
 # Build
 
-This documentation will cover both the [building of the UI code](#ui-build), and also how it is [built and integrated with Strimzi](#ui-build-into-strimzi).
+This documentation will cover both the [building of the UI client and server code](#ui-client-and-server-build), and also how the output of these builds is [built and integrated with Strimzi](#ui-build-into-strimzi).
 
-## UI build
+## UI client and server build
 
-This UI is built using two tools, [Babel](https://babeljs.io/) and [Webpack](https://webpack.js.org/). Webpack acts as our main build and bundling tool, while Babel acts as a transpiler - meaning the UI codebase can make use of the latest and greatest ECMAscript syntax, and Babel will polyfill where appropriate to provide cross browser support. The below will detail choices we have made regarding how the build works, configuration and considerations to be aware of, and the end output. The aim of this stack is to have a fast and efficient build for day to day development, but also the smallest possible built bundles so users do not need to wait a long time for all required assets to be retrieved by their browser.
+This UI codebase (client and server) is built using two tools, [Babel](https://babeljs.io/) and [Webpack](https://webpack.js.org/). Webpack acts as our main build and bundling tool, while Babel acts as a transpiler - meaning the UI codebase can make use of the latest and greatest ECMAscript syntax, and Babel will polyfill where appropriate to provide cross browser support. The below will detail choices we have made regarding how the build works, configuration and considerations to be aware of, and the end output. The aim of this stack is to have a fast and efficient build for day to day development, but also the smallest possible built bundles so users do not need to wait a long time for all required assets to be retrieved by their browser.
 
 ### Treeshaking
 
@@ -80,7 +80,8 @@ In addition to aliasing, the webpack configuration will be as follows:
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | entry                           | `client/Bootstrap/index.js`                                                                                                                                             | Build entry point. _Note:_ the `scss/css` is expected to be imported by individual view layer code, which is imported (directly or indirectly) from this file. Details to follow in Code Style approach documentation regarding this styling approach and why. |
 | mode                            | `production` or `development` (provided via config file used)                                                                                                           |                                                                                                                                       Build mode. If production, code will be minified and have developer helpers (warnings etc) removed from the built output |
-| output.path                     | `dist` (via constant)                                                                                                                                                   |                                                                                                                                                                                                                All output to be placed in the `dist` directory |
+| target                          | `web` or `node` (provided via config file used)                                                                                                                         |                                                                                The build target. The client side code will be built for `web`, and server `node`, reflecting where the code runs (and thus what Webpack will/will not include in it's output). |
+| output.path                     | `dist/client` or `dist/server` (via constant)                                                                                                                           |                                                                                                           All output to be placed in the `dist` directory, with client code going into the `client` directory, and all server code into `server` respectively. |
 | output.publicPath               | `` (empty string) | The public path of static/public content included by Webpack. Is relative to the URL.                                                               |
 | output.filename                 | `[name].bundle.js`                                                                                                                                                      |                                                                                                                                                                 Name of the built entry bundle. Will be `main.bundle.js` once built as we have one entry point |
 | module.rules                    | Array of rules - [see here for details](#module-rules)                                                                                                                  |                                                                                                                                         Rules/tests to run on modules being built. Depending on the file being parsed, different transformations should be run |
@@ -120,6 +121,7 @@ We also make use of the following plugins:
 | compression-webpack-plugin         |                                                                                  Compresses built output further using `gzip` algorithm, and emits these compressed files. Depending on headers provided by the browser, these gziped versions will be served to the browser, rather than the uncompressed versions |
 | webpack-bundle-analyzer            | At build time, produce a report regarding the JS bundle size (useful for understanding bloat and duplication). At dev build time this is an html file (which is then hosted by `webpack-dev-server`), and a json file at production build time. Each report is written to the `generated/bundle-analyser` directory |
 | BannerPlugin                       |                                                                                                                                                                                                            Used to add a copyright header to built css code. Other types handled by other plugins (eg TerserPlugin) |
+| webpack-node-externals             |                                                                        Excludes any code from `node_modules`. Useful when building node.js bundles, due to OS/dynamic requirements of those modules. Expectation is these will be installed/provided at build time via an `npm install` alongside the built output. |
 
 Where appropriate, plugins will be provided via helper functions from a common configuration file, but allow for modification to their configuration. [See this section for more details](#ui-build-implementation).
 
@@ -141,25 +143,30 @@ Given the above configuration, built output will be created in a `dist` director
 
 ```
 dist/
-    index.html
-    favicon.ico
-    main.bundle.js
-    <hash1>.bundle.js
-    <hash2>.bundle.js
-    ....
-    main.bundle.js.gz
-    <hash1>.bundle.js.gz
-    <hash2>.bundle.js.gz
-    ....
-    main.css
-    <hash1>.bundle.css
-    <hash2>.bundle.css
-    ...
-    images/
-        image1.svg
+    client/
+        index.html
+        favicon.ico
+        main.bundle.js
+        <hash1>.bundle.js
+        <hash2>.bundle.js
+        ....
+        main.bundle.js.gz
+        <hash1>.bundle.js.gz
+        <hash2>.bundle.js.gz
+        ....
+        main.css
+        <hash1>.bundle.css
+        <hash2>.bundle.css
         ...
-    fonts/
-        font1.ttf
+        images/
+            image1.svg
+            ...
+        fonts/
+            font1.ttf
+            ...
+        ...
+    server/
+        main.bundle.js
         ...
 ```
 
@@ -188,4 +195,12 @@ The above UI build is implemented in the [`build directory`](../utils/build). It
 
 ## UI build into Strimzi
 
-This will be completed once https://github.com/strimzi/proposals/pull/6 has been finalized.
+The UI build is used in a `dockerfile` to produce an image that can then be deployed as a part of Strimzi. This `dockerfile` performs the following steps:
+
+- Install all dependencies
+- Run `npm run build`, which in turn runs a production build of the client and server
+- Clear installed dependencies, and install just production (shipped) dependencies
+- Move the built UI directory `dist` and `node_modules` to the required location
+- Sets the entrypoint to a script/command which runs the UI Server: `node dist/server/main.bundle.js`
+
+Further details to be added once https://github.com/strimzi/proposals/pull/6 has been finalized.
