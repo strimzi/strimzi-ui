@@ -58,10 +58,11 @@ with React component code:
 
 ### Server Testing
 
-The strimzi-ui server should be tested from outside the server - like how a
-user would use it. It should be behaviourally driven using _Jest_ and
-_Cucumber_ to talk to each enpoint and check that the response received is
-correct. The test code for the server is in the `server/test` directory.
+The strimzi-ui server should be tested from outside the server, as a user would
+access it (indirectly) through via the UI. It should be behaviourally driven
+using _Jest_ and _Cucumber_ to talk to each enpoint and check that the response
+received is correct. The test code for the server is in the `server/test`
+directory.
 
 ### End to End testing
 
