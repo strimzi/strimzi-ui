@@ -56,6 +56,13 @@ with React component code:
 - `client/Groups`
 - `client/Panels`
 
+### Server Testing
+
+The strimzi-ui server should be tested from outside the server - like how a
+user would use it. It should be behaviourally driven using _Jest_ and
+_Cucumber_ to talk to each enpoint and check that the response received is
+correct. The test code for the server is in the `server/test` directory.
+
 ### End to End testing
 
 End to End tests should exercise a user scenario - focus on the behaviour a
@@ -102,7 +109,8 @@ confirm the test is clean and will be reliable:
 In this repo, we aim to have 100% code coverage across all components. This code
 coverage should be achieved through useful functional/behavioural tests and
 not just units to increase the coverage. We want all lines to be verified
-through meaninful tests.
+through meaninful tests. Code coverage should be used as a tool to help spot
+where certain tests may have been overlooked.
 
 ## Accessibility testing
 
@@ -132,23 +140,4 @@ function signatures that are well documented. Once implemented these should
 not be changed so that function complexity does not grow. If additional behaviour
 is required later on, these should be extended through new utility functions.
 
-## Testing contexts (an example of using test utilities)
-
-Testing contexts is an example of having common test logic that can be
-abstracted away. Here, the function `renderWithContextProviders` has been
-provided that extends the base rtl `render` function but can be given a list
-of context providers and their values that will wrap the provided children.
-Using this, a common render can be defined in a test file for contexts so that
-each test only needs to worry about using a consumer. For example:
-
-```
-render = (children) =>
-  renderWithContextProviders(children, {}, [
-    { provider: MyProvicer1, value: providerValue1 },
-    { provider: MyProvider2, value: providerValue2 },
-  ]);
-```
-
-This can be defined in a test file so that tests can still use a `render`
-function in the same way they usually would with rtl but these renders will be
-wrapped in the providers defined in the above function.
+View all test utily documentation [here](../utils/test/README.md).

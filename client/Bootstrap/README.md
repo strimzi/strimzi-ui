@@ -6,7 +6,11 @@ While it's own directory, the code in this directory should be tested and develo
 
 ## Test approach
 
-Bootstrap should be tested in a behavioural manor. See [Behavioural Driven Development](../../docs/Test.md#style-of-test).
+The code in this directory should only be tested through End-to-End tests.
+This is because these files do not contribute unit-level behaviour but have
+an impact on the entire UI. This should help speed up development of bootstrap
+code and unit testing at this level can be fiddly. See
+[End-to-End testing](../../docs/Test.md#end-to-end-testing).
 
 ## Expected files
 
