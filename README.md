@@ -39,3 +39,4 @@ Further details around how this UI is implemented can be found below:
 - [Build](./docs/Build.md)
 - [Linting](./docs/Linting.md)
 - [Test](./docs/Test.md)
+- [Contribution](./docs/Contribution.md)
