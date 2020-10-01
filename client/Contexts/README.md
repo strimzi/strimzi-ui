@@ -6,7 +6,7 @@ It is expected that when used in production Context Provider(s) will be used by 
 
 ## Test approach
 
-To be defined in https://github.com/strimzi/strimzi-ui/issues/7
+Elements should be tested in a functional manor. See [Test Driven Development](../../docs/Test.md#style-of-test).
 
 ## Expected files
 

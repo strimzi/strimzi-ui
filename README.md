@@ -37,6 +37,7 @@ Further details around how this UI is implemented can be found below:
 - [Architecture](./docs/Architecture.md)
 - [Build](./docs/Build.md)
 - [Linting](./docs/Linting.md)
+- [Test](./docs/Test.md)
 
 ### Known issues
 

@@ -4,7 +4,7 @@
 
 ## Test approach
 
-To be defined in https://github.com/strimzi/strimzi-ui/issues/7
+Bootstrap should be tested in a behavioural manor. See [Behavioural Driven Development](../../docs/Test.md#style-of-test).
 
 ## Expected files
 
