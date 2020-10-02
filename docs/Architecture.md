@@ -31,6 +31,7 @@ This document will cover the core Architectural decisions made for this UI, how 
   - [Directory structure](#directory-structure)
   - [`Element`, `Group`, `Panel`, `Bootstrap` component pattern](#element-group-panel-bootstrap-component-pattern)
   - [Swappable view layers](#swappable-view-layers)
+  - [Dependency management](#dependency-management)
 - [Supporting utilities and tools](#supporting-utilities-and-tools)
   - [Storybook](#storybook)
   - [Mock admin server](#mock-admin-server)
@@ -378,6 +379,23 @@ Note that due to the aliases that the implementation details are completely abst
 For this capability to work, [file name conventions](#file-name-conventions) need to be followed (so the aliases align with file names), and the properties/behaviours exposed by components should align: all that should be different should be how a capability is rendered - not it's capability. If different behaviours are required, different components should be implemented to provide these.
 
 _Note_: Implementation of this will follow in a future PR.
+
+#### Dependency management
+
+This UI will make use of a number of third party dependencies to operate at develop, test, and runtime. The will range from helper tools such as Webpack, to frameworks, such as React. The `package.json` file/schema defines three types of dependency, `dependencies`, `peerDependencies` and `devDependencies`. Depending on which section a dependency sits, it will be treated differently at build time, and moreover, imply/have a different contextual meaning:
+
+- `dependencies` are bundled on `npm publish`, meaning they are shipped as a part of this package on build
+- `peerDependencies` are required but not included on `npm publish`. Users of the built package are expected to provide them alongside this package (giving the user more control over what versions of packages are used)
+- `devDependencies` are used to support the development and test of a package, but are not shipped
+
+Tooling, such as [`npm audit`](https://docs.npmjs.com/cli/audit) make use of/utilise these sections to report when a dependency has a known vulnerability, and can thus call out if an issue is shipped by this package, assuming that dependencies are correctly catagorised based on their usage. Given the nature of JavaScript and where it is used, having these tools report issues when they occur is incredibly valuable.
+
+The Strimzi-ui will not be published. Instead, it will consume a number of packages, and be built to provide a UI. Some of these packages will be used and shipped directly, but some will also generate and polyfill code in this repository to produce the the built UI. Thus, in the event of a security issue, we need to understand if the issue relates in any way to what we ship. We therefore categorise our dependencies as follows:
+
+- `dependencies` are any dependency which are either shipped bundled in the built output via direct usage (eg React), included in the dockerfile which will run the UI (eg Express) or generate output that is then built and shipped (ie babel transforms/plugins, Webpack plugins etc)
+- `devDependencies` are used to support the development and test of the UI, but that are not shipped. Eg Webpack, Jest, eslint
+
+The correct usage/catagorisation of dependencies will be checked on PR, alongside other checks, such as the licence that dependency comes with.
 
 ### Supporting utilities and tools
 
