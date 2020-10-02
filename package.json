@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
-    "commitlint": "^9.1.0",
+    "commitlint": "^11.0.0",
     "css-loader": "^3.6.0",
     "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.11.0",
