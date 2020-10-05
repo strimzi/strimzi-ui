@@ -288,7 +288,7 @@ To support development and test of the Strimzi UI, a number of tools and utiliti
 
 When developing [Element](../client/Elements), [Group](../client/Groups) or [Panel](../client/Panels) components for the Strimzi UI, Storybook stories are implemented alongside the component code, allowing reviewers to easily run the component, see the visual rendering of the component and manually test the functionality. As referenced in the [file name conventions](#file-name-conventions) section, Storybook stories are defined in separate files in the same directory as the component implementation files, and should be suffixed with `.stories.js`.
 
-By building up a library of Storybook stories, all the UI components in the Strimzi UI can be viewed in one place with minimal effort, allowing easy composition and creation of higher-level components. If possible, both view layers (`CARBON` and `PATTERNFLY`) will be viewable when running Storybook, allowing developers to easily compare, contrast and ensure equality of functionality when developing for either view layer. If it is not possible to run a Storybook with both view layers, a separate Storybook instance can be run for each view layer.
+By building up a library of Storybook stories, all the UI components in the Strimzi UI can be viewed in one place with minimal effort, allowing easy composition and creation of higher-level components. By referencing the individual view layer implementations and/or importing them directly, both view layers (`CARBON` and `PATTERNFLY`) are viewable when running Storybook, allowing developers to easily compare, contrast and ensure equality of functionality when developing for either view layer.
 
 The addons included in the Strimzi UI Storybook configuration include:
 

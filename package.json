@@ -15,9 +15,9 @@
     "licence:add": "license-check-and-add --f ./utils/linting/license-check-and-add.config.json add",
     "lint": "npm-run-all 'lint:allfiles -- .' 'lint:js -- .' 'lint:styling -- \"**/*.(s)css\"' 'lint:format -- .'",
     "lint:allfiles": "npm-run-all 'licence:add -- {1}' --",
-    "lint:js": "eslint --config ./utils/linting/eslint.config.js --fix --max-warnings 0",
+    "lint:js": "eslint --config ./utils/linting/eslint.config.js --fix --max-warnings 0 --ignore-path ./utils/linting/.eslintignore",
     "lint:styling": "stylelint --config ./utils/linting/stylelint.config.js --fix --max-warnings 0",
-    "lint:format": "prettier --config ./utils/linting/prettier.config.js --write"
+    "lint:format": "prettier --config ./utils/linting/prettier.config.js --write --ignore-path ./utils/linting/.prettierignore"
   },
   "sideEffects": false,
   "repository": {
