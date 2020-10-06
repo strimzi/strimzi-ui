@@ -8,14 +8,16 @@
     "start": "webpack-dev-server --config utils/build/webpack.dev.js",
     "build": "webpack --config utils/build/webpack.prod.js",
     "pretest": "npm-run-all --parallel licence:check && prettier --config ./utils/linting/prettier.config.js --check .",
+    "storybook": "start-storybook --port 6006",
+    "storybook:build": "build-storybook -o .out",
     "test": "echo https://github.com/strimzi/strimzi-ui/issues/7",
     "licence:check": "license-check-and-add --f ./utils/linting/license-check-and-add.config.json check",
     "licence:add": "license-check-and-add --f ./utils/linting/license-check-and-add.config.json add",
     "lint": "npm-run-all 'lint:allfiles -- .' 'lint:js -- .' 'lint:styling -- \"**/*.(s)css\"' 'lint:format -- .'",
     "lint:allfiles": "npm-run-all 'licence:add -- {1}' --",
-    "lint:js": "eslint --config ./utils/linting/eslint.config.js --fix --max-warnings 0",
+    "lint:js": "eslint --config ./utils/linting/eslint.config.js --fix --max-warnings 0 --ignore-path ./utils/linting/.eslintignore",
     "lint:styling": "stylelint --config ./utils/linting/stylelint.config.js --fix --max-warnings 0",
-    "lint:format": "prettier --config ./utils/linting/prettier.config.js --write"
+    "lint:format": "prettier --config ./utils/linting/prettier.config.js --write --ignore-path ./utils/linting/.prettierignore"
   },
   "sideEffects": false,
   "repository": {
@@ -38,6 +40,12 @@
     "webpack": "^4.43.0"
   },
   "devDependencies": {
+    "@storybook/addon-actions": "^6.0.22",
+    "@storybook/addon-essentials": "^6.0.22",
+    "@storybook/addon-knobs": "^6.0.22",
+    "@storybook/addon-links": "^6.0.22",
+    "@storybook/addon-storysource": "^6.0.22",
+    "@storybook/react": "^6.0.22",
     "babel-eslint": "^10.1.0",
     "commitlint": "^11.0.0",
     "css-loader": "^3.6.0",
@@ -52,6 +60,8 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.5",
     "sass-loader": "^9.0.2",
+    "storybook": "^6.0.22",
+    "storybook-readme": "^5.0.8",
     "style-loader": "^1.2.1",
     "stylelint": "^13.6.1",
     "stylelint-config-prettier": "^8.0.2",

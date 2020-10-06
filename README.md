@@ -29,6 +29,7 @@ If you run into any issues while working in this repo, please check out [the tro
 - `npm run build` - builds the UI
 - `npm run clean` - deletes the build/generated content directories
 - `npm run lint` - lints the codebase. See [`Linting`](./docs/Linting.md) for the individual linting steps
+- `npm run storybook` - runs [Storybook](./docs/Architecture.md#storybook) for the UI components.
 
 ## Implementation documentation
 

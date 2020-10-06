@@ -24,7 +24,7 @@ This document will cover the core Architectural decisions made for this UI, how 
 - [Code structure](#code-structure)
   - [Directory structure](#directory-structure)
   - [`Element`, `Group`, `Panel`, `Bootstrap` component pattern](#element-group-panel-bootstrap-component-pattern)
-  - [Swap-able view layers](#swap-able-view-layers)
+  - [Swappable view layers](#swappable-view-layers)
 - [Supporting utilities and tools](#supporting-utilities-and-tools)
   - [Storybook](#storybook)
   - [Mock admin server](#mock-admin-server)
@@ -117,13 +117,13 @@ This UI makes use of:
 
 ##### File name conventions
 
-As mentioned above, the Strimzi-ui, inspired by the MVC pattern, separates business logic from rendering logic. This means a component's logic will be split across multiple files. In addition, for capabilities such as [Swap-able view layers](#swap-able-view-layers) to work, file names need to be known and consistent. Thus, a set of file name conventions should be followed to not only enable these capabilities, but also to standardise and make the codebase more approachable.
+As mentioned above, the Strimzi-ui, inspired by the MVC pattern, separates business logic from rendering logic. This means a component's logic will be split across multiple files. In addition, for capabilities such as [swappable view layers](#swappable-view-layers) to work, file names need to be known and consistent. Thus, a set of file name conventions should be followed to not only enable these capabilities, but also to standardise and make the codebase more approachable.
 
 | Filename                                     | Contains/used for                                                                                                                                                                                                     | Alias (if available) |
 | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
 | `index.js`                                   | Barrel file. Used to export modules/components/functions.                                                                                                                                                             |                      |
-| `View.<suffix>.js` / `View.js`               | Contains React component rendering logic. This can have a view layer suffix if different view layer implementations are required [(see table for details)](#swap-able-view-layers). Should be a functional component. | View                 |
-| `Styling.<suffix>.(s)css` / `Styling.(s)css` | Styling code. This can have a view layer suffix if different view layer implementations are required [(see table for details)](#swap-able-view-layers).                                                               | Styling              |
+| `View.<suffix>.js` / `View.js`               | Contains React component rendering logic. This can have a view layer suffix if different view layer implementations are required [(see table for details)](#swappable-view-layers). Should be a functional component. | View                 |
+| `Styling.<suffix>.(s)css` / `Styling.(s)css` | Styling code. This can have a view layer suffix if different view layer implementations are required [(see table for details)](#swappable-view-layers).                                                               | Styling              |
 | `Model.js`                                   | Business logic, implemented as a React Hook.                                                                                                                                                                          | Model                |
 | `Context.js`                                 | React Context component implementation. See the [Contexts](../client/Contexts/README.md) for details.                                                                                                                 | Contexts             |
 | `Hook.js`                                    | React custom hook implementation. See the [Hooks](../client/Hooks/README.md) for details.                                                                                                                             | Hooks                |
@@ -227,7 +227,7 @@ To combat these cases, the React components written to implement this UI have be
 
 The READMEs for each of these component types will cover the expectations from an implementation, test and usage point of view.
 
-#### Swap-able view layers
+#### Swappable view layers
 
 One of the areas of extensibility this UI offers is that of the View layer implementation it uses. This allows the Strimzi-ui to quickly change it's look and feel if a user needs it to, while maintaining the same core business and backend logic that make the UI work. Implemented view layer implementations for the Strimzi-ui are detailed below, along with what environment variable (`VL`) value would need to be provided to build the UI using a particular View layer implementation:
 
@@ -284,7 +284,19 @@ To support development and test of the Strimzi UI, a number of tools and utiliti
 
 #### Storybook
 
-This section to follow in a future PR/as a part of https://github.com/strimzi/strimzi-ui/issues/14 .
+[Storybook](https://storybook.js.org/) is a UI development tool that helps to build UI components in isolation and record their states as stories. This allows separation of concerns and ensures components are developed in a composable manner. Additionally, Storybook helps document components for reuse, can be used for visual testing of components and can also be extended with an [ecosystem of addons](https://storybook.js.org/addons).
+
+When developing [Element](../client/Elements), [Group](../client/Groups) or [Panel](../client/Panels) components for the Strimzi UI, Storybook stories are implemented alongside the component code, allowing reviewers to easily run the component, see the visual rendering of the component and manually test the functionality. As referenced in the [file name conventions](#file-name-conventions) section, Storybook stories are defined in separate files in the same directory as the component implementation files, and should be suffixed with `.stories.js`.
+
+By building up a library of Storybook stories, all the UI components in the Strimzi UI can be viewed in one place with minimal effort, allowing easy composition and creation of higher-level components. By referencing the individual view layer implementations and/or importing them directly, both view layers (`CARBON` and `PATTERNFLY`) are viewable when running Storybook, allowing developers to easily compare, contrast and ensure equality of functionality when developing for either view layer.
+
+The addons included in the Strimzi UI Storybook configuration include:
+
+- [Readme](https://github.com/tuchk4/storybook-readme): displays the README for a component in the Storybook UI.
+- [Knobs](https://github.com/storybookjs/storybook/tree/master/addons/knobs): allows dynamic props editing using the Storybook UI.
+- [Actions](https://github.com/storybookjs/storybook/tree/master/addons/actions): used to display data received by event handlers in the Storybook UI.
+- [Links](https://github.com/storybookjs/storybook/tree/master/addons/links): used to create links that navigate between stories in the Storybook UI.
+- [Storysource](https://github.com/storybookjs/storybook/tree/master/addons/storysource): shows the source code for stories in the Storybook UI addon panel.
 
 #### Mock admin server
 
