@@ -10,7 +10,7 @@ Each area of this codebase has a README that goes alongside it that thouroughly 
 
 ## Development Method
 
-All components in this repository should be developed using Test Driven Development or Behaviour Driven Development. This ensures that code is only being written that adds value to the end user. By following the TDD or BDD structure properly, it should make refactors safe to do and ensure that regressions can be avoided as much as possible. For more details on writing tests in this repo [view our test documentation](./Test.md).
+All components in this repository should be developed using Test Driven Development or Behaviour Driven Development. This ensures that code is only being written that adds value to the end user. By following the TDD or BDD structure properly, it should make refactoring safe to do and ensure that regressions can be avoided as much as possible. For more details on writing tests in this repo [view our test documentation](./Test.md).
 
 ## Components should be functional
 
@@ -26,7 +26,7 @@ Every component should also come with a detailed Storybook. They should have app
 
 ## Component Conventions
 
-We have defined four main types of components that make up the UI: Elements, Groups, Panels, and Bootstrap. These defnitions allow us to clearly split up complexity and allow for maximum modularity of the UI. For full information about why we use this structure [view our architecture documentation](./Architecture.md#element-group-panel-bootstrap-component-pattern)
+We have defined four main types of components that make up the UI: Elements, Groups, Panels, Pages, and Bootstrap. These defnitions allow us to clearly split up complexity and allow for maximum modularity of the UI. For full information about why we use this structure [view our architecture documentation](./Architecture.md#element-group-panel-bootstrap-component-pattern)
 
 ## CSS should be written using the block-element-modifier (BEM) naming convention
 
