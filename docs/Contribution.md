@@ -36,7 +36,7 @@ All CSS in this project is written using the BEM naming convetion. We chose BEM 
 - It makes JSX much more readable when the styling applied can be derived from the class names.
 - It should help reduce duplicate CSS as common styles will already be defined.
 
-BEM is dificult to enforce automatically so reviewers should be vigilant to CSS class names to ensure it matches the BEM convention.
+To help enforce the BEM naming convention, we have enabled the [stylelint-selector-bem-pattern](https://www.npmjs.com/package/stylelint-selector-bem-pattern) plugin.
 
 ## Component CSS should live in its own namespace
 
