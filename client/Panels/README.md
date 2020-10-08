@@ -12,21 +12,21 @@ For a given Panel component `Topics`, the expected files are as follows:
 
 ```
 Panels/
-  index.js
+  index.ts
   Topics/
-    index.js
+    index.ts
     README.md
-    View.js
-    Model.js
+    View.ts
+    Model.ts
     Styling.scss
 ```
 
 Where:
 
-- index.js acts as a barrel file, exporting the public API of this component/component bundle.
+- index.ts acts as a barrel file, exporting the public API of this component/component bundle.
 - README.md is the readme for this component, detailing design choices and usage
-- View.js is the view logic for this component
-- Model.js (_optional_) is the model (business) logic for this component
+- View.ts is the view logic for this component
+- Model.ts (_optional_) is the model (business) logic for this component
 - Styling.scss (_optional_) is the styling for this component
 
 ## Components

@@ -27,8 +27,8 @@ The UI makes extensive use of Webpack's [alias](https://webpack.js.org/configura
 
 ```
   ...
-  View.carbon.js
-  View.patternfly.js
+  View.carbon.ts
+  View.patternfly.ts
   ...
 ```
 
@@ -42,7 +42,7 @@ export * from 'View'
 
 ```
 ...
-    View: `./View.${VL_SUFFIX}.js`
+    View: `./View.${VL_SUFFIX}.ts`
 ...
 ```
 
@@ -102,6 +102,7 @@ Webpack allows file specific loaders or utilities to be invoked as a part of the
 | Rule                        | Plugin/loader(s)                                                                                        |                                                                                                                                                                                                   Purpose |
 | --------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | `/(\.css\|.scss)$/`         | `style-loader` (dev only), `miniCssExtractPlugin.loader` (production only), `css-loader`, `sass-loader` | Handle scss/css loading/references. If dev mode, use `style-loader` for speed, else use `miniCssExtractPlugin.loader` (in combination with the `miniCssExtractPlugin` plugin) to produce/emit css file(s) |
+| `/(\.ts|tsx)$/`             | `ts-loader`                                                                                             |                                                                                                                                                               Transpiles TypeScript files into JavaScript |
 | `/(\.js)$/`                 | `babel-loader`                                                                                          |                                                        Perform babel transpile on all JS files. This will be configured with presets for recent browsers, and enable caching to improve build performance |
 | `/\.(woff(2)?\|ttf\|eot)$/` | `file-loader`                                                                                           |                 For any font file, use file-loader to package the font to the `output.path` and replace/update any imports of those fonts to this location. These will be directed to a 'fonts' directory |
 | `/\.(jpg\|gif\|png\|svg)$/` | `file-loader`                                                                                           |             For any image file, use file-loader to package the image to the `output.path` and replace/update any imports of those images to this location. These will be directed to a 'images' directory |
@@ -122,6 +123,7 @@ We also make use of the following plugins:
 | webpack-bundle-analyzer            | At build time, produce a report regarding the JS bundle size (useful for understanding bloat and duplication). At dev build time this is an html file (which is then hosted by `webpack-dev-server`), and a json file at production build time. Each report is written to the `generated/bundle-analyser` directory |
 | BannerPlugin                       |                                                                                                                                                                                                            Used to add a copyright header to built css code. Other types handled by other plugins (eg TerserPlugin) |
 | webpack-node-externals             |                                                                        Excludes any code from `node_modules`. Useful when building node.js bundles, due to OS/dynamic requirements of those modules. Expectation is these will be installed/provided at build time via an `npm install` alongside the built output. |
+| tsconfig-paths-webpack-plugin      |                                                                                                                                                                                                              Reads a specified `tsconfig.json` file, and generates Webpack aliases for any specified `path` values. |
 
 Where appropriate, plugins will be provided via helper functions from a common configuration file, but allow for modification to their configuration. [See this section for more details](#ui-build-implementation).
 
@@ -181,7 +183,7 @@ To enable efficient development, this UI makes use of [webpack-dev-server](https
 | compress         | `true`                                                            |                                                                                                                                                                                                                                                   Serve all content via .gz files - makes rebuilds/hot changes faster to retrieve |
 | inline           | `true`                                                            |                                                                                                                                                                                                                                                            Enforce default setting, recommended when using `hot` reloading option |
 | hot              | `true`                                                            |                                                                                                                                                                                                                                                                                Enables hot reloading of content when files change |
-| proxy            | TBD                                                               |                                                                                                                                                                                                                                                                    Used to proxy requests for backend data when developing the UI |
+| proxy            | `{'*': 'http://localhost:3000'}`                                  |                               Used to proxy requests for backend data when developing the UI. Any request not handled by the dev server will be proxied. This first goes to localhost 3000, which is a development instance of the UI server. This in turn proxies data to the mock admin server, as per the production topology. |
 | overlay.warnings | `false`                                                           |                                                                                                                                                                                                                                                                                     In case of an warning, do not show an overlay |
 | overlay.errors   | `true`                                                            |                                                                                                                                                                                                                                                                       In case of an error, show an overlay over the UI showing it |
 | host             | `localhost`                                                       |                                                                                                                                                                                                                              The hostname to use for the server. Can be overridden using the `DEV_HOSTNAME` environment variable. |

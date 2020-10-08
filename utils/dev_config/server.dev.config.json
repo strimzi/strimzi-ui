@@ -1,0 +1,14 @@
+{
+  "modules": {
+    "api": true,
+    "client": false,
+    "config": true,
+    "log": true,
+    "mockapi": false
+  },
+  "proxy": {
+    "hostname": "0.0.0.0",
+    "port": 9080,
+    "transport": {}
+  }
+}

@@ -3,22 +3,27 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 const path = require('path');
-const { webpackAliases } = require('../utils/tooling/aliasHelper.js');
+const merge = require('lodash.merge');
+
 const { PRODUCTION, DEVELOPMENT } = require('../utils/tooling/constants.js');
 const babelPresets = require('./babelPresets.js');
 
 // constants
 const UI_TITLE = 'Strimzi UI';
 const BUILD_DIR = path.resolve(__dirname, '../dist');
+const CLIENT_BUILD_DIR = path.resolve(__dirname, `${BUILD_DIR}/client`);
+const SERVER_BUILD_DIR = path.resolve(__dirname, `${BUILD_DIR}/server`);
 const GENERATED_DIR = path.resolve(__dirname, '../generated');
 const BUNDLE_ANALYSER_DIR = `${GENERATED_DIR}/bundle-analyser/`;
 const BOOTSTRAP_DIR = path.resolve(__dirname, '../client/Bootstrap/');
 const IMAGES_DIR = path.resolve(__dirname, '../client/Images');
+const SERVER_DIR = path.resolve(__dirname, '../server/');
 
 // common plugin imports/functions to wrap them with common default config
 const HtmlPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const returnPluginWithConfig = (plugin, defaultConfig = {}) => (
   customConfig = {}
@@ -49,6 +54,8 @@ const withWebpackBundleAnalyzerPlugin = returnPluginWithConfig(
     openAnalyzer: false, // do not auto open analyser tool
   }
 );
+
+const withTsconfigPathsPlugin = returnPluginWithConfig(TsconfigPathsPlugin, {});
 
 // common rules configuration
 const returnModuleRuleWithConfig = (defaultConfig = {}, defaultUse = []) => (
@@ -81,9 +88,29 @@ const withStylingModuleLoader = returnModuleRuleWithConfig(
   ]
 );
 
+const withTSModuleLoader = (tsConfigFile) =>
+  returnModuleRuleWithConfig(
+    {
+      test: /\.(tsx|ts)?$/,
+      exclude: /(node_modules)/,
+    },
+    [
+      {
+        loader: 'ts-loader',
+        options: {
+          configFile: path.resolve(
+            __dirname,
+            tsConfigFile || 'tsconfig.common.json'
+          ),
+          onlyCompileBundledFiles: true,
+        },
+      },
+    ]
+  )();
+
 const withJSModuleLoader = returnModuleRuleWithConfig(
   {
-    test: /\.(jsx|js)?$/,
+    test: /\.js?$/,
     exclude: /(node_modules)/,
   },
   [
@@ -129,24 +156,30 @@ const withImageModuleLoader = returnModuleRuleWithConfig(
 );
 
 // exported helper function - returns common configuration, merged via object spread. Provided options take precedence
-const returnBasicConfigMergedWith = (customConfigurationForBuildMode = {}) => ({
-  entry: `${BOOTSTRAP_DIR}/index.js`,
-  output: {
-    path: BUILD_DIR,
-    publicPath: '',
-    filename: '[name].bundle.js',
-  },
-  module: {
-    // given the dynamic nature of rules and configuration, none a re provided by default. Use the exported `moduleLoaders` to return loaders with some default configs
-    rules: [],
-  },
-  // given different build modes will require different plugins/plugin configuration, none are provided by default. Use the exported `plugins` for commonly used plugins with default configuration
-  plugins: [],
-  resolve: {
-    alias: webpackAliases,
-  },
-  ...customConfigurationForBuildMode,
-});
+const returnBasicConfigMergedWith = (customConfigurationForBuildMode = {}) =>
+  merge(
+    {
+      entry: `${BOOTSTRAP_DIR}/index.ts`,
+      target: 'web', // build for browsers (Webpack default)
+      output: {
+        path: BUILD_DIR,
+        publicPath: '',
+        filename: '[name].bundle.js',
+      },
+      module: {
+        // given the dynamic nature of rules and configuration, none a re provided by default. Use the exported `moduleLoaders` to return loaders with some default configs
+        rules: [],
+      },
+      // given different build modes will require different plugins/plugin configuration, none are provided by default. Use the exported `plugins` for commonly used plugins with default configuration
+      plugins: [],
+      resolve: {
+        plugins: [],
+        alias: {},
+        extensions: ['.ts', '.tsx', '.js', '.json'],
+      },
+    },
+    customConfigurationForBuildMode
+  );
 
 module.exports = {
   returnBasicConfigMergedWith,
@@ -154,9 +187,11 @@ module.exports = {
     withHTMLPlugin,
     withMiniCssExtractPlugin,
     withWebpackBundleAnalyzerPlugin,
+    withTsconfigPathsPlugin,
   },
   moduleLoaders: {
     withStylingModuleLoader,
+    withTSModuleLoader,
     withJSModuleLoader,
     withFontModuleLoader,
     withImageModuleLoader,
@@ -166,9 +201,12 @@ module.exports = {
     PRODUCTION,
     DEVELOPMENT,
     BUILD_DIR,
+    CLIENT_BUILD_DIR,
+    SERVER_BUILD_DIR,
     BOOTSTRAP_DIR,
     IMAGES_DIR,
     GENERATED_DIR,
     BUNDLE_ANALYSER_DIR,
+    SERVER_DIR,
   },
 };

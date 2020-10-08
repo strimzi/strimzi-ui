@@ -1,8 +1,16 @@
 {
   "license": "./utils/tooling/headers/StrimziHeader.txt",
-  "ignore": [".**", ".git/**", "./utils/tooling/headers", "**.md", "**.pptx"],
+  "ignore": [
+    ".**",
+    ".git/**",
+    "./utils/headers",
+    "**.md",
+    "**.pptx",
+    "./build/dockerfile",
+    "./generated/**"
+  ],
   "licenseFormats": {
-    "js|ts|tsx|css|scss": {
+    "tsx|jsx|ts|js|css|scss": {
       "prepend": "/*",
       "append": " */",
       "eachLine": {

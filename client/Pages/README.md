@@ -75,9 +75,9 @@ This section provides a summary of the currently provided modules, and the pages
 
 | Module                | Panel used | Included in main bundle? | Path used              | Summary                                                                                                                                                                                                                                                                                                                                             |
 | --------------------- | ---------- | ------------------------ | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| NoPages.page.js       | TBD        | Yes                      | `/error/nopages`       | Page shown to a user when no pages (following introspection) can be shown to a user due to either a lack of supporting backend capability or if no pages have been configured to display via feature flags (these scenarios are edge cases). If a user cannot access any page due to a lack of authorization, they will see the NotAuthorized page. |
-| NotFound.page.js      | TBD        | Yes                      | `/error/notfound`      | Page shown to a user when either the URL they provide does not match a page we do not recognise or can show with the current backend                                                                                                                                                                                                                |
-| NotAuthorized.page.js | TBD        | Yes                      | `/error/notauthorized` | Page shown to a user when either they do not have the correct authorization to access a page in the UI                                                                                                                                                                                                                                              |
+| NoPages.page.ts       | TBD        | Yes                      | `/error/nopages`       | Page shown to a user when no pages (following introspection) can be shown to a user due to either a lack of supporting backend capability or if no pages have been configured to display via feature flags (these scenarios are edge cases). If a user cannot access any page due to a lack of authorization, they will see the NotAuthorized page. |
+| NotFound.page.ts      | TBD        | Yes                      | `/error/notfound`      | Page shown to a user when either the URL they provide does not match a page we do not recognise or can show with the current backend                                                                                                                                                                                                                |
+| NotAuthorized.page.ts | TBD        | Yes                      | `/error/notauthorized` | Page shown to a user when either they do not have the correct authorization to access a page in the UI                                                                                                                                                                                                                                              |
 
 _Note_: Above metadata to be implemented in a following PR, but is representative of the structure expected here, and what purpose/capability they should provide.
 
@@ -87,14 +87,14 @@ For a given set of page metadata `Topics` for a topics page, the expected files 
 
 ```
 Pages/
-  index.js
+  index.ts
   README.md
-  Topics.page.js
+  Topics.page.ts
   ...
 ```
 
 Where:
 
-- index.js acts as a barrel file, exporting all page metadata defined in this module as the public API for what pages are available for use
+- index.ts acts as a barrel file, exporting all page metadata defined in this module as the public API for what pages are available for use
 - README.md is this readme
-- Topics.page.js contains the module which exports page metadata
+- Topics.page.ts contains the module which exports page metadata

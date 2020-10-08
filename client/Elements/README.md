@@ -12,19 +12,19 @@ For a given Element component `Heading`, the expected files are as follows:
 
 ```
 Elements/
-  index.js
+  index.ts
   Heading/
-    index.js
+    index.ts
     README.md
-    View.js
+    View.ts
     Styling.scss
 ```
 
 Where:
 
-- index.js acts as a barrel file, exporting all public elements of this component/the components in the Elements directory
+- index.ts acts as a barrel file, exporting all public elements of this component/the components in the Elements directory
 - README.md is the readme for this component, detailing design choices and usage
-- View.js is the view logic for this component
+- View.ts is the view logic for this component
 - Styling.scss (_optional_) is the styling for this component
 
 ## Components

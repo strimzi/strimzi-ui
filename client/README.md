@@ -10,3 +10,4 @@ This directory contains all client code for the Strimzi UI - ie code which is se
 - [Images](./Images/README.md) - images used across the UI
 - [Pages](./Pages/README.md) - metadata used to describe the pages shown in the UI
 - [Panels](./Panels/README.md) - section/page level components
+- `tsconfig.json` - Typescript config for this codebase

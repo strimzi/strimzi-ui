@@ -1,6 +1,6 @@
 # Bootstrap
 
-This directory contains all code required to bootstrap the UI. This will include the build entry point `index.js` ([for further details, see build documentation](../../docs/Build.md)), `index.html` template which will ultimately be returned the to the user when the access the UI, as well as all the React components that set up initial UI state and represent UI level behaviours, such as Navigation or user management.
+This directory contains all code required to bootstrap the UI. This will include the build entry point `index.ts` ([for further details, see build documentation](../../docs/Build.md)), `index.html` template which will ultimately be returned the to the user when the access the UI, as well as all the React components that set up initial UI state and represent UI level behaviours, such as Navigation or user management.
 
 While it's own directory, the code in this directory should be tested and developed in the same manner as a [`Panel`](../Panels/README.md) component, but additionally make use of user story end to end tests, which drive the whole UI to achieve the stated user goals.
 
@@ -18,24 +18,24 @@ For a given Bootstrap component `Navigation`, the expected files are as follows:
 
 ```
 Bootstrap/
-  index.js (*)
+  index.ts (*)
   index.html
   Navigation/
-    index.js (**)
+    index.ts (**)
     README.md
-    View.js
-    Model.js
+    View.ts
+    Model.ts
     Styling.scss
 ```
 
 Where:
 
-- index.js (\*) acts as the build (and thus client) entry point
+- index.ts (\*) acts as the build (and thus client) entry point
 - index.html is the HTML template file which is used to
-- index.js (\*\*) acts as a barrel file, exporting all public elements of this component
+- index.ts (\*\*) acts as a barrel file, exporting all public elements of this component
 - README.md is the readme for this component, detailing design choices and usage
-- View.js is the view logic for this component
-- Model.js (_optional_) is the model (business) logic for this component
+- View.ts is the view logic for this component
+- Model.ts (_optional_) is the model (business) logic for this component
 - Styling.scss (_optional_) is the styling for this component
 
 ## Components

@@ -3,7 +3,7 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-// prod specific plugins and webpack configuration
+// client production specific plugins and webpack configuration
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
@@ -16,9 +16,11 @@ const {
   moduleLoaders,
   CONSTANTS,
 } = require('./webpack.common.js');
-const { STRIMZI_HEADER } = require('../utils/tooling/constants.js');
+const { relativeClientAliases } = require('../utils/tooling/aliasHelper.js');
+const { HEADER_TEXT } = require('../utils/tooling/constants.js');
 const {
   withStylingModuleLoader,
+  withTSModuleLoader,
   withJSModuleLoader,
   withFontModuleLoader,
   withImageModuleLoader,
@@ -27,12 +29,18 @@ const {
   withHTMLPlugin,
   withMiniCssExtractPlugin,
   withWebpackBundleAnalyzerPlugin,
+  withTsconfigPathsPlugin,
 } = plugins;
 
-const { PRODUCTION } = CONSTANTS;
+const { PRODUCTION, CLIENT_BUILD_DIR, BUNDLE_ANALYSER_DIR } = CONSTANTS;
 
 const prodSpecificConfig = {
   mode: PRODUCTION,
+  output: {
+    path: CLIENT_BUILD_DIR,
+    publicPath: '',
+    filename: '[name].bundle.js',
+  },
   module: {
     rules: [
       withStylingModuleLoader([
@@ -40,6 +48,7 @@ const prodSpecificConfig = {
           loader: MiniCssExtractPlugin.loader,
         },
       ]),
+      withTSModuleLoader('../client/tsconfig.json'),
       withJSModuleLoader(),
       withFontModuleLoader(),
       withImageModuleLoader(),
@@ -52,7 +61,7 @@ const prodSpecificConfig = {
         terserOptions: {
           output: {
             comments: false, // remove all comments
-            preamble: STRIMZI_HEADER, // add strimzi licence to built JS
+            preamble: HEADER_TEXT, // add strimzi licence to built JS
           },
           keep_classnames: true,
           keep_fnames: true,
@@ -91,13 +100,25 @@ const prodSpecificConfig = {
     }),
     // add copyright to css files(other files already have the header)
     new BannerPlugin({
-      banner: `${STRIMZI_HEADER}`,
+      banner: `${HEADER_TEXT}`,
       test: /.css/,
       raw: true,
     }),
     // include default bundle analysis
-    withWebpackBundleAnalyzerPlugin(),
+    withWebpackBundleAnalyzerPlugin({
+      reportFilename: `${BUNDLE_ANALYSER_DIR}/client-report.json`,
+    }),
   ],
+  resolve: {
+    alias: {
+      ...relativeClientAliases,
+    },
+    plugins: [
+      withTsconfigPathsPlugin({
+        configFile: './client/tsconfig.json',
+      }),
+    ],
+  },
 };
 
 module.exports = returnBasicConfigMergedWith(prodSpecificConfig);

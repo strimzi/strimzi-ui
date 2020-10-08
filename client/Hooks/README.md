@@ -1,6 +1,6 @@
 # Hooks
 
-This directory contains all re-usable custom [React Hooks](https://reactjs.org/docs/hooks-intro.html#motivation) implemented for use across this UI. Unlike Models, these hooks encapsulate re-usable/common logic views or models may want to utilise, such as translation capabilities.
+This directory contains all re-usable custom [React Hooks](https://reactts.org/docs/hooks-intro.html#motivation) implemented for use across this UI. Unlike Models, these hooks encapsulate re-usable/common logic views or models may want to utilise, such as translation capabilities.
 
 ## Test approach
 
@@ -12,17 +12,17 @@ For a given Hook `useFoo`, the expected files are as follows:
 
 ```
 Hooks/
-  index.js
+  index.ts
   useFoo/
     README.md
-    Hook.js
+    Hook.ts
 ```
 
 Where:
 
-- index.js acts as a barrel file, exporting the hooks defined in the Hooks directory
+- index.ts acts as a barrel file, exporting the hooks defined in the Hooks directory
 - README.md is the readme for this hook, detailing design choices and usage
-- Hook.js is the hook implementation
+- Hook.ts is the hook implementation
 
 ## Implemented hooks
 

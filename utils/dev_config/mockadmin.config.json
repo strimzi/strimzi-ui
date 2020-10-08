@@ -1,0 +1,23 @@
+{
+  "authentication": {
+    "strategy": "none"
+  },
+  "client": {
+    "transport": {}
+  },
+  "modules": {
+    "api": false,
+    "client": false,
+    "config": true,
+    "log": false,
+    "mockapi": true
+  },
+  "proxy": {
+    "hostname": "0.0.0.0",
+    "port": 3000,
+    "transport": {}
+  },
+  "logging": true,
+  "hostname": "0.0.0.0",
+  "port": 9080
+}

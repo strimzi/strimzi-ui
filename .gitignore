@@ -5,6 +5,8 @@ node_modules/
 
 # built content
 dist/
+.out/
+js/
 
 # test/supporting generated content
 generated/
