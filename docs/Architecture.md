@@ -31,6 +31,7 @@ This document will cover the core Architectural decisions made for this UI, how 
   - [Directory structure](#directory-structure)
   - [`Element`, `Group`, `Panel`, `Bootstrap` component pattern](#element-group-panel-bootstrap-component-pattern)
   - [Swappable view layers](#swappable-view-layers)
+  - [Dependency management](#dependency-management)
 - [Supporting utilities and tools](#supporting-utilities-and-tools)
   - [Storybook](#storybook)
   - [Mock admin server](#mock-admin-server)
@@ -222,9 +223,9 @@ As mentioned, the core module will import and interact with any other module's `
 
 #### Entity model
 
-A UI typically allows a user to interact with resources. These resources are types of known entity (eg a Topic), which typically can be created, read, updated or deleted. Similarly, entities are often protected by authorization controls, restricting a user's access or ability to create, read, update or delete a given named entity or entity type. In the case of authorization for example, different mechanisms may be used to grant or reject the ability to create for instance. Equally, the ability to 'retrieve' an entity may vary (i.e retrieve the whole entity, or just a particular attribute) by use case. From a UI point of view, the 'how' of an operation on an entity is not important. What is important is if we can or cannot, and how the UI should ultimately respond to that.
+A UI typically allows a user to interact with resources. These resources are types of known entity (E.g. a Topic), which typically can be created, read, updated or deleted. Entities are often protected by authorization controls, restricting a user's access or ability to create, read, update or delete a given named entity or entity type. In the case of authorization for example, different mechanisms may be used to grant or reject the ability to create for instance. The ability to 'retrieve' an entity may vary (i.e retrieve the whole entity, or just a particular attribute) by use case. From a UI point of view, the 'how' of an operation on an entity is not important. What is important is if we can or cannot, and how the UI should ultimately respond to that.
 
-Thus, to help encapsulate these cases and capabilities, the Strimzi ui (both client and server) uses a simple 'entity model' to help describe/define what entities are used in a given scenario, and what operations need to be performed on them. These operations typically will take the form of CRUD actions (although additional actions can also be provided/checked on a case by case basis), which will be checked at runtime via a defined callback for that action, with the callback being provided appropriate state so it can return a `true` or `false` result, indicating if 'this' action on 'this' entity is currently possible. Keys for common operations on any entity (ie `CREATE`,`READ`,`UPDATE` and `DELETE`) will be defined in [`entityModelConstants.js`](../utils/entityModelConstants.js), with more specific keys being added as required.
+Thus, to help encapsulate these cases and capabilities, the Strimzi ui (both client and server) uses a simple 'entity model' to help describe/define what entities are used in a given scenario, and what operations need to be performed on them. These operations typically will take the form of CRUD actions (although additional actions can also be provided/checked on a case by case basis), which will be checked at runtime via a defined callback for that action, with the callback being provided appropriate state so it can return a `true` or `false` result, indicating if 'this' action on 'this' entity is currently possible. Keys for common operations on any entity (I.e. `CREATE`,`READ`,`UPDATE` and `DELETE`) will be defined in [`entityModelConstants.js`](../utils/entityModelConstants.js), with more specific keys being added as required.
 
 In the case of the Strimzi ui, this approach is used currently to describe backend capability required to show a page at minimum, and what authorization rights a user requires to access a page at minimum ([More details available here](../client/Pages/README.md)). In this case, the callbacks are provided with either [the result of GraphQL introspection](#introspection)) or current known authorization state respectively, which are then processed/checked in the callback to return the required `true`/`false` result.
 
@@ -378,6 +379,23 @@ Note that due to the aliases that the implementation details are completely abst
 For this capability to work, [file name conventions](#file-name-conventions) need to be followed (so the aliases align with file names), and the properties/behaviours exposed by components should align: all that should be different should be how a capability is rendered - not it's capability. If different behaviours are required, different components should be implemented to provide these.
 
 _Note_: Implementation of this will follow in a future PR.
+
+#### Dependency management
+
+This UI will make use of a number of third party dependencies to operate at develop, test, and runtime. This will range from helper tools such as Webpack, to frameworks, like React. The `package.json` file/schema defines three main types of dependency: `dependencies`, `peerDependencies` and `devDependencies`. In a traditional NPM package, depending on which section a dependency sits, it will be treated differently at `npm publish` (build) time:
+
+- `dependencies` are bundled on `npm publish`, meaning they are shipped as a part of this package on build
+- `peerDependencies` are required but not included in the built output created via `npm publish`. Users of the built package are expected to provide them alongside this package (giving the user more control over what versions of packages are used)
+- `devDependencies` are used to support the development and test of a package, but are not shipped
+
+Tooling, such as [`npm audit`](https://docs.npmjs.com/cli/audit) make use of/utilise these sections to report when a dependency has a known vulnerability, and can thus call out if an issue is shipped by this package, assuming that dependencies are correctly catagorised based on their usage. Given the nature of JavaScript and where it is used, having these tools report issues when they occur is incredibly valuable.
+
+The Strimzi-ui will not be published. Instead, it will consume a number of packages, and be built to provide a UI. Some of these packages will be used and shipped directly, but some will also generate and polyfill code in this repository to produce the the built UI. Thus, in the event of a security issue, we need to understand if the issue relates in any way to what we ship. We therefore categorise our dependencies as follows:
+
+- `dependencies` are any dependency which are either shipped bundled in the built output via direct usage (E.g. React), included in the dockerfile which will run the UI (E.g. Express) or generate output that is then built and shipped (I.e. babel transforms/plugins, Webpack plugins etc)
+- `devDependencies` are used to support the development and test of the UI, but that are not shipped. E.g. Webpack, Jest, eslint
+
+The correct usage/catagorisation of dependencies will be checked on PR, alongside other checks, such as the licence that dependency comes with.
 
 ### Supporting utilities and tools
 
