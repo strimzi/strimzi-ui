@@ -8,7 +8,9 @@
     "start": "webpack-dev-server --config utils/build/webpack.dev.js",
     "build": "webpack --config utils/build/webpack.prod.js",
     "server": "",
-    "test": "jest --collectCoverage",
+    "test:unit": "jest --collectCoverage --config utils/test/jest.config.js",
+    "test:e2e:open": "npm-run-all clean build server cy:open",
+    "test:e2e:closed": "npm-run-all clean build server cy:closed",
     "pretest": "npm-run-all --parallel licence:check && prettier --config ./utils/linting/prettier.config.js --check .",
     "storybook": "start-storybook --port 6006",
     "storybook:build": "build-storybook -o .out",
@@ -19,8 +21,8 @@
     "lint:js": "eslint --config ./utils/linting/eslint.config.js --fix --max-warnings 0 --ignore-path ./utils/linting/.eslintignore",
     "lint:styling": "stylelint --config ./utils/linting/stylelint.config.js --fix --max-warnings 0",
     "lint:format": "prettier --config ./utils/linting/prettier.config.js --write",
-    "cypress:open": "npm-run-all clean build server cy:open",
-    "cy:open": "cypress open --config-file utils/test/cypress.json"
+    "cy:open": "cypress open --config-file utils/test/cypress.json",
+    "cy:closed": "cypress --config-file utils/test/cypress.json"
   },
   "sideEffects": false,
   "repository": {
@@ -30,9 +32,6 @@
   "license": "Apache-2.0",
   "bugs": {},
   "homepage": "https://github.com/strimzi/strimzi-ui#readme",
-  "cypress-cucumber-preprocessor": {
-    "stepDefinitions": "e2e/features/step_definitions"
-  },
   "dependencies": {
     "@babel/core": "^7.10.5",
     "@babel/preset-env": "^7.10.4",
@@ -41,6 +40,7 @@
     "html-webpack-plugin": "^4.3.0",
     "mini-css-extract-plugin": "^0.9.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "react": "^16.13.1",
     "sass": "^1.26.10",
     "terser-webpack-plugin": "^3.0.7",
     "webpack": "^4.43.0"

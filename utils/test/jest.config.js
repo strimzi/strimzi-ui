@@ -2,7 +2,7 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-const { jestModuleMapper } = require('./utils/aliasHelper.js');
+const { jestModuleMapper } = require('../aliasHelper.js');
 
 const config = {
   clearMocks: true,
@@ -31,15 +31,12 @@ const config = {
   testPathIgnorePatterns: ['/e2e/'],
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest',
-    '^.+\\.(js|jsx|ts|tsx)$': [
-      'babel-jest',
-      { configFile: './utils/test/test.babel.js' },
-    ],
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './test.babel.js' }],
   },
   moduleNameMapper: {
     ...jestModuleMapper,
   },
-  setupFiles: ['<rootDir>/utils/test/support'],
+  setupFiles: ['./support'],
 };
 
 module.exports = config;
