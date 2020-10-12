@@ -18,9 +18,11 @@ This document will cover the core Architectural decisions made for this UI, how 
     - [Routing and navigation model](#routing-and-navigation)
     - [GraphQL Introspection](#introspection)
     - [Component topology](#component-topology)
+    - [Logging](#client-side-logging)
   - [Back end (server)](#server)
     - [Technologies and patterns used](#server-technologies-and-patterns-used)
     - [`Router`, `Controller`, `Data` pattern](#router-controller-data-pattern)
+    - [Logging](#server-side-logging)
   - [Entity model](#entity-model)
   - [Configuration and feature flagging](#configuration-and-feature-flagging)
     - [Configuration types and usage](#configuration-types-and-usage)
@@ -171,6 +173,20 @@ The Strimzi ui will perform an introspection of the backend server when it first
 
 This section to follow in a future PR.
 
+##### Client-side logging
+
+Log messages from the client are sent to the server via a dedicated websocket. Logging and the websocket connection are enabled when the `LOGGING` query parameter exists in the URL. The `LOGGING` query parameter is detected by a Logging Hook, which provides a logging callback used in components/code on the client side. The value of the `LOGGING` query parameter is a regex that is used to determine which components and code are logged. Each client component registers it's own name via the logging callback, and if that name matches the `LOGGING` query parameter regex, any log messages emitted by the client component are sent over the websocket.
+
+The logging callback includes a `level` string argument that matches the [pino logging-levels](https://github.com/pinojs/pino/blob/master/docs/api.md#level-string), a `message` argument, and a list of inserts that are String-converted and included with the message.
+
+At the server, a websocket listener on the `/log` endpoint logs the received client-side log events via the [pino](https://github.com/pinojs/pino) logging library at the logging-level provided to the logging callback. Each log event includes the following information:
+
+- the client component name.
+- the client-side timestamp recorded when the client-side logging callback was invoked.
+- the server-side timestamp recorded when the websocket log event was received.
+- a unique client ID that is tied to the websocket client to allow log events from the same client to be grouped together.
+- the log event message from the client component code.
+
 #### Server
 
 This section will detail the purpose and implementation choices made around the Strimzi ui's UI server.
@@ -186,6 +202,7 @@ The server, like the client code, makes use of a number of technologies and patt
   - [express-session](https://github.com/expressjs/session) and [connect-redis](https://github.com/tj/connect-redis) for session management and simple Redis integration
   - [body-parser](https://github.com/expressjs/body-parser) and [cookie-parser](https://github.com/expressjs/cookie-parser) for additional request parsing and sanitisation
 - [node-http-proxy](https://github.com/http-party/node-http-proxy) to provide HTTP and WS proxy support
+- [pino](https://github.com/pinojs/pino) and [pino-http](https://github.com/pinojs/pino-http#readme) to provide fast, low-overhead logging and HTTP request logging respectively. The [pino-pretty](https://github.com/pinojs/pino-pretty) module can be used to prettify the logging output.
 - Code, defined in modules based on their responsibility, further separated into a [`Router`, `Controller`, `Data` pattern](#router-controller-data-pattern), a form of the [Model View Controller (MVC)](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) design pattern for keeping express, business, and additional data fetching logic separate
 
 ##### `Router`, `Controller`, `Data` pattern
@@ -220,6 +237,16 @@ server/
 ```
 
 As mentioned, the core module will import and interact with any other module's `router` via the `index.js` barrel file. Further details of this interaction can be found in [the core module's README.](../server/core/README.md)
+
+##### Server-side logging
+
+Server-side logging uses the [pino](https://github.com/pinojs/pino) logging library to emit logging events to STDOUT. Logging configuration is managed via the [`logging` configuration object](#server-configuration), which is added to the default [pino options](https://github.com/pinojs/pino/blob/master/docs/api.md#options).
+
+Each module in the server uses it's own [child logger](https://github.com/pinojs/pino/blob/master/docs/child-loggers.md) to allow simple filtering of logging events by module in post-processing. To allow more fine grained log filtering [pino-filter](https://github.com/pinojs/pino-filter) is included in the project dependencies, but is not used by default.
+
+All HTTP requests are logged at the `info`-level using [pino-http](https://github.com/pinojs/pino-http#readme) which hooks into the express server, allowing requests and responses to be easily correlated.
+
+Modules should infrequently log at the `warning` or `info` levels, as these messages will appear in the default log configuration. Most module level logging should be at the `debug` or `trace` levels. The `fatal` and `error` level logging messages should only be used when there are fundamental failures in the server code.
 
 #### Entity model
 
@@ -272,21 +299,21 @@ The UI server will primarily be configured at runtime via a provided JSON file. 
 
 Configuration options for the server include:
 
-| Configuration                | Required | Default                                                                                                          | Purpose                                                                                                                                                                                |
-| ---------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| authentication.strategy      | No       | `none`                                                                                                           | What authentication strategy to use to authenticate users. See [the security section](#security) for details of the available options.                                                 |
-| authentication.configuration | No       | `{}`                                                                                                             | Any additional configuration required for the provided authentication strategy `authentication.strategy` . See [the security section](#security) for details of the available options. |
-| client.configOverrides       | No       | `{}`                                                                                                             | Overrides to send to the client. See [client configuration for further details](#client-configuration). These values will take precedence over any others provided.                    |
-| client.transport.cert        | No       | N/A - if one of `client.transport.cert` or `client.transport.key` are not provided, server will be HTTP          | PEM certificate presented to browsers on connecting to the UI server.                                                                                                                  |
-| client.transport.key         | No       | N/A - if one of `client.transport.cert` or `client.transport.key` are not provided, server will be HTTP          | PEM certificate private key for the certificate provided in `client.transport.cert`.                                                                                                   |
-| client.transport.ciphers     | No       | default set from [node's tls module](https://nodejs.org/api/tls.html#tls_modifying_the_default_tls_cipher_suite) | TLS ciphers used/supported by the HTTPS server for client negotiation. Only applies if starting an HTTPS server.                                                                       |
-| client.transport.minTLS      | No       | `TLSv1.2`                                                                                                        | Minimum TLS version supported by the server. Only applies if starting an HTTPS server. Set to `TLSv1.2` for browser compatibility.                                                     |
-| modules                      | No       | Object - [enabled modules and configuration can be found here](##router-controller-data-pattern)                 | The modules which are either enabled or disabled.                                                                                                                                      |
-| logging                      | No       | TBD                                                                                                              | Logging configuration settings. Format to be defined in https://github.com/strimzi/strimzi-ui/issues/24                                                                                |
-| proxy.transport.cert         | No       | If not provided, SSL certificate validation of the upstream admin server is disabled                             | CA certificate in PEM format of the backend admin server api requests are to be sent to.                                                                                               |
-| proxy.hostname               | Yes      | N/A                                                                                                              | The hostname of the admin server to send api requests to.                                                                                                                              |
-| proxy.port                   | Yes      | N/A                                                                                                              | The port of the admin server to send api requests to.                                                                                                                                  |
-| featureFlags                 | No       | `{}`                                                                                                             | Feature flag overrides to set. The configuration is as per the format specified [here](#feature-flags). These values will take precedence over any others provided.                    |
+| Configuration                | Required | Default                                                                                                                                | Purpose                                                                                                                                                                                |
+| ---------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| authentication.strategy      | No       | `none`                                                                                                                                 | What authentication strategy to use to authenticate users. See [the security section](#security) for details of the available options.                                                 |
+| authentication.configuration | No       | `{}`                                                                                                                                   | Any additional configuration required for the provided authentication strategy `authentication.strategy` . See [the security section](#security) for details of the available options. |
+| client.configOverrides       | No       | `{}`                                                                                                                                   | Overrides to send to the client. See [client configuration for further details](#client-configuration). These values will take precedence over any others provided.                    |
+| client.transport.cert        | No       | N/A - if one of `client.transport.cert` or `client.transport.key` are not provided, server will be HTTP                                | PEM certificate presented to browsers on connecting to the UI server.                                                                                                                  |
+| client.transport.key         | No       | N/A - if one of `client.transport.cert` or `client.transport.key` are not provided, server will be HTTP                                | PEM certificate private key for the certificate provided in `client.transport.cert`.                                                                                                   |
+| client.transport.ciphers     | No       | default set from [node's tls module](https://nodejs.org/api/tls.html#tls_modifying_the_default_tls_cipher_suite)                       | TLS ciphers used/supported by the HTTPS server for client negotiation. Only applies if starting an HTTPS server.                                                                       |
+| client.transport.minTLS      | No       | `TLSv1.2`                                                                                                                              | Minimum TLS version supported by the server. Only applies if starting an HTTPS server. Set to `TLSv1.2` for browser compatibility.                                                     |
+| modules                      | No       | Object - [enabled modules and configuration can be found here](##router-controller-data-pattern)                                       | The modules which are either enabled or disabled.                                                                                                                                      |
+| logging                      | No       | `{}` - Info-level logs in newline delimited JSON format (the default [pino](https://github.com/pinojs/pino) format) written to STDOUT. | Logging configuration settings added to the default [pino options](https://github.com/pinojs/pino/blob/master/docs/api.md#options).                                                    |
+| proxy.transport.cert         | No       | If not provided, SSL certificate validation of the upstream admin server is disabled                                                   | CA certificate in PEM format of the backend admin server api requests are to be sent to.                                                                                               |
+| proxy.hostname               | Yes      | N/A                                                                                                                                    | The hostname of the admin server to send api requests to.                                                                                                                              |
+| proxy.port                   | Yes      | N/A                                                                                                                                    | The port of the admin server to send api requests to.                                                                                                                                  |
+| featureFlags                 | No       | `{}`                                                                                                                                   | Feature flag overrides to set. The configuration is as per the format specified [here](#feature-flags). These values will take precedence over any others provided.                    |
 
 [As mentioned in the usage section](#configuration-types-and-usage)], having loaded the server configuration, this will be reduced and served by the server to the client. The reduced result is also available to the server.
 
