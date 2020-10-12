@@ -1,7 +1,7 @@
 {
   "baseUrl": "http://localhost:8080",
-  "screenshotsFolder": "failure_output/screenshots",
-  "videosFolder": "failure_output/videos",
+  "screenshotsFolder": "e2e/failure_output/screenshots",
+  "videosFolder": "e2e/failure_output/videos",
   "integrationFolder": "e2e/features",
   "fixturesFolder": "e2e/fixtures",
   "supportFile": "e2e/support/index.ts",

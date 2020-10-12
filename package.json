@@ -22,7 +22,7 @@
     "lint:styling": "stylelint --config ./utils/linting/stylelint.config.js --fix --max-warnings 0",
     "lint:format": "prettier --config ./utils/linting/prettier.config.js --write",
     "cy:open": "cypress open --config-file utils/test/cypress.json",
-    "cy:closed": "cypress --config-file utils/test/cypress.json"
+    "cy:closed": "cypress run --config-file utils/test/cypress.json"
   },
   "sideEffects": false,
   "repository": {

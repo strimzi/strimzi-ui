@@ -9,6 +9,7 @@ dist/
 # test/supporting generated content
 generated/
 coverage/
+e2e/failure_output
 
 # misc
 .history
