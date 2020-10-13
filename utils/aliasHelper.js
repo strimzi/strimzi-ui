@@ -46,8 +46,8 @@ const jestModuleMapper = Object.values(modules).reduce(
     return { ...mapping, [regex]: path };
   },
   {
-    [`^(${relativeMocks})(.*)$`]: '<rootDir>/utils/test/mockfile.util.js',
-    [`^.+\\.(${ignoredBinaries})$`]: '<rootDir>/utils/test/mockfile.util.js',
+    [`^(${relativeMocks})(.*)$`]: '<rootDir>/test/mockfile.util.js',
+    [`^.+\\.(${ignoredBinaries})$`]: '<rootDir/test/mockfile.util.js',
   }
 );
 

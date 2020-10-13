@@ -8,7 +8,7 @@
     "start": "webpack-dev-server --config utils/build/webpack.dev.js",
     "build": "webpack --config utils/build/webpack.prod.js",
     "server": "",
-    "test:unit": "jest --collectCoverage --config utils/test/jest.config.js",
+    "test:unit": "jest --collectCoverage --config test/jest.config.js",
     "test:e2e:open": "npm-run-all clean build server cy:open",
     "test:e2e:closed": "npm-run-all clean build server cy:closed",
     "pretest": "npm-run-all --parallel licence:check && prettier --config ./utils/linting/prettier.config.js --check .",
@@ -21,8 +21,8 @@
     "lint:js": "eslint --config ./utils/linting/eslint.config.js --fix --max-warnings 0 --ignore-path ./utils/linting/.eslintignore",
     "lint:styling": "stylelint --config ./utils/linting/stylelint.config.js --fix --max-warnings 0",
     "lint:format": "prettier --config ./utils/linting/prettier.config.js --write",
-    "cy:open": "cypress open --config-file utils/test/cypress.json",
-    "cy:closed": "cypress run --config-file utils/test/cypress.json"
+    "cy:open": "cypress open --config-file e2e/cypress.json",
+    "cy:closed": "cypress run --config-file e2e/cypress.json"
   },
   "sideEffects": false,
   "repository": {

@@ -1,1 +1,1 @@
-utils/test/cypress-cucumber-preprocessor.config.js
+test/cypress-cucumber-preprocessor.config.js
