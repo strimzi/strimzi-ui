@@ -1,4 +1,4 @@
-# Continuos Integration
+# Continuous Integration
 
 This repo makes use of GitHub Actions to run various checks to aid maintaining this repo. Actions allow us to run certain checks on PRs, maintain our dependencies, and have automatic issue checking. All code for workflows and actions can be found in the `.github` directory at the root of this repository.
 
