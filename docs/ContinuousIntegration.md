@@ -24,4 +24,4 @@ On merge to master, a hosted version of the project storybook will be available 
 
 ## Stale Issue/Pull Request Management
 
-To prevent this repo from filling with stale issues and pull requests, we make use of an action that will automatically flag old issues and pull requests as stale. If, after 30 days, the issue/pr is still open, it will automatically be closed. The action that manages this can be found [here](https://github.com/marketplace/actions/close-stale-issues). An issue/pr will become stale after 30 days of no activity. If there is no activity for a further 5 days, it will be deleted.
+To prevent this repo from filling with stale issues and pull requests, we make use of an action that will automatically flag old issues and pull requests as stale. If, after 30 days, the issue/pr is still open, it will automatically be closed. The action that manages this can be found [here](https://github.com/marketplace/actions/close-stale-issues). An issue/pr will become stale after 14 days of no activity. If there is no activity for a further 5 days, it will be deleted.
