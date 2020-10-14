@@ -19,7 +19,7 @@ const relativeAliases = {
 
 const relativeMocks = Object.keys(relativeAliases).join('|');
 const ignoredBinaries = ['png', 'svg', 'ico', 'scss'].join('|');
-const mockFile = '<rootDir>/test_common/mockfile.util.js';
+const mockFile = '<rootDir>/test_common/mockfile.util.ts';
 
 const modules = moduleNames.reduce((moduleConfig, name) => {
   const currentModule = {

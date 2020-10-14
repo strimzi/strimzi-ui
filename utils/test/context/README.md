@@ -7,10 +7,10 @@ of context providers and their values that will wrap the provided children.
 Using this, a common render can be defined in a test file for contexts so that
 each test only needs to worry about using a consumer. For example:
 
-```javascript
+```typescript
 render = (children) =>
   renderWithContextProviders(children, {}, [
-    { provider: MyProvicer1, value: providerValue1 },
+    { provider: MyProvider1, value: providerValue1 },
     { provider: MyProvider2, value: providerValue2 },
   ]);
 ```
