@@ -5,3 +5,5 @@ dist/
 generated/
 coverage/
 .*
+*.txt
+*.feature

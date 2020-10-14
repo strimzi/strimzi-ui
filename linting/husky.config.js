@@ -5,7 +5,7 @@
 
 // https://github.com/typicode/husky#supported-hooks
 const config = {
-  'pre-commit': 'lint-staged --config ./utils/linting/lint-staged.config.js',
+  'pre-commit': 'lint-staged --config ./linting/lint-staged.config.js',
   'commit-msg': 'commitlint -E HUSKY_GIT_PARAMS',
 };
 

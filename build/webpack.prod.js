@@ -16,7 +16,7 @@ const {
   moduleLoaders,
   CONSTANTS,
 } = require('./webpack.common.js');
-const { STRIMZI_HEADER } = require('../constants.js');
+const { STRIMZI_HEADER } = require('../utils/tooling/constants.js');
 const {
   withStylingModuleLoader,
   withJSModuleLoader,

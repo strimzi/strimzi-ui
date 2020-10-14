@@ -1,6 +1,6 @@
-# Test
+# Test Common
 
-This directory contains all files that provide utility to all tests. See the full [test utilities doc here](../docs/Test.md#test-utilities).
+This directory contains all files that provide common utility to all tests. See the full [test utilities doc here](../docs/Test.md#test-utilities).
 
 ## Contents
 

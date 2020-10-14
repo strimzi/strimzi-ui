@@ -4,5 +4,11 @@ This directory contains common helper code or configuration for a variety of pur
 
 ## Utilities available
 
+### Tooling
+
 - `constants.js` - file containing development/build time constants.
 - `aliasHelper.js` - logic used to generate code aliases. Currently generates aliases for Webpack, but could also generate aliases for other tools, such as Jest.
+
+### Test
+
+- [Context](./test/context.README.md) - utilities for writing tests for components that use contexts.
