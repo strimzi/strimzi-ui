@@ -9,3 +9,4 @@ This directory contains all documentation relating to the whole repository. For 
 - [Linting](./Linting.md)
 - [Test](./Test.md)
 - [Contribution](./Contribution.md)
+- [Continuous Integration](./ContinuousIntegration.md)
