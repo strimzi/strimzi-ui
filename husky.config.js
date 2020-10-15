@@ -1,1 +1,1 @@
-utils/linting/husky.config.js
+linting/husky.config.js

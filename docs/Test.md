@@ -48,13 +48,15 @@ test assets, such as `describe`, `it` and `expect`:
 ### Behavioural Driven Development
 
 Code in the following directories are expected to be driven by behavioural
-driven deveopment. They use _Jest_ as a test runner, using standard Jest test
-assets, such as `describe`, `it` and `expect`, and _RTL_ to mount and interact
-with React component code:
+driven development. They use _Jest_ as a test runner, with _jest-cucumber-fusion_
+to link jest and cucumber. Jest `expects` and all aspects of `RTL` can still be
+used to test React code:
 
 - `client/Elements`
 - `client/Groups`
 - `client/Panels`
+
+Common step definitions should be defined in `test_common/jest_cucumber_support/common_stepdefs.ts`.
 
 ### Server Testing
 
@@ -87,7 +89,7 @@ syntax. Your `.feature` file should live inside `e2e/features`. The steps are
 written inside `e2e/features/step_definitions`. Definition files are written using
 [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor).
 
-On failure - the `failure_output/screenshots` and `failure_output/videos`
+On failure - the `e2e/failure_output/screenshots` and `e2e/failure_output/videos`
 directories will contain a capture of the page at failure time, and a
 recordings of the test until failure.
 
@@ -120,7 +122,7 @@ To be discussed at https://github.com/strimzi/strimzi-ui/issues/20
 ## Test tooling used
 
 The current set of tooling used to implement tests can be found below. In
-addition to this set, a library of [test utilities exist](../src/TestUtils/README.md)
+addition to this set, a library of [test utilities exist](../utils/test/README.md)
 to help enable the fast and reliable creation and maintaince of tests going
 forwards.
 
@@ -141,4 +143,4 @@ function signatures that are well documented. Once implemented these should
 not be changed so that function complexity does not grow. If additional behaviour
 is required later on, these should be extended through new utility functions.
 
-View all test utily documentation [here](../utils/test/README.md).
+View all test utility documentation [here](../test_common/README.md).

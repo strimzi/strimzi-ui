@@ -3,17 +3,17 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 const path = require('path');
-const { webpackAliases } = require('../aliasHelper.js');
-const { PRODUCTION, DEVELOPMENT } = require('../constants.js');
+const { webpackAliases } = require('../utils/tooling/aliasHelper.js');
+const { PRODUCTION, DEVELOPMENT } = require('../utils/tooling/constants.js');
 const babelPresets = require('./babelPresets.js');
 
 // constants
 const UI_TITLE = 'Strimzi UI';
-const BUILD_DIR = path.resolve(__dirname, '../../dist');
-const GENERATED_DIR = path.resolve(__dirname, '../../generated');
+const BUILD_DIR = path.resolve(__dirname, '../dist');
+const GENERATED_DIR = path.resolve(__dirname, '../generated');
 const BUNDLE_ANALYSER_DIR = `${GENERATED_DIR}/bundle-analyser/`;
-const BOOTSTRAP_DIR = path.resolve(__dirname, '../../client/Bootstrap/');
-const IMAGES_DIR = path.resolve(__dirname, '../../client/Images');
+const BOOTSTRAP_DIR = path.resolve(__dirname, '../client/Bootstrap/');
+const IMAGES_DIR = path.resolve(__dirname, '../client/Images');
 
 // common plugin imports/functions to wrap them with common default config
 const HtmlPlugin = require('html-webpack-plugin');

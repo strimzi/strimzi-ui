@@ -1,1 +1,1 @@
-utils/linting/commitlint.config.js
+linting/commitlint.config.js
