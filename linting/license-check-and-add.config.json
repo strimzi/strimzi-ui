@@ -3,7 +3,7 @@
   "ignore": [
     ".**",
     ".git/**",
-    "./utils/headers",
+    "utils/headers",
     "**.md",
     "**.pptx",
     "./build/dockerfile",

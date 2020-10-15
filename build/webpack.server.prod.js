@@ -14,7 +14,7 @@ const {
   CONSTANTS,
 } = require('./webpack.common.js');
 const { HEADER_TEXT } = require('../utils/tooling/constants.js');
-const { withTSModuleLoader, withJSModuleLoader } = moduleLoaders;
+const { withTypeScriptModuleLoader, withJSModuleLoader } = moduleLoaders;
 const { withWebpackBundleAnalyzerPlugin, withTsconfigPathsPlugin } = plugins;
 
 const {
@@ -35,7 +35,7 @@ const prodSpecificConfig = {
   },
   module: {
     rules: [
-      withTSModuleLoader('../server/tsconfig.json'),
+      withTypeScriptModuleLoader('../server/tsconfig.json'),
       withJSModuleLoader(),
     ],
   },
@@ -65,11 +65,7 @@ const prodSpecificConfig = {
     }),
   ],
   resolve: {
-    plugins: [
-      withTsconfigPathsPlugin({
-        configFile: './server/tsconfig.json',
-      }),
-    ],
+    plugins: [withTsconfigPathsPlugin({ configFile: 'server/tsconfig.json' })],
   },
 };
 

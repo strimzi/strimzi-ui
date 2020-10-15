@@ -3,6 +3,8 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
+const tsConfig = require('./eslint.config.typescript.js');
+
 const rulesets = [
   'eslint:recommended',
   'plugin:react/recommended',
@@ -14,6 +16,8 @@ const customRules = {
   indent: ['error', 2],
   // all lines to have semicolons to end statements
   semi: ['error', 'always'],
+  'i18next/no-literal-string': ['error', { markupOnly: true }],
+  'id-length': ['error', { exceptions: ['_'] }],
 };
 
 // https://eslint.org/docs/user-guide/configuring
@@ -35,7 +39,7 @@ module.exports = {
     },
     sourceType: 'module',
   },
-  plugins: ['react', 'jest', 'cypress'],
+  plugins: ['react', 'jest', 'cypress', 'i18next'],
   // detect and use the version of react installed to guide rules used
   settings: {
     react: {
@@ -43,6 +47,5 @@ module.exports = {
     },
   },
   rules: customRules,
-  // ignore built output
-  ignorePatterns: ['**/dist'],
+  overrides: [tsConfig],
 };

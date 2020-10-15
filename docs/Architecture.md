@@ -121,7 +121,7 @@ This UI makes use of:
   - React Lazy and Suspense: to enable asynchronous loading of component code where required
 - [Sass](https://sass-lang.com/) for styling. This adds a number of helpful features on top of the core css language to commonise and speed up style implementation
 - Webpack and Babel for building, bundling, treeshaking and transpiling the UI, and enabling day to day development. See [the build documentation](./Build.md#ui-build) for further details on build choices and setup.
-- [`Barrel files`](https://basarat.gitbook.io/typescript/main-1/barrel) and named exports. Barrel files (when combined with [Webpack aliases](./Build.md#webpack-aliases)) allow for many components/modules/functions/constants which are related to be imported and used via one import statement. This relies on exported components/modules/functions/constants to be individually named so they can be imported directly.
+- [`Barrel files`](https://basarat.gitbook.io/typescript/main-1/barrel) and named exports. Barrel files (when combined with [path mapping](./Build.md#module-aliases)) allow for many components/modules/functions/constants which are related to be imported and used via one import statement. This relies on exported components/modules/functions/constants to be individually named so they can be imported directly.
 - [`React Router`](https://github.com/ReactTraining/react-router) for it's declarative routing capabilities.
 
 ##### File name conventions

@@ -1,21 +1,12 @@
 {
-  "extends": "../utils/dev_config/tsconfig.common.json",
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "module": "esnext",
     "jsx": "react",
     "outDir": "../js/client",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
-      "Images/*": ["Images/*"],
-      "Styling": ["./Styling.scss"],
-      "Bootstrap/*": ["Bootstrap/*"],
-      "Contexts": ["Contexts/"],
-      "Elements": ["Elements/"],
-      "Groups": ["Groups/"],
-      "Hooks": ["Hooks/"],
-      "Pages": ["Pages/"],
-      "Panels": ["Panels/"]
+      "utils/*": ["../utils/*"]
     }
-  },
-  "include": ["."]
+  }
 }
