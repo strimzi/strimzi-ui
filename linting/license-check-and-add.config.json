@@ -24,7 +24,7 @@
         "prepend": " "
       }
     },
-    "dotfiles|prettierignore|feature": {
+    "dotfiles|prettierignore|feature|conf": {
       "eachLine": {
         "prepend": "# "
       }

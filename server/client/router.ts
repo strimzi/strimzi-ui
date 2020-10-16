@@ -4,7 +4,12 @@
  */
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
-import { totalNumberOfFiles, protectedFiles, builtClientDir, hasIndexFile } from './controller';
+import {
+  totalNumberOfFiles,
+  protectedFiles,
+  builtClientDir,
+  hasIndexFile,
+} from './controller';
 import { UIServerModule } from 'types';
 
 const moduleName = 'client';
@@ -16,7 +21,9 @@ export const ClientModule: UIServerModule = {
     const { debug, exit } = entry('addModule');
     const routerForModule = express.Router();
 
-    debug(`Client is hosting ${totalNumberOfFiles} static files,  ${protectedFiles.length} of which are protected and require authentication`);
+    debug(
+      `Client is hosting ${totalNumberOfFiles} static files, ${protectedFiles.length} of which are protected and require authentication`
+    );
     debug(`Client has index.html to serve? ${hasIndexFile}`);
 
     // add the auth middleware to all non public files

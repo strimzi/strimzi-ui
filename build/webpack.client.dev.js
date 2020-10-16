@@ -12,6 +12,7 @@ const {
 } = require('./webpack.common.js');
 
 const { relativeClientAliases } = require('../utils/tooling/aliasHelper.js');
+const { devEnvToUseTls } = require('../utils/tooling/secureDevUtil.js');
 
 const {
   withHTMLPlugin,
@@ -74,11 +75,16 @@ const devSpecificConfig = {
     compress: true,
     inline: true,
     hot: true,
+    https: devEnvToUseTls,
     host: devHostname,
     port: devPort,
-    proxy: {
-      '*': 'http://localhost:3000',
-    },
+    proxy: [
+      {
+        context: ['**'],
+        target: `http${devEnvToUseTls ? 's' : ''}://localhost:3000`,
+        secure: false,
+      },
+    ],
     overlay: {
       warnings: false,
       errors: true,

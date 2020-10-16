@@ -4,6 +4,7 @@
  */
 
 import http from 'http';
+import https from 'https';
 
 import { loadConfig, watchConfig, getServerName } from 'serverConfig';
 import { returnExpress } from 'core';
@@ -61,15 +62,48 @@ loadConfig((loadedInitialConfig) => {
     config = latestConfig;
   }); // load config and update config value
 
-  const httpServer = http.createServer(returnExpress(serverName, () => config));
+  const expressAppForServer = returnExpress(serverName, () => config);
 
-  const instance = httpServer.listen(config.port, config.hostname, () =>
+  const { cert, key, ciphers, minTLS } = config.client.transport;
+  let server;
+  let isServerSecure = false;
+
+  if (cert && key) {
+    isServerSecure = true;
+    log(
+      serverName,
+      'startup',
+      'main',
+      'server starting',
+      `Strimzi ui server will server via HTTPS`
+    );
+    const httpsConfig = {
+      key,
+      cert,
+      ciphers,
+      minVersion: minTLS || 'TLSv1.2',
+    };
+    server = https.createServer(httpsConfig, expressAppForServer);
+  } else {
+    log(
+      serverName,
+      'startup',
+      'main',
+      'server starting',
+      `Strimzi ui server will server via HTTP`
+    );
+    server = http.createServer(expressAppForServer);
+  }
+
+  const instance = server.listen(config.port, config.hostname, () =>
     log(
       serverName,
       'startup',
       'main',
       'server ready',
-      `Strimzi ui server ready at http://${config.hostname}:${config.port}`
+      `Strimzi ui server ready at http${isServerSecure ? 's' : ''}://${
+        config.hostname
+      }:${config.port}`
     )
   );
 

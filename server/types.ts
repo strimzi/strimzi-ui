@@ -3,6 +3,7 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 import express from 'express';
+import { SecureVersion } from 'tls';
 
 export type supportedAuthenticationStrategyTypes = 'none' | 'scram' | 'oauth';
 
@@ -21,7 +22,7 @@ type sslCertificateType = {
   /** TLS ciphers used/supported by the HTTPS server for client negotiation */
   ciphers?: string;
   /** Minimum TLS version supported by the server */
-  minTLS?: string;
+  minTLS?: SecureVersion;
 };
 
 type clientConfigType = {
@@ -30,9 +31,6 @@ type clientConfigType = {
   /** SSL transport configuration */
   transport: sslCertificateType;
 };
-
-/** configuration overrides */
-type configurationOverridesType = Record<string, unknown>;
 
 /** feature flag configuration overrides */
 type featureFlagsConfigType = Record<string, unknown>;
@@ -64,8 +62,6 @@ export type serverConfig = {
   authentication: authenticationConfigType;
   /** client (browser) facing configuration */
   client: clientConfigType;
-  /** configuration overrides (for both client and server) */
-  configurationOverrides: configurationOverridesType;
   /** feature flag configuration overrides (for both client and server) */
   featureFlags: featureFlagsConfigType;
   /** logging configuration */

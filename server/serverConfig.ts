@@ -3,7 +3,7 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import { existsSync, readFile, watch } from 'fs';
+import { existsSync, watch } from 'fs';
 import { resolve } from 'path';
 import merge from 'lodash.merge';
 
@@ -17,7 +17,6 @@ const defaultConfig: serverConfig = {
   client: {
     transport: {},
   },
-  configurationOverrides: {},
   featureFlags: {},
   modules: {
     api: true,
@@ -27,8 +26,8 @@ const defaultConfig: serverConfig = {
     mockapi: false,
   },
   proxy: {
-    hostname: '0.0.0.0',
-    port: 3000,
+    hostname: 'strimzi.admin.hostname.com',
+    port: 9080,
     transport: {},
   },
   logging: true,
@@ -45,44 +44,39 @@ const configFileExists = existsSync(pathToConfigFile);
 export const getServerName: () => string = () =>
   process.env.serverName || 'Strimzi-ui server';
 
-export const loadConfig: (
-  callback: (config: serverConfig, err?: Error | null) => void
-) => void = (callback) =>
-  readFile(pathToConfigFile, { encoding: 'utf-8' }, (err, fileContent) => {
-    let config = merge({}, defaultConfig);
-    if (err) {
-      log(
-        getServerName(),
-        'runtime',
-        'config',
-        'Error',
-        `Error thrown while reading config file: ${err.message}`,
-        err
-      );
-      log(
-        getServerName(),
-        'runtime',
-        'config',
-        'Error',
-        `Will fallback to default config`
-      );
-    } else {
-      log(
-        getServerName(),
-        'runtime',
-        'config',
-        'loadConfig',
-        `Loaded configuration from: ${pathToConfigFile}`
-      );
-      const parsedConfig = JSON.parse(fileContent);
-      // merge parsed with core/std config
-      config = merge(config, parsedConfig);
-    }
-    callback(config, err);
-  });
+export const loadConfig: (callback: (config: serverConfig) => void) => void = (
+  callback
+) => {
+  let config = merge({}, defaultConfig);
+
+  if (configFileExists) {
+    log(
+      getServerName(),
+      'runtime',
+      'serverConfig',
+      'loadConfig',
+      `Using config file '${pathToConfigFile}'`
+    );
+    delete require.cache[require.resolve(pathToConfigFile)];
+    // this is a deliberate require so we can load json/js, and have it parsed/modules evaluated
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const loadedConfig = require(pathToConfigFile);
+    // merge parsed with core/std config
+    config = merge(config, loadedConfig);
+  } else {
+    log(
+      getServerName(),
+      'runtime',
+      'serverConfig',
+      'Error',
+      `The file specified config file '${pathToConfigFile}' was not found. Will fallback to default config`
+    );
+  }
+  callback(config);
+};
 
 export const watchConfig: (
-  callbackOnConfigChange: (newConfig: serverConfig, err?: Error | null) => void
+  callbackOnConfigChange: (newConfig: serverConfig) => void
 ) => void = (callbackOnConfigChange) =>
   configFileExists &&
   watch(

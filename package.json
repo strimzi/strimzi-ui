@@ -6,10 +6,10 @@
   "scripts": {
     "clean": "rm -rf dist/ && rm -rf js/ && rm -rf .out/ && rm -rf generated/",
     "start": "npm-run-all --parallel start:client start:server start:mockadminserver",
-    "start:builtserver": "configPath=utils/dev_config/server.e2e.config.json node dist/server/main.js",
+    "start:builtserver": "configPath=utils/dev_config/server.e2e.config.js node dist/server/main.js",
     "start:client": "webpack-dev-server --config build/webpack.client.dev.js",
-    "start:server": "configPath=utils/dev_config/server.dev.config.json npm run server",
-    "start:mockadminserver": "serverName=mockadminserver configPath=utils/dev_config/mockadmin.config.json npm run server",
+    "start:server": "configPath=utils/dev_config/server.dev.config.js npm run server",
+    "start:mockadminserver": "serverName=mockadminserver configPath=utils/dev_config/mockadmin.config.js npm run server",
     "start:e2eserver": "npm-run-all --parallel start:builtserver start:mockadminserver",
     "server": "npx nodemon --exec 'ts-node -r tsconfig-paths/register --project server/tsconfig.json' server/main.ts",
     "build": "webpack --config build/webpack.client.prod.js && webpack --config build/webpack.server.prod.js",
@@ -29,7 +29,8 @@
     "lint:styling": "stylelint --config ./linting/stylelint.config.js --fix --max-warnings 0",
     "lint:format": "prettier --config ./linting/prettier.config.js --write",
     "cy:open": "cypress open --config-file e2e/cypress.json",
-    "cy:closed": "cypress run --config-file e2e/cypress.json"
+    "cy:closed": "cypress run --config-file e2e/cypress.json",
+    "addDevCerts": "./utils/tooling/generateCerts.sh"
   },
   "sideEffects": false,
   "repository": {
@@ -67,9 +68,9 @@
     "@storybook/react": "^6.0.22",
     "@testing-library/react": "^11.0.4",
     "@types/cypress-cucumber-preprocessor": "^1.14.1",
+    "@types/express": "^4.17.8",
     "@types/jest": "^26.0.14",
     "@types/node": "^14.11.2",
-    "@types/express": "^4.17.8",
     "@typescript-eslint/eslint-plugin": "^4.2.0",
     "@typescript-eslint/parser": "^4.2.0",
     "babel-eslint": "^10.1.0",
@@ -103,6 +104,7 @@
     "stylelint-config-sass-guidelines": "^7.0.0",
     "stylelint-config-standard": "^20.0.0",
     "stylelint-selector-bem-pattern": "^2.1.0",
+    "supertest": "^5.0.0",
     "ts-jest": "^26.4.1",
     "ts-loader": "^8.0.4",
     "ts-node": "^9.0.0",
