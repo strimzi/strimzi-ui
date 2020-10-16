@@ -4,22 +4,23 @@
  */
 import express from 'express';
 import helmet from 'helmet';
-import { randomBytes } from 'crypto';
 import * as availableModules from './modules';
 import { serverConfig, UIServerModule } from 'types';
+import { authFunction } from 'placeholderFunctionsToReplace';
 import {
-  generateLoggers,
-  log,
-  authFunction,
-} from 'placeholderFunctionsToReplace';
+  generateLogger,
+  generateHttpLogger,
+  STRIMZI_UI_REQUEST_ID_HEADER,
+} from 'logging';
 
-const STRIMZI_UI_REQUEST_ID_HEADER = 'x-strimzi-ui-request';
+const logger = generateLogger('core');
 
 export const returnExpress: (
   serverName: string,
   getConfig: () => serverConfig
 ) => express.Application = (serverName, getConfig) => {
   const app = express();
+  const httpLogger = generateHttpLogger();
 
   // add helmet middleware
   app.use(helmet());
@@ -33,26 +34,14 @@ export const returnExpress: (
       >,
       { moduleName, addModule }: UIServerModule
     ) => {
-      log(
-        serverName,
-        'startup',
-        'core',
-        'moduleMount',
-        `Mounting module '${moduleName}'`
-      );
+      logger.info(`Mounting module '${moduleName}'`);
       const config = getConfig();
       const { mountPoint, routerForModule } = addModule(
-        (moduleName) => generateLoggers(serverName, moduleName, 'startup'),
+        (moduleName) => generateLogger(moduleName),
         authFunction(config.authentication),
         config
       );
-      log(
-        serverName,
-        'startup',
-        'core',
-        'moduleMount',
-        `Mounted module '${moduleName}' on '${mountPoint}'`
-      );
+      logger.info(`Mounted module '${moduleName}' on '${mountPoint}'`);
       return { ...acc, [moduleName]: { mountPoint, routerForModule } };
     },
     {}
@@ -60,51 +49,35 @@ export const returnExpress: (
 
   // before all handlers, add context and request start/end handlers
   app.all('*', (req, res, next) => {
-    // add id to request for use downstream
-    if (!req.headers[STRIMZI_UI_REQUEST_ID_HEADER]) {
-      req.headers[STRIMZI_UI_REQUEST_ID_HEADER] = randomBytes(8).toString(
-        'hex'
-      );
-    }
-    const requestID = req.headers[STRIMZI_UI_REQUEST_ID_HEADER] as string;
-    // and make sure the response has the header
-    res.setHeader(STRIMZI_UI_REQUEST_ID_HEADER, requestID);
-    // create a 'context' for this request, containing config, a request ID, and loggers. Available to handlers via `res.locals.strimziuicontext`
+    // set up logger for start/end of request
+    httpLogger(req, res);
+    req.log.debug('Request received');
+    // and make sure the response has the requestID header
+    res.setHeader(STRIMZI_UI_REQUEST_ID_HEADER, req.id as string);
+
+    // create a 'context' for this request, containing config and the request ID. Available to handlers via `res.locals.strimziuicontext`
     res.locals.strimziuicontext = {
       config: getConfig(),
-      requestID,
+      requestID: req.id,
     };
-    // set up loggers for start/end of request
-    const { event } = generateLoggers(serverName, 'core', requestID);
-    event(`requestStart`, `${req.method} of ${req.url} starting`);
-    res.once('finish', () => {
-      event(
-        `requestEnd`,
-        `${req.method} of ${req.url} complete RC: ${res.statusCode}`
-      );
-    });
     next();
   });
 
   Object.entries(routingTable).forEach(
     ([moduleName, { mountPoint, routerForModule }]) =>
       app.use(`${mountPoint}`, (req, res, next) => {
-        // add loggers for this module
+        // add logger for this module
         res.locals.strimziuicontext = {
           ...res.locals.strimziuicontext,
-          loggers: generateLoggers(
-            serverName,
-            moduleName,
-            res.locals.strimziuicontext.requestID
-          ),
+          logger: generateLogger(moduleName, req.id as string),
         };
 
-        const { entry } = res.locals.strimziuicontext.loggers;
-        const { debug, exit } = entry(`module enabled check`);
         const isEnabled =
           res.locals.strimziuicontext.config.modules[moduleName];
-        debug(`Enabled?`, isEnabled);
-        exit(isEnabled);
+        res.locals.strimziuicontext.logger.debug(
+          `%s module is ${isEnabled ? '' : 'not '}enabled`,
+          moduleName
+        );
         isEnabled ? routerForModule(req, res, next) : next(); // if enabled, call the router for the module so it can handle the request. Else, call the next module
       })
   );

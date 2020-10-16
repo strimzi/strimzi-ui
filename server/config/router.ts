@@ -10,8 +10,8 @@ const moduleName = 'config';
 export const ConfigModule: UIServerModule = {
   moduleName,
   addModule: (logGenerator, authFn) => {
-    const { entry } = logGenerator(moduleName);
-    const { exit } = entry('addModule');
+    const logger = logGenerator(moduleName);
+    const { exit } = logger.entry('addModule');
     const routerForModule = express.Router();
 
     // implementation to follow

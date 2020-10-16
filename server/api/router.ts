@@ -17,9 +17,9 @@ const moduleName = 'api';
 export const ApiModule: UIServerModule = {
   moduleName,
   addModule: (logGenerator, authFn, serverConfig) => {
-    const { entry } = logGenerator(moduleName);
+    const logger = logGenerator(moduleName);
     const { proxy } = serverConfig;
-    const { debug, exit } = entry('addModule', proxy);
+    const { exit } = logger.entry('addModule', proxy);
     const { hostname, port, contextRoot, transport } = proxy;
     const { cert, minTLS } = transport;
 
@@ -31,7 +31,7 @@ export const ApiModule: UIServerModule = {
       secure: cert ? true : false,
     };
 
-    debug(`api proxy configuration`, JSON.stringify(proxyConfig));
+    logger.debug({ proxyConfig }, `api proxy configuration`);
 
     const routerForModule = express.Router();
     const backendProxy = createProxyServer(proxyConfig);

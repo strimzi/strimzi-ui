@@ -17,6 +17,12 @@ module.exports = {
       ...mockAdminCertificates,
     },
   },
+  logging: {
+    level: 'debug',
+    prettyPrint: {
+      translateTime: true,
+    },
+  },
   modules: {
     api: false,
     client: false,
@@ -26,6 +32,5 @@ module.exports = {
   proxy: {
     transport: {},
   },
-  logging: true,
   ...mockadminServer,
 };

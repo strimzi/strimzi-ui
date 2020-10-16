@@ -15,6 +15,12 @@ module.exports = {
       ...serverCertificates,
     },
   },
+  logging: {
+    level: 'debug',
+    prettyPrint: {
+      translateTime: true,
+    },
+  },
   modules: {
     api: true,
     client: false,

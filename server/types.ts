@@ -4,6 +4,7 @@
  */
 import express from 'express';
 import { SecureVersion } from 'tls';
+import { Logger, LoggerOptions } from 'pino';
 
 export type supportedAuthenticationStrategyTypes = 'none' | 'scram' | 'oauth';
 
@@ -70,7 +71,7 @@ export type serverConfig = {
   /** feature flag configuration overrides (for both client and server) */
   featureFlags: featureFlagsConfigType;
   /** logging configuration */
-  logging: boolean;
+  logging: LoggerOptions;
   /** module configuration */
   modules: moduleConfigType;
   /** proxy (Strimzi-admin) configuration options */
@@ -81,24 +82,19 @@ export type serverConfig = {
   port: number;
 };
 
-export interface createLogger {
-  /** function which returns a configured logger with the provided values baked into it */
-  (prefix: string, moduleName: string, requestID: string): loggerType;
-}
+/** Re-export the pino Logger type */
+export type loggerType = Logger;
 
-type loggerType = {
-  /** function which logs entry into a function. Returns an object containing debug, exit loggers with the given name baked in */
+/** Extend the pino Logger type with entry/exit tracing */
+export type entryExitLoggerType = Logger & {
+  /** function which logs entry into a function. Returns an object containing an exit loggers with the given name baked in */
   entry: (
     functionName: string,
     ...params: Array<unknown>
   ) => {
-    /** called on exit of a function. Returns the parameter provided (enabling return exit('foobar');) */
-    exit: <T>(params: T) => T;
-    /** debug level trace handler */
-    debug: (msg: string, ...params: Array<unknown>) => void;
+    /** called on exit of a function. Returns the parameter provided (enabling `return exit('foobar');`) */
+    exit: <T>(returns: T) => T;
   };
-  /** general event handler */
-  event: (eventName: string, msg: string, ...params: Array<unknown>) => void;
 };
 
 export type strimziUIContextType = {
@@ -106,14 +102,14 @@ export type strimziUIContextType = {
   config: serverConfig;
   /** the unique id for this request */
   requestID: string;
-  /** an logger object containing pre configured loggers to use for the life of this request */
-  loggers: loggerType;
+  /** a pre-configured logger object to use for the life of this request */
+  logger: entryExitLoggerType;
 };
 
 interface addModule {
   /** function called to add a module to the UI server */
   (
-    mountLogger: (moduleName: string) => loggerType,
+    mountLogger: (moduleName: string) => entryExitLoggerType,
     authFunction: expressMiddleware,
     configAtServerStart: serverConfig
   ): {

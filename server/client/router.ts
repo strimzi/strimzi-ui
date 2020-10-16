@@ -13,8 +13,8 @@ export const ClientModule: UIServerModule = {
   moduleName,
   addModule: (logGenerator, authFn, serverConfig) => {
     const { publicDir } = serverConfig.client.configOverrides;
-    const { entry } = logGenerator(moduleName);
-    const { debug, exit } = entry('addModule', publicDir);
+    const logger = logGenerator(moduleName);
+    const { exit } = logger.entry('addModule', publicDir);
     const routerForModule = express.Router();
 
     const {
@@ -24,10 +24,10 @@ export const ClientModule: UIServerModule = {
       hasIndexFile,
     } = getFiles(publicDir);
 
-    debug(
+    logger.debug(
       `Client is hosting ${totalNumberOfFiles} static files, ${protectedFiles.length} of which are protected and require authentication`
     );
-    debug(`Client has index.html to serve? ${hasIndexFile}`);
+    logger.debug(`Client has index.html to serve? ${hasIndexFile}`);
 
     // add the auth middleware to all non public files
     protectedFiles.forEach((file) => routerForModule.get(`${file}`, authFn));
