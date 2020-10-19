@@ -2,5 +2,6 @@
   "extends": "../utils/dev_config/tsconfig.common.json",
   "compilerOptions": {
     "types": ["cypress", "node"]
-  }
+  },
+  "include": ["./*.ts"]
 }
