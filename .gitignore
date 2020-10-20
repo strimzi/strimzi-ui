@@ -10,6 +10,7 @@ dist/
 generated/
 coverage/
 e2e/failure_output
+.out/
 
 # misc
 .history

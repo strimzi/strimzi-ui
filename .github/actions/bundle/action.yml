@@ -1,0 +1,15 @@
+# Copyright Strimzi authors.
+# License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
+name: "Bundle size"
+description: "Check the size of the bundle"
+inputs:
+  MASTER_REPORT:
+    description: "Bundle report from master branch"
+outputs:
+  bundle_report:
+    description: "Markdown representation of bundle sizes"
+  overall_bundle_size_change:
+    description: "Overall percentage change of bundle sizes between master and current"
+runs:
+  using: "docker"
+  image: "Dockerfile"

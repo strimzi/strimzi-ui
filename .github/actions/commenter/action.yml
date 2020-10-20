@@ -1,0 +1,16 @@
+# Copyright Strimzi authors.
+# License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
+name: "Commenter"
+description: "Comment inputed text on issue/pull request"
+inputs:
+  GITHUB_TOKEN:
+    description: "Github action bot token"
+  BUNDLE_REPORT:
+    description: "Markdown representation of bundle sizes"
+  OVERALL_BUNDLE_SIZE_CHANGE:
+    description: "Overall percentage change of bundle sizes between master and current"
+  TEST_COVERAGE:
+    description: "Test coverage report from jest tests"
+runs:
+  using: "docker"
+  image: "Dockerfile"
