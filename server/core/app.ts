@@ -9,6 +9,8 @@ import * as availableModules from './modules';
 import { serverConfig, UIServerModule } from 'types';
 import { generateLoggers, log, authFunction } from 'placeholder';
 
+const STRIMZI_UI_REQUEST_ID_HEADER = 'x-strimzi-ui-request';
+
 export const returnExpress: (
   serverName: string,
   getConfig: () => serverConfig
@@ -34,10 +36,11 @@ export const returnExpress: (
         'moduleMount',
         `Mounting module '${moduleName}'`
       );
+      const config = getConfig();
       const { mountPoint, routerForModule } = addModule(
         (moduleName) => generateLoggers(serverName, moduleName, 'startup'),
-        authFunction(),
-        getConfig()
+        authFunction(config.authentication),
+        config
       );
       log(
         serverName,
@@ -54,10 +57,14 @@ export const returnExpress: (
   // before all handlers, add context and request start/end handlers
   app.all('*', (req, res, next) => {
     // add id to request for use downstream
-    if (!req.headers.surid) {
-      req.headers.surid = randomBytes(8).toString('hex');
+    if (!req.headers[STRIMZI_UI_REQUEST_ID_HEADER]) {
+      req.headers[STRIMZI_UI_REQUEST_ID_HEADER] = randomBytes(8).toString(
+        'hex'
+      );
     }
-    const requestID = req.headers.surid as string;
+    const requestID = req.headers[STRIMZI_UI_REQUEST_ID_HEADER] as string;
+    // and make sure the response has the header
+    res.setHeader(STRIMZI_UI_REQUEST_ID_HEADER, requestID);
     // create a 'context' for this request, containing config, a request ID, and loggers. Available to handlers via `res.locals.strimziuicontext`
     res.locals.strimziuicontext = {
       config: getConfig(),
@@ -77,7 +84,7 @@ export const returnExpress: (
 
   Object.entries(routingTable).forEach(
     ([moduleName, { mountPoint, routerForModule }]) =>
-      app.all(`${mountPoint}*`, (req, res, next) => {
+      app.use(`${mountPoint}`, (req, res, next) => {
         // add loggers for this module
         res.locals.strimziuicontext = {
           ...res.locals.strimziuicontext,

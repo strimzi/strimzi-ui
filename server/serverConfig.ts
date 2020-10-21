@@ -11,17 +11,21 @@ import { log } from 'placeholder';
 import { serverConfig, supportedAuthenticationStrategyTypes } from 'types';
 
 /** Out of the box when built by webpack, it replaces `require` with it's own version (`__webpack_require__`), which requires static paths. As we use require to load a config from an envvar, we need the node require function (`__non_webpack_require__`, as called by webpack). Thus, check if we are in a webpack built environment (I.e `__non_webpack_require__` is defined), and if so, use it, else use `require` (which will be the normal node require, used via ts-node etc) */
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const requireForConfigLoad =
   typeof __non_webpack_require__ !== 'undefined' && __non_webpack_require__
     ? __non_webpack_require__
     : require;
+/* eslint-enable no-undef */
 
 const defaultConfig: serverConfig = {
   authentication: {
     strategy: 'none' as supportedAuthenticationStrategyTypes,
   },
   client: {
+    configOverrides: {
+      publicDir: './dist/client',
+    },
     transport: {},
   },
   featureFlags: {},
@@ -41,6 +45,9 @@ const defaultConfig: serverConfig = {
   hostname: '0.0.0.0',
   port: 3000,
 };
+
+export const getDefaultConfig: () => serverConfig = () =>
+  merge({}, defaultConfig);
 
 const pathToConfigFile = process.env.configPath
   ? resolve(process.env.configPath)

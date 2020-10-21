@@ -7,7 +7,7 @@ import { SecureVersion } from 'tls';
 
 export type supportedAuthenticationStrategyTypes = 'none' | 'scram' | 'oauth';
 
-type authenticationConfigType = {
+export type authenticationConfigType = {
   /** What authentication strategy to use to authenticate users */
   strategy: supportedAuthenticationStrategyTypes;
   /** Any additional configuration required for the provided authentication strategy */
@@ -27,7 +27,10 @@ type sslCertificateType = {
 
 type clientConfigType = {
   /** Overrides to send to the client */
-  configOverrides?: Record<string, unknown>;
+  configOverrides: {
+    /** location of public files to server to the client */
+    publicDir: string;
+  };
   /** SSL transport configuration */
   transport: sslCertificateType;
 };
@@ -137,8 +140,8 @@ export interface expressMiddleware {
 /** the request object provided on UI server request. Core express request plus additions */
 export type strimziUIRequestType = express.Request & {
   headers: {
-    /** unique identifier for a request. If not present, will be added by the core module */
-    surid: string;
+    /** unique identifier for a request. If not present, will be added by the core module, and returned in the response */
+    'x-strimzi-ui-request': string;
   };
 };
 /** the response object provided on UI server request. Core express request plus additions */

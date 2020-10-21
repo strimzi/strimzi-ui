@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "Strimzi UI provides a way for managing Strimzi and Kafka clusters (+ other components) deployed by it using a graphical user interface.",
   "scripts": {
-    "clean": "rm -rf dist/ && rm -rf js/ && rm -rf .out/ && rm -rf generated/",
+    "clean": "rm -rf dist/ && rm -rf js/ && rm -rf .out/ && rm -rf generated/ && rm -rf coverage/",
     "start": "npm-run-all --parallel start:client start:server start:mockadminserver",
     "start:builtserver": "configPath=utils/dev_config/server.e2e.config.js node dist/server/main.js",
     "start:client": "webpack-dev-server --config build/webpack.client.dev.js",
@@ -72,6 +72,7 @@
     "@types/express": "^4.17.8",
     "@types/jest": "^26.0.14",
     "@types/node": "^14.11.2",
+    "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^4.2.0",
     "@typescript-eslint/parser": "^4.2.0",
     "babel-eslint": "^10.1.0",

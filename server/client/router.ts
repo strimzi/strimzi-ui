@@ -4,22 +4,25 @@
  */
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
-import {
-  totalNumberOfFiles,
-  protectedFiles,
-  builtClientDir,
-  hasIndexFile,
-} from './controller';
+import { getFiles } from './controller';
 import { UIServerModule } from 'types';
 
 const moduleName = 'client';
 
 export const ClientModule: UIServerModule = {
   moduleName,
-  addModule: (logGenerator, authFn) => {
+  addModule: (logGenerator, authFn, serverConfig) => {
+    const { publicDir } = serverConfig.client.configOverrides;
     const { entry } = logGenerator(moduleName);
-    const { debug, exit } = entry('addModule');
+    const { debug, exit } = entry('addModule', publicDir);
     const routerForModule = express.Router();
+
+    const {
+      totalNumberOfFiles,
+      protectedFiles,
+      builtClientDir,
+      hasIndexFile,
+    } = getFiles(publicDir);
 
     debug(
       `Client is hosting ${totalNumberOfFiles} static files, ${protectedFiles.length} of which are protected and require authentication`
@@ -36,9 +39,11 @@ export const ClientModule: UIServerModule = {
       express.static(builtClientDir)
     );
 
-    // if no match, and we have an index.html file, redirect to it
+    // if no match, not a file (path contains '.'), and we have an index.html file, redirect to it (ie return index so client navigation logic kicks in). Else do nothing (404 unless another module handles it)
     hasIndexFile &&
-      routerForModule.get('*', (req, res) => res.redirect(`/index.html`));
+      routerForModule.get(/^((?!\.).)+$/, (req, res) =>
+        res.redirect(`/index.html`)
+      );
 
     return exit({ mountPoint: '/', routerForModule });
   },

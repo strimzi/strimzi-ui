@@ -3,7 +3,7 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 import express from 'express';
-import httpProxy from 'http-proxy';
+import { createProxyServer } from 'http-proxy';
 import { UIServerModule } from 'types';
 
 import {
@@ -34,7 +34,7 @@ export const ApiModule: UIServerModule = {
     debug(`api proxy configuration`, JSON.stringify(proxyConfig));
 
     const routerForModule = express.Router();
-    const backendProxy = httpProxy.createProxyServer(proxyConfig);
+    const backendProxy = createProxyServer(proxyConfig);
 
     // add proxy event handlers
     backendProxy.on('error', proxyErrorHandler);

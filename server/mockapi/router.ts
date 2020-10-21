@@ -14,8 +14,14 @@ export const MockApiModule: UIServerModule = {
     const { exit } = entry('addModule');
     const routerForModule = express.Router();
 
-    // implementation to follow
-    routerForModule.get('*', (req, res) => res.sendStatus(200));
+    // endpoint used for test purposes
+    routerForModule.get('/test', (req, res) => {
+      res.setHeader('x-strimzi-ui-module', moduleName);
+      res.sendStatus(418);
+    });
+
+    // other implementation to follow
+    routerForModule.get('/*', (req, res) => res.sendStatus(200));
 
     return exit({ mountPoint: '/api', routerForModule });
   },

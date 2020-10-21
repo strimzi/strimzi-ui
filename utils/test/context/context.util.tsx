@@ -3,18 +3,18 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 import React, { Provider, ReactElement, ReactNode } from 'react';
-import { render } from '@testing-library/react';
+import { render, RenderResult } from '@testing-library/react';
 
 type ProviderEntry = {
-  value: any;
-  provider: Provider<any>;
+  value: unknown;
+  provider: Provider<unknown>;
 };
 
 const contextWrapper = (
   providers: Array<ProviderEntry>,
   children: ReactNode
 ) => {
-  let provider = providers.shift();
+  const provider = providers.shift();
   if (provider) {
     if (providers.length == 0) {
       return (
@@ -36,9 +36,9 @@ const contextWrapper = (
 
 const renderWithContextProviders = (
   ui: ReactElement,
-  options: Object,
+  options: Record<string, unknown>,
   providers: Array<ProviderEntry>
-) =>
+): RenderResult =>
   render(ui, {
     wrapper: ({ children }) => contextWrapper(providers, children),
     ...options,

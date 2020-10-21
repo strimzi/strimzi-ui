@@ -5,15 +5,26 @@
 // placeholder functions - to be replaced by actual implementation later
 
 import express from 'express';
-import { createLogger } from 'types';
+import { createLogger, authenticationConfigType } from 'types';
 
 // https://github.com/orgs/strimzi/projects/2#card-44265081
 // function which returns a piece of express middleware for a given auth strategy
-const authFunction: () => (
+const authFunction: (
+  config: authenticationConfigType
+) => (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
-) => void = () => (req, res, next) => next(); // if auth on, reject for sake of example. This is a middleware, akin to passport doing its checks.
+) => void = ({ strategy }) => {
+  switch (strategy) {
+  default:
+  case 'none':
+    return (req, res, next) => next();
+  case 'scram':
+  case 'oauth':
+    return (req, res) => res.sendStatus(511); // if auth on, reject for sake of example. This is a middleware, akin to passport doing its checks.
+  }
+};
 
 //https://github.com/orgs/strimzi/projects/2#card-46109274
 const log: (

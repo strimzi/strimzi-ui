@@ -10,3 +10,4 @@ coverage/
 dockerfile
 *.conf
 *.sh
+*.svg
