@@ -54,7 +54,6 @@ const pathToConfigFile = process.env.configPath
   : resolve('./server.config.json'); // default file config
 
 const configFileExists = existsSync(pathToConfigFile);
-
 export const getServerName: () => string = () =>
   process.env.serverName || 'Strimzi-ui server';
 

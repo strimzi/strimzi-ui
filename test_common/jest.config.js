@@ -7,6 +7,7 @@ const { jestModuleMapper } = require('../utils/tooling/aliasHelper.js');
 const config = {
   rootDir: '../',
   clearMocks: true,
+  testTimeout: 10000, // required for server tests, which take ~3 seconds to start
   coverageDirectory: 'coverage',
   coveragePathIgnorePatterns: [
     '/node_modules/',

@@ -17,12 +17,12 @@ const authFunction: (
   next: express.NextFunction
 ) => void = ({ strategy }) => {
   switch (strategy) {
-  default:
-  case 'none':
-    return (req, res, next) => next();
-  case 'scram':
-  case 'oauth':
-    return (req, res) => res.sendStatus(511); // if auth on, reject for sake of example. This is a middleware, akin to passport doing its checks.
+    default:
+    case 'none':
+      return (req, res, next) => next();
+    case 'scram':
+    case 'oauth':
+      return (req, res) => res.sendStatus(511); // if auth on, reject for sake of example. This is a middleware, akin to passport doing its checks.
   }
 };
 
