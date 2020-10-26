@@ -36,7 +36,7 @@ export const ClientModule: UIServerModule = {
     routerForModule.get(
       '*',
       expressStaticGzip(builtClientDir, {}),
-      express.static(builtClientDir)
+      express.static(builtClientDir, { index: false })
     );
 
     // if no match, not a file (path contains '.'), and we have an index.html file, redirect to it (ie return index so client navigation logic kicks in). Else do nothing (404 unless another module handles it)

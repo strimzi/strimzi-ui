@@ -10,14 +10,15 @@ const babelPresets = require('./babelPresets.js');
 
 // constants
 const UI_TITLE = 'Strimzi UI';
-const BUILD_DIR = path.resolve(__dirname, '../dist');
+const ROOT_DIR = path.resolve(__dirname, '../');
+const BUILD_DIR = path.resolve(__dirname, `${ROOT_DIR}/dist`);
 const CLIENT_BUILD_DIR = path.resolve(__dirname, `${BUILD_DIR}/client`);
 const SERVER_BUILD_DIR = path.resolve(__dirname, `${BUILD_DIR}/server`);
-const GENERATED_DIR = path.resolve(__dirname, '../generated');
+const GENERATED_DIR = path.resolve(__dirname, `${ROOT_DIR}/generated`);
 const BUNDLE_ANALYSER_DIR = `${GENERATED_DIR}/bundle-analyser/`;
-const BOOTSTRAP_DIR = path.resolve(__dirname, '../client/Bootstrap/');
-const IMAGES_DIR = path.resolve(__dirname, '../client/Images');
-const SERVER_DIR = path.resolve(__dirname, '../server/');
+const BOOTSTRAP_DIR = path.resolve(__dirname, `${ROOT_DIR}/client/Bootstrap/`);
+const IMAGES_DIR = path.resolve(__dirname, `${ROOT_DIR}/client/Images`);
+const SERVER_DIR = path.resolve(__dirname, `${ROOT_DIR}/server/`);
 
 // common plugin imports/functions to wrap them with common default config
 const HtmlPlugin = require('html-webpack-plugin');

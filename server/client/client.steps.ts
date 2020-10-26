@@ -36,7 +36,6 @@ Then(
     await request.then(
       (res) => {
         const { status } = res;
-        //console.dir(res);
         const expectedStatus = parseInt(statusCode as string);
         expect(status).toBe(expectedStatus);
       },

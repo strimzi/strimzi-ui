@@ -5,7 +5,9 @@
 const {
   serverCertificates,
   mockAdminCertificates,
-} = require('../tooling/secureDevUtil.js');
+  devEnvValues,
+} = require('../tooling/runtimeDevUtils.js');
+const { devServer, mockadminServer } = devEnvValues;
 
 // used in e2e, this is the UI server running as it would in a prod environment, but using mock admin/certificate config
 module.exports = {
@@ -15,10 +17,10 @@ module.exports = {
     },
   },
   proxy: {
-    hostname: 'localhost',
-    port: 9080,
+    ...mockadminServer,
     transport: {
       ...mockAdminCertificates,
     },
   },
+  ...devServer,
 };

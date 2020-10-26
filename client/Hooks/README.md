@@ -1,6 +1,6 @@
 # Hooks
 
-This directory contains all re-usable custom [React Hooks](https://reactts.org/docs/hooks-intro.html#motivation) implemented for use across this UI. Unlike Models, these hooks encapsulate re-usable/common logic views or models may want to utilise, such as translation capabilities.
+This directory contains all re-usable custom [React Hooks](https://reactjs.org/docs/hooks-intro.html#motivation) implemented for use across this UI. Unlike Models, these hooks encapsulate re-usable/common logic views or models may want to utilise, such as translation capabilities.
 
 ## Test approach
 

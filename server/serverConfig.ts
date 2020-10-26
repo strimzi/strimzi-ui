@@ -7,7 +7,7 @@ import { existsSync, watch } from 'fs';
 import { resolve } from 'path';
 import merge from 'lodash.merge';
 
-import { log } from 'placeholder';
+import { log } from 'placeholderFunctionsToReplace';
 import { serverConfig, supportedAuthenticationStrategyTypes } from 'types';
 
 /** Out of the box when built by webpack, it replaces `require` with it's own version (`__webpack_require__`), which requires static paths. As we use require to load a config from an envvar, we need the node require function (`__non_webpack_require__`, as called by webpack). Thus, check if we are in a webpack built environment (I.e `__non_webpack_require__` is defined), and if so, use it, else use `require` (which will be the normal node require, used via ts-node etc) */

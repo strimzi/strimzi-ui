@@ -12,7 +12,11 @@ const {
 } = require('./webpack.common.js');
 
 const { relativeClientAliases } = require('../utils/tooling/aliasHelper.js');
-const { devEnvToUseTls } = require('../utils/tooling/secureDevUtil.js');
+const {
+  devEnvToUseTls,
+  devEnvValues,
+} = require('../utils/tooling/runtimeDevUtils.js');
+const { webpackDevServer, devServer } = devEnvValues;
 
 const {
   withHTMLPlugin,
@@ -33,9 +37,6 @@ const {
   BUILD_DIR,
   BUNDLE_ANALYSER_DIR,
 } = CONSTANTS;
-
-const devHostname = process.env.DEV_HOSTNAME || 'localhost';
-const devPort = process.env.DEV_PORT || 8080;
 
 const devSpecificConfig = {
   mode: DEVELOPMENT,
@@ -76,12 +77,14 @@ const devSpecificConfig = {
     inline: true,
     hot: true,
     https: devEnvToUseTls,
-    host: devHostname,
-    port: devPort,
+    host: webpackDevServer.hostname,
+    port: webpackDevServer.port,
     proxy: [
       {
         context: ['**'],
-        target: `http${devEnvToUseTls ? 's' : ''}://localhost:3000`,
+        target: `http${devEnvToUseTls ? 's' : ''}://${devServer.hostname}:${
+          devServer.port
+        }`,
         secure: false,
       },
     ],

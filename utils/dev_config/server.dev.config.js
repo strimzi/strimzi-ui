@@ -5,7 +5,9 @@
 const {
   serverCertificates,
   mockAdminCertificates,
-} = require('../tooling/secureDevUtil.js');
+  devEnvValues,
+} = require('../tooling/runtimeDevUtils.js');
+const { devServer, mockadminServer } = devEnvValues;
 
 module.exports = {
   client: {
@@ -21,10 +23,10 @@ module.exports = {
     mockapi: false,
   },
   proxy: {
-    hostname: 'localhost',
-    port: 9080,
+    ...mockadminServer,
     transport: {
       ...mockAdminCertificates,
     },
   },
+  ...devServer,
 };

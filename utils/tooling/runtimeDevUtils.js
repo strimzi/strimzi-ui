@@ -5,6 +5,25 @@
 const { existsSync, readFileSync } = require('fs');
 const { resolve } = require('path');
 
+// development time environment variable overrides.
+const devEnvValues = {
+  // webpack dev server hostname and port
+  webpackDevServer: {
+    hostname: process.env.WDS_HOSTNAME || 'localhost',
+    port: process.env.WDS_PORT || 8080,
+  },
+  // mock admin server hostname and port
+  mockadminServer: {
+    hostname: process.env.MA_HOSTNAME || 'localhost',
+    port: process.env.MA_PORT || 9080,
+  },
+  // (development instance) server hostname and port
+  devServer: {
+    hostname: process.env.SD_HOSTNAME || 'localhost',
+    port: process.env.SD_PORT || 3000,
+  },
+};
+
 const getIfExists = (file) =>
   existsSync(resolve(__dirname, file))
     ? readFileSync(resolve(__dirname, file))
@@ -25,4 +44,5 @@ module.exports = {
     serverCertificates.cert && serverCertificates.key ? true : false,
   serverCertificates,
   mockAdminCertificates,
+  devEnvValues,
 };

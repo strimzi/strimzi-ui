@@ -7,7 +7,11 @@ import helmet from 'helmet';
 import { randomBytes } from 'crypto';
 import * as availableModules from './modules';
 import { serverConfig, UIServerModule } from 'types';
-import { generateLoggers, log, authFunction } from 'placeholder';
+import {
+  generateLoggers,
+  log,
+  authFunction,
+} from 'placeholderFunctionsToReplace';
 
 const STRIMZI_UI_REQUEST_ID_HEADER = 'x-strimzi-ui-request';
 

@@ -4,7 +4,7 @@
  */
 import * as config from './main.http.conf';
 
-import { serverCertificates } from '../../../utils/tooling/secureDevUtil.js';
+import { serverCertificates } from '../../../utils/tooling/runtimeDevUtils.js';
 
 module.exports = {
   ...config,

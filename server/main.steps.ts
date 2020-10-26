@@ -21,7 +21,7 @@ import {
   worldGenerator,
 } from '../test_common/jest_cucumber_support/commonTestTypes';
 
-import { devEnvToUseTls } from '../utils/tooling/secureDevUtil';
+import { devEnvToUseTls } from '../utils/tooling/runtimeDevUtils';
 
 type testRequestType = {
   type: typeof http | typeof https;

@@ -4,7 +4,7 @@
 #
 # Note: this is provided for purposes of completing/illustrating a production build of the UI - this will be replaced in due course with a strimzi based image + node runtime w/ tini etc
 
-FROM node:lts-alpine3.12 as builder
+FROM node:lts-alpine as builder
 
 WORKDIR /usr/strimzi-ui/
 
@@ -20,7 +20,7 @@ RUN rm -rf /node_modules \
 
 # ---------------------------------------------------------------------------- #
 
-FROM node:lts-alpine3.12
+FROM node:lts-alpine
 
 # copy required built output to image
 COPY --from=builder --chown=root:root /usr/strimzi-ui/LICENSE ./

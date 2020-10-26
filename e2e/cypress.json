@@ -1,5 +1,5 @@
 {
-  "baseUrl": "http://localhost:8080",
+  "baseUrl": "http://localhost:3000",
   "screenshotsFolder": "e2e/failure_output/screenshots",
   "videosFolder": "e2e/failure_output/videos",
   "integrationFolder": "e2e/features",

@@ -8,7 +8,7 @@ import https from 'https';
 
 import { loadConfig, watchConfig, getServerName } from 'serverConfig';
 import { returnExpress } from 'core';
-import { log } from 'placeholder';
+import { log } from 'placeholderFunctionsToReplace';
 
 const errorHandler: (err: Error, ...others: unknown[]) => void = (
   err,

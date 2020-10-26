@@ -19,6 +19,8 @@ Once these prerequisites are met, all required dependencies to build and run the
 npm install
 ```
 
+The Strimzi-UI can be developed while making use of TLS certificates between server and client, as would be the case in a typical production deployment. The [`openssl`](https://www.openssl.org/) tool and configuration (used via the `npm run addDevCerts` command) can generate representative development time certificates for this purpose, given `openssl` is installed for your operating system. This is not required however to develop the UI.
+
 If you run into any issues while working in this repo, please check out [the troubleshooting guide](#troubleshooting).
 
 ### Helpful commands
