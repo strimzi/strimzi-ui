@@ -22,7 +22,7 @@ const config = {
     '!*',
   ],
   moduleNameMapper: {
-    ...pathsToModuleNameMapper(compilerOptions.paths),
+    ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
     ...jestModuleMapper,
   },
 };

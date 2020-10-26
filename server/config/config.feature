@@ -7,5 +7,5 @@ Feature: config module
     Scenario: Returns with the expected response for a config call
     Given a 'config_only' server configuration
     And I run an instance of the Strimzi-UI server
-    When I make a 'get' request to '/config'
+    When I make a 'getConfigAndFeatureFlagQuery' gql request to '/config'
     Then I get the expected config response

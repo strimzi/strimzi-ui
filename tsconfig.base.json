@@ -12,7 +12,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "noImplicitAny": false,
-    "outDir": "../../js"
+    "outDir": "./js"
   },
-  "exclude": ["../../utils"]
+  "exclude": ["utils", "build", "**/test_common", "**/*.js"]
 }

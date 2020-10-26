@@ -6,7 +6,7 @@
 import http from 'http';
 import https from 'https';
 
-import { loadConfig, watchConfig, getServerName } from 'serverConfig';
+import { loadConfig, watchConfig } from 'serverConfig';
 import { returnExpress } from 'core';
 import { generateLogger, updateRootLoggerOptions } from 'logging';
 
@@ -40,7 +40,7 @@ loadConfig((loadedInitialConfig) => {
     logger = generateLogger('main');
   }, logger); // load config and update config value
 
-  const expressAppForServer = returnExpress(getServerName(), () => config);
+  const expressAppForServer = returnExpress(() => config);
 
   const { cert, key, ciphers, minTLS } = config.client.transport;
   let server;

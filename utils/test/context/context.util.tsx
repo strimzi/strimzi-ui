@@ -5,26 +5,24 @@
 import React, { Provider, ReactElement, ReactNode } from 'react';
 import { render, RenderResult } from '@testing-library/react';
 
-type ProviderEntry = {
-  value: unknown;
-  provider: Provider<unknown>;
+type TestProviderWithValue<T> = {
+  value: T;
+  provider: Provider<T>;
 };
 
-const contextWrapper = (
-  providers: Array<ProviderEntry>,
+const contextWrapper: <T>(
+  providers: Array<TestProviderWithValue<T>>,
   children: ReactNode
-) => {
-  const provider = providers.shift();
-  if (provider) {
-    if (providers.length == 0) {
-      return (
-        <provider.provider value={provider.value}>{children}</provider.provider>
-      );
+) => JSX.Element = (providers, children) => {
+  const { provider: ProviderToMount, value } = providers.shift();
+  if (ProviderToMount) {
+    if (providers.length === 0) {
+      return <ProviderToMount value={value}>{children}</ProviderToMount>;
     } else {
       return (
-        <provider.provider value={provider.value}>
+        <ProviderToMount value={value}>
           {contextWrapper(providers, children)}
-        </provider.provider>
+        </ProviderToMount>
       );
     }
   } else {
@@ -34,11 +32,11 @@ const contextWrapper = (
   }
 };
 
-const renderWithContextProviders = (
+const renderWithContextProviders: <T>(
   ui: ReactElement,
   options: Record<string, unknown>,
-  providers: Array<ProviderEntry>
-): RenderResult =>
+  providers: Array<TestProviderWithValue<T>>
+) => RenderResult = (ui, options, providers) =>
   render(ui, {
     wrapper: ({ children }) => {
       return contextWrapper(providers, children);

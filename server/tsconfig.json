@@ -4,7 +4,9 @@
     "module": "CommonJS",
     "outDir": "../js/server",
     "baseUrl": "./",
-    "paths": {}
+    "paths": {
+      "ui-config": ["../config/index.ts"]
+    }
   },
   "include": ["."]
 }

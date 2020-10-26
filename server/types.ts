@@ -28,12 +28,11 @@ type sslCertificateType = {
 
 type clientConfigType = {
   /** Overrides to send to the client */
-  configOverrides: {
-    /** location of public files to server to the client */
-    publicDir: string;
-  };
+  configOverrides: Record<string, unknown>;
   /** SSL transport configuration */
   transport: sslCertificateType;
+  /** location of public files to server to the client */
+  publicDir: string;
 };
 
 /** feature flag configuration overrides */

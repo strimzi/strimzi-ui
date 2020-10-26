@@ -368,31 +368,15 @@ Once all callbacks have been executed, the _server_ will reduce and own the curr
 
 ##### Client configuration
 
-Additional content to follow in a future PR/as a part of https://github.com/strimzi/strimzi-ui/issues/13 .
+As mentioned
+
+[Configuration options for the client can be found here.](../client/README.md#configuration-options)
 
 ##### Server configuration
 
 The UI server will primarily be configured at runtime via a provided JSON file. This could be a file on the file system, but is expected to be when deployed as a part of Strimzi to be a mounted configmap, the content of which is defined by the operator deploying it. The file will then be watched by the server, and configuration will refresh as the file changes.
 
-Configuration options for the server include:
-
-| Configuration                | Required | Default                                                                                                          | Purpose                                                                                                                                                                                |
-| ---------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| authentication.strategy      | No       | `none`                                                                                                           | What authentication strategy to use to authenticate users. See [the security section](#security) for details of the available options.                                                 |
-| authentication.configuration | No       | `{}`                                                                                                             | Any additional configuration required for the provided authentication strategy `authentication.strategy` . See [the security section](#security) for details of the available options. |
-| client.configOverrides       | No       | `{}`                                                                                                             | Overrides to send to the client. See [client configuration for further details](#client-configuration). These values will take precedence over any others provided.                    |
-| client.transport.cert        | No       | N/A - if one of `client.transport.cert` or `client.transport.key` are not provided, server will be HTTP          | PEM certificate presented to browsers on connecting to the UI server.                                                                                                                  |
-| client.transport.key         | No       | N/A - if one of `client.transport.cert` or `client.transport.key` are not provided, server will be HTTP          | PEM certificate private key for the certificate provided in `client.transport.cert`.                                                                                                   |
-| client.transport.ciphers     | No       | default set from [node's tls module](https://nodejs.org/api/tls.html#tls_modifying_the_default_tls_cipher_suite) | TLS ciphers used/supported by the HTTPS server for client negotiation. Only applies if starting an HTTPS server.                                                                       |
-| client.transport.minTLS      | No       | `TLSv1.2`                                                                                                        | Minimum TLS version supported by the server. Only applies if starting an HTTPS server. Set to `TLSv1.2` for browser compatibility.                                                     |
-| featureFlags                 | No       | `{}`                                                                                                             | Feature flag overrides to set. The configuration is as per the format specified [here](#feature-flags). These values will take precedence over any others provided.                    |
-| hostname                     | No       | '0.0.0.0'                                                                                                        | The hostname the UI server will be bound to.                                                                                                                                           |
-| logging                      | No       | TBD                                                                                                              | Logging configuration settings. Format to be defined in https://github.com/strimzi/strimzi-ui/issues/24                                                                                |
-| modules                      | No       | Object - [enabled modules and configuration can be found here](##router-controller-data-pattern)                 | The modules which are either enabled or disabled.                                                                                                                                      |
-| port                         | No       | 3000                                                                                                             | The port the UI server will be bound to.                                                                                                                                               |
-| proxy.transport.cert         | No       | If not provided, SSL certificate validation of the upstream admin server is disabled                             | CA certificate in PEM format of the backend admin server api requests are to be sent to.                                                                                               |
-| proxy.hostname               | Yes      | N/A                                                                                                              | The hostname of the admin server to send api requests to.                                                                                                                              |
-| proxy.port                   | Yes      | N/A                                                                                                              | The port of the admin server to send api requests to.                                                                                                                                  |
+[Configuration options for the server can be found here.](../server/README.md#configuration-options)
 
 [As mentioned in the usage section](#configuration-types-and-usage)], having loaded the server configuration, this will be reduced and served by the server to the client. The reduced result is also available to the server.
 
@@ -408,19 +392,17 @@ To support the goals of extensibility and aid consistency across the code base, 
 
 UI codebases tend to contain a large number of files, so sensible organisation not only keeps the code neat and tidy, but can help provide context for what particular areas do/are responsible for. The following covers what directories exist in the root of this repository, and their content:
 
-| Directory     | Contains                                                                                  |
-| ------------- | ----------------------------------------------------------------------------------------- |
-| config        | All configuration options available in the UI (both client and server side)               |
-| client/\*     | All code served to the browser                                                            |
-| docs          | All 'repository level' documentation                                                      |
-| docs/assets   | Assets used to support documentation - images etc                                         |
-| server/\*     | All code related to the UI server implementation                                          |
-| utils         | Utility code and configuration used by both client and server, and to support development |
-| utils/build   | Build implementation and configuration                                                    |
-| utils/headers | Copyright header statements                                                               |
-| utils/linting | Code style, linting and formatting configuration and supporting code                      |
+| Directory   | Contains                                                                                  |
+| ----------- | ----------------------------------------------------------------------------------------- |
+| build       | Build implementation and configuration                                                    |
+| client/\*   | All code served to the browser                                                            |
+| config      | All configuration options available in the UI (both client and server side)               |
+| docs        | All 'repository level' documentation                                                      |
+| docs/assets | Assets used to support documentation - images etc                                         |
+| server/\*   | All code related to the UI server implementation                                          |
+| utils       | Utility code and configuration used by both client and server, and to support development |
 
-As mentioned in the Code Style document (https://github.com/strimzi/strimzi-ui/issues/4), all of these directories will include a README file providing further details on what they contain.
+As mentioned in the [contribution document](./Contribution.md), all of these directories will include a README file providing further details on what they contain.
 
 #### `Element` `Group` `Panel` `Bootstrap` component pattern
 

@@ -15,4 +15,4 @@ Configuration used for development purposes. See the [README](./dev_config/READM
 
 ### Test
 
-- [Context](./test/context.README.md) - utilities for writing tests for components that use contexts.
+Test helper/common code. See the [README](./test/README.md) for further details.

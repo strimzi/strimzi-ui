@@ -5,6 +5,10 @@
 import express from 'express';
 import { UIServerModule } from 'types';
 
+import bodyParser from 'body-parser';
+import { ApolloServer } from 'apollo-server-express';
+import { resolvers, schema } from './controller';
+
 const moduleName = 'config';
 
 export const ConfigModule: UIServerModule = {
@@ -13,8 +17,13 @@ export const ConfigModule: UIServerModule = {
     const { exit } = logger.entry('addModule');
     const routerForModule = express.Router();
 
-    // implementation to follow
-    routerForModule.get('*', authFn, (req, res) => res.sendStatus(200));
+    const server = new ApolloServer({ typeDefs: schema, resolvers });
+
+    routerForModule.use(
+      authFn,
+      bodyParser.json(),
+      server.getMiddleware({ path: '/' })
+    );
 
     return exit({ mountPoint: '/config', routerForModule });
   },
