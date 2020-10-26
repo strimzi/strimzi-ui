@@ -56,6 +56,8 @@ type proxyConfigType = {
   hostname: string;
   /** The port number of the backend server to send API requests to */
   port: number;
+  /** The context root for the Strimzi-admin api  */
+  contextRoot: string;
   /** SSL transport configuration */
   transport: sslCertificateType;
 };

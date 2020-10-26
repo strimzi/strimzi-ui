@@ -20,11 +20,11 @@ export const ApiModule: UIServerModule = {
     const { entry } = logGenerator(moduleName);
     const { proxy } = serverConfig;
     const { debug, exit } = entry('addModule', proxy);
-
-    const { cert, minTLS } = proxy.transport;
+    const { hostname, port, contextRoot, transport } = proxy;
+    const { cert, minTLS } = transport;
 
     const proxyConfig = {
-      target: `${cert ? 'https' : 'http'}://${proxy.hostname}:${proxy.port}`,
+      target: `${cert ? 'https' : 'http'}://${hostname}:${port}${contextRoot}`,
       ca: cert,
       minVersion: minTLS,
       changeOrigin: true,

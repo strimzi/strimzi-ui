@@ -38,6 +38,7 @@ const defaultConfig: serverConfig = {
   },
   proxy: {
     hostname: 'strimzi.admin.hostname.com',
+    contextRoot: '/',
     port: 9080,
     transport: {},
   },

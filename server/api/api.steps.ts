@@ -82,9 +82,10 @@ And(
 );
 
 Then(
-  'I get the expected proxied response',
+  'I make the expected proxy request and get the expected proxied response',
   stepWithWorld(async (world) => {
     const { request, context, configuration } = world;
+    const expectedContextRoot = configuration.proxy.contextRoot;
     const securedConfig = configuration.proxy.transport.cert ? true : false;
 
     const expectFailure = context.responseWillError ? true : false;
@@ -106,6 +107,8 @@ Then(
           expect(ca).toBeUndefined();
           expect(secure).toBe(false);
         }
+        // confirm the expected context root is added to the end of the target
+        expect(target.endsWith(expectedContextRoot)).toBe(true);
 
         expect(placeholderProxyEvent).not.toBeCalled(); // confirm placeholder event handlers are not called (ie ones provided by API module are)
         // confirm the API module handles the response

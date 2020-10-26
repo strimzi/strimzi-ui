@@ -12,10 +12,11 @@ const devEnvValues = {
     hostname: process.env.WDS_HOSTNAME || 'localhost',
     port: process.env.WDS_PORT || 8080,
   },
-  // mock admin server hostname and port
+  // mock admin server hostname, port and api module context root
   mockadminServer: {
     hostname: process.env.MA_HOSTNAME || 'localhost',
     port: process.env.MA_PORT || 9080,
+    contextRoot: process.env.MA_CONTEXT_ROOT || '/api',
   },
   // (development instance) server hostname and port
   devServer: {

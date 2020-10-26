@@ -51,6 +51,16 @@ const apiModuleConfig: () => serverConfig = () =>
     modules: { ...modules, api: true },
   });
 
+const apiModuleConfigWithCustomContextRoot: () => serverConfig = () =>
+  merge(merge({}, defaultTestConfig()), {
+    proxy: {
+      hostname: 'test-backend',
+      port: 3434,
+      contextRoot: '/myCustomContextRoot',
+    },
+    modules: { ...modules, api: true },
+  });
+
 const securedApiModuleConfig: () => serverConfig = () =>
   merge(merge(apiModuleConfig()), {
     proxy: {
@@ -78,5 +88,7 @@ export const getConfigForName: (name: string) => serverConfig = (name) => {
       return apiModuleConfig();
     case 'api_secured_only':
       return securedApiModuleConfig();
+    case 'api_with_custom_context_root':
+      return apiModuleConfigWithCustomContextRoot();
   }
 };

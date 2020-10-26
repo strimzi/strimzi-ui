@@ -15,9 +15,12 @@ export const MockApiModule: UIServerModule = {
     const routerForModule = express.Router();
 
     // endpoint used for test purposes
-    routerForModule.get('/test', (req, res) => {
+    routerForModule.get('/test', (_, res) => {
+      const { entry } = res.locals.strimziuicontext.loggers;
+      const { exit } = entry('`/test` handler');
       res.setHeader('x-strimzi-ui-module', moduleName);
       res.sendStatus(418);
+      exit(418);
     });
 
     // other implementation to follow
