@@ -18,6 +18,8 @@ const config = {
     '/coverage/',
     '/.storybook/',
     '/test_common/',
+    '/.github/',
+    '/.out/',
   ],
   collectCoverageFrom: ['**/*.{js,jsx,ts,tsx}', '!**/*.config.*'],
   coverageReporters: ['json', 'text', 'lcov', 'json-summary'],

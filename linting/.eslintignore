@@ -5,3 +5,4 @@
 # negated files/directories to be included
 # Directories that start with dots are excluded by default, causing eslint warnings
 !.storybook/
+!.github/

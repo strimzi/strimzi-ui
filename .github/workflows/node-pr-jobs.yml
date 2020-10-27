@@ -1,0 +1,100 @@
+# Copyright Strimzi authors.
+# License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
+name: Node
+
+on: [pull_request]
+
+jobs:
+  build-current:
+    runs-on: ubuntu-latest
+    name: Build and Test
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: master
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Upload Master Bundle Report
+        run: echo "MASTER_REPORT=$(cat generated/bundle-analyser/report.json)" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Caluclate bundle size
+        id: bundle
+        uses: ./.github/actions/bundle
+        with:
+          MASTER_REPORT: ${{ env.MASTER_REPORT }}
+      - name: Test
+        run: npm run test:unit
+      - name: Coverage report
+        id: coverage
+        if: ${{ always() }}
+        uses: ./.github/actions/coverage-report
+      - name: Comment on PR
+        if: ${{ always() }}
+        uses: ./.github/actions/commenter
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUNDLE_REPORT: ${{ steps.bundle.outputs.bundle_report }}
+          OVERALL_BUNDLE_SIZE_CHANGE: ${{ steps.bundle.outputs.overall_bundle_size_change }}
+          TEST_COVERAGE: ${{ steps.coverage.outputs.test_coverage }}
+
+  lint:
+    runs-on: ubuntu-latest
+    name: Linter
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Install Dependencies
+        run: npm ci
+      - name: Lint all files
+        run: npm run lint
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    name: E2E Tests
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Install dependencies
+        run: npm ci
+      - name: run tests
+        run: npm run test:e2e
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: failures
+          path: failure_output
+
+  storybook-artifact:
+    runs-on: ubuntu-latest
+    name: PR Storybook
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build Storybook
+        run: npm run storybook:build
+      - name: Upload Storybook Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: storybook
+          path: .out
