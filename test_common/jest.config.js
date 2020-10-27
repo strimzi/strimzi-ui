@@ -52,10 +52,10 @@ const config = {
   moduleNameMapper: {
     ...jestModuleMapper,
   },
-  setupFiles: ['./test_common/jest_cucumber_support/index.ts'],
+  setupFiles: ['<rootDir>/test_common/jest_cucumber_support/index.ts'],
   globals: {
     'ts-jest': {
-      tsConfig: '<rootDir>/test_common/tsconfig.test.json',
+      tsconfig: '<rootDir>/test_common/tsconfig.test.json',
     },
   },
 };

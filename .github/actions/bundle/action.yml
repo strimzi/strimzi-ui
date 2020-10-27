@@ -3,8 +3,10 @@
 name: "Bundle size"
 description: "Check the size of the bundle"
 inputs:
-  MASTER_REPORT:
-    description: "Bundle report from master branch"
+  CLIENT_MASTER_REPORT:
+    description: "Bundle report from master branch for client code"
+  SERVER_MASTER_REPORT:
+    description: "Bundle report from master branch for server code"
 outputs:
   bundle_report:
     description: "Markdown representation of bundle sizes"

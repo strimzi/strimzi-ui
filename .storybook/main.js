@@ -4,7 +4,6 @@
  */
 
 const devWebpackConfig = require('../build/webpack.client.dev.js');
-const path = require('path');
 
 module.exports = {
   stories: ['../client/**/*.stories.@(js|jsx|ts|tsx)'],
@@ -32,15 +31,7 @@ module.exports = {
       ...storybookWebpackConfig.resolve,
       alias: {
         ...devWebpackConfig.resolve.alias,
-        ...storybookWebpackConfig.resolve.alias,
-        // storybook can accidentally pick up other versions of core-js brought in
-        // by other modules. This makes sure it only ever uses the version it's
-        // expecting to exist. Issue: https://github.com/storybookjs/storybook/issues/11255
-        'core-js/modules': path.resolve(
-          __dirname,
-          '..',
-          'node_modules/storybook/node_modules/core-js/modules'
-        ),
+        ...storybookWebpackConfig.resolve.alias
       },
     }
   }),

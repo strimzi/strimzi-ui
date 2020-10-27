@@ -5,16 +5,31 @@
 const core = require("@actions/core");
 const fs = require("fs");
 
+// map of nicer labels to built bundle files in the reports
 const BUNDLE_LABELS = {
   'main.bundle.js': "Strimzi UI JS Bundle",
+  'main.js': "Strimzi UI Server JS Bundle",
 };
-const TABLE_HEADINGS = ['Bundle', 'New Size', 'Original Size', 'Increase/Decrese', 'File'];
+const TABLE_HEADINGS = ['Bundle', 'New Size', 'Original Size', 'Increase/Decrease', 'File'];
 
 const round = (value) => Math.round(value * 100) / 100;
+const percentageValueOrNa = value => value === Infinity ? 'N/A' : `${value}%`;
 
-const getReports = () => {
-  let masterReport = JSON.parse(core.getInput('MASTER_REPORT'));
-  const currentReport = JSON.parse(fs.readFileSync('./generated/bundle-analyser/report.json'));
+const CLIENT_REPORT_CONFIG = {
+  reportFor: 'client',
+  masterReportEnvvar: 'CLIENT_MASTER_REPORT',
+  branchReportFile: './generated/bundle-analyser/client-report.json',
+};
+
+const SERVER_REPORT_CONFIG = {
+  reportFor: 'server',
+  masterReportEnvvar: 'SERVER_MASTER_REPORT',
+  branchReportFile: './generated/bundle-analyser/server-report.json',
+};
+
+const getReports = (currentMasterReportEnvvar, branchReportFile) => {
+  let masterReport = core.getInput(currentMasterReportEnvvar) ? JSON.parse(core.getInput(currentMasterReportEnvvar)) : [];
+  const currentReport = fs.existsSync(branchReportFile) ? JSON.parse(fs.readFileSync(branchReportFile)) : [];
   return {masterReport, currentReport};
 };
 
@@ -40,7 +55,7 @@ const createBundleReportTable = (bundleReport, bundleSizes) => bundleReport.redu
   const masterSize = round(masterSizeBytes / 1024);
   const bundleLabel = BUNDLE_LABELS[bundle.label] || bundle.label;
   const sizeDiff = round(currentSizeBytes / masterSizeBytes) - 1;
-  const sizeDiffText = `${round(sizeDiff * 100)}%`;
+  const sizeDiffText = percentageValueOrNa(round(sizeDiff * 100));
 
   return `${previousbundleText} |${bundleLabel}|${currentSize}KB|${masterSize}KB|${sizeDiffText}|${bundle.label}|\n`;
 }, createTableHeader(TABLE_HEADINGS));
@@ -53,18 +68,28 @@ const calculateOverallChange = (bundleSizes) => {
     };
   }, {totalMasterSize: 0, totalCurrentSize: 0});
 
-  return `${round(((sizes.totalCurrentSize / sizes.totalMasterSize) - 1) * 100)}%`;
+  return percentageValueOrNa(round(((sizes.totalCurrentSize / sizes.totalMasterSize) - 1) * 100));
 };
 
 async function buildBundleReport() {
   try {
-    const {masterReport, currentReport} = getReports();
-    const bundleSizes = initBundleSizeObject(masterReport);
-    const bundleReportTable = createBundleReportTable(currentReport, bundleSizes);
-    const overallBundleSizeChange = calculateOverallChange(bundleSizes);
 
-    core.setOutput('bundle_report', bundleReportTable);
-    core.setOutput('overall_bundle_size_change', overallBundleSizeChange);
+    const actionOutput = [CLIENT_REPORT_CONFIG, SERVER_REPORT_CONFIG].map(reportToProcess => {
+      const {reportFor, masterReportEnvvar, branchReportFile} = reportToProcess;
+      const {masterReport, currentReport} = getReports(masterReportEnvvar, branchReportFile);
+      const bundleSizes = initBundleSizeObject(masterReport);
+      const bundleReportTable = createBundleReportTable(currentReport, bundleSizes);
+      const overallBundleSizeChange = calculateOverallChange(bundleSizes);
+
+      return {
+        reportFor,
+        'bundle_report': bundleReportTable,
+        'overall_bundle_size_change': overallBundleSizeChange
+      };
+    }).reduce((acc, {reportFor, bundle_report, overall_bundle_size_change}) => ({...acc, [reportFor]: {bundle_report, overall_bundle_size_change}}), {});
+
+    core.setOutput(`bundle_report`, JSON.stringify(actionOutput));
+
   } catch (error) {
     core.setFailed(error.message);
   }
