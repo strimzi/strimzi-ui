@@ -9,8 +9,7 @@ const moduleName = 'mockapi';
 
 export const MockApiModule: UIServerModule = {
   moduleName,
-  addModule: (logGenerator) => {
-    const logger = logGenerator(moduleName);
+  addModule: (logger) => {
     const { exit } = logger.entry('addModule');
     const routerForModule = express.Router();
 

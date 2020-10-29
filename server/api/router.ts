@@ -16,8 +16,7 @@ const moduleName = 'api';
 
 export const ApiModule: UIServerModule = {
   moduleName,
-  addModule: (logGenerator, authFn, serverConfig) => {
-    const logger = logGenerator(moduleName);
+  addModule: (logger, authFn, serverConfig) => {
     const { proxy } = serverConfig;
     const { exit } = logger.entry('addModule', proxy);
     const { hostname, port, contextRoot, transport } = proxy;

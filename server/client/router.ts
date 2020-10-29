@@ -11,9 +11,8 @@ const moduleName = 'client';
 
 export const ClientModule: UIServerModule = {
   moduleName,
-  addModule: (logGenerator, authFn, serverConfig) => {
+  addModule: (logger, authFn, serverConfig) => {
     const { publicDir } = serverConfig.client.configOverrides;
-    const logger = logGenerator(moduleName);
     const { exit } = logger.entry('addModule', publicDir);
     const routerForModule = express.Router();
 

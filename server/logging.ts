@@ -7,7 +7,7 @@ import pinoLogger from 'pino';
 import pinoHttpLogger from 'pino-http';
 import { randomBytes } from 'crypto';
 
-import { loadConfig, watchConfig, getServerName } from 'serverConfig';
+import { getServerName } from 'serverConfig';
 import { entryExitLoggerType } from 'types';
 
 const STRIMZI_UI_REQUEST_ID_HEADER = 'x-strimzi-ui-request';
@@ -15,13 +15,6 @@ const STRIMZI_UI_REQUEST_ID_HEADER = 'x-strimzi-ui-request';
 const serverName = getServerName();
 
 let rootLogger = pinoLogger();
-
-/** Returns the logger used by the serverConfig functions */
-const getConfigLogger = () =>
-  rootLogger.child({
-    serverName,
-    module: 'config',
-  });
 
 /** Replaces the rootLogger with a new pinoLogger with the supplied options */
 const updateRootLoggerOptions: (
@@ -51,16 +44,6 @@ const updateRootLoggerOptions: (
     );
   }
 };
-
-/** Update the rootLogger when the config is loaded */
-loadConfig((loadedInitialConfig) => {
-  updateRootLoggerOptions(loadedInitialConfig.logging, false);
-}, getConfigLogger());
-
-/** Update the rootLogger when the config is updated */
-watchConfig((latestConfig) => {
-  updateRootLoggerOptions(latestConfig.logging, true);
-}, getConfigLogger());
 
 /** Generate an entryExitLogger */
 const generateLogger: (
@@ -107,4 +90,9 @@ const generateRequestID: (Request) => string = (req) => {
   return req.headers[STRIMZI_UI_REQUEST_ID_HEADER] as string;
 };
 
-export { generateLogger, generateHttpLogger, STRIMZI_UI_REQUEST_ID_HEADER };
+export {
+  generateLogger,
+  generateHttpLogger,
+  updateRootLoggerOptions,
+  STRIMZI_UI_REQUEST_ID_HEADER,
+};

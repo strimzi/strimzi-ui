@@ -8,9 +8,9 @@ import https from 'https';
 
 import { loadConfig, watchConfig, getServerName } from 'serverConfig';
 import { returnExpress } from 'core';
-import { generateLogger } from 'logging';
+import { generateLogger, updateRootLoggerOptions } from 'logging';
 
-const logger = generateLogger('main');
+let logger = generateLogger('main');
 const errorHandler: (err: Error, ...others: unknown[]) => void = (
   err,
   ...others
@@ -27,6 +27,8 @@ loadConfig((loadedInitialConfig) => {
     { config }, // include the config in the log event JSON
     'Strimzi ui server starting with config'
   );
+  updateRootLoggerOptions(config.logging, false);
+  logger = generateLogger('main');
 
   watchConfig((latestConfig) => {
     config = latestConfig;
@@ -34,6 +36,8 @@ loadConfig((loadedInitialConfig) => {
       { config }, // include the updated config in the log event JSON
       'Strimzi ui server configuration update'
     );
+    updateRootLoggerOptions(config.logging, true);
+    logger = generateLogger('main');
   }, logger); // load config and update config value
 
   const expressAppForServer = returnExpress(getServerName(), () => config);

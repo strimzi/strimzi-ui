@@ -13,17 +13,18 @@ import {
   STRIMZI_UI_REQUEST_ID_HEADER,
 } from 'logging';
 
-const logger = generateLogger('core');
-
 export const returnExpress: (
   serverName: string,
   getConfig: () => serverConfig
 ) => express.Application = (serverName, getConfig) => {
+  const logger = generateLogger('core');
   const app = express();
-  const httpLogger = generateHttpLogger();
 
   // add helmet middleware
   app.use(helmet());
+
+  // add pino-http middleware
+  app.use(generateHttpLogger());
 
   // for each module, call the function to add it to the routing table
   const routingTable = Object.values(availableModules).reduce(
@@ -37,7 +38,7 @@ export const returnExpress: (
       logger.info(`Mounting module '${moduleName}'`);
       const config = getConfig();
       const { mountPoint, routerForModule } = addModule(
-        (moduleName) => generateLogger(moduleName),
+        generateLogger(moduleName),
         authFunction(config.authentication),
         config
       );
@@ -49,10 +50,9 @@ export const returnExpress: (
 
   // before all handlers, add context and request start/end handlers
   app.all('*', (req, res, next) => {
-    // set up logger for start/end of request
-    httpLogger(req, res);
+    // log start of request (end of request is automatically logged)
     req.log.debug('Request received');
-    // and make sure the response has the requestID header
+    // make sure the response has the requestID header (set via the pino-http middleware)
     res.setHeader(STRIMZI_UI_REQUEST_ID_HEADER, req.id as string);
 
     // create a 'context' for this request, containing config and the request ID. Available to handlers via `res.locals.strimziuicontext`

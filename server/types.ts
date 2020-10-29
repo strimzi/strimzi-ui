@@ -109,7 +109,7 @@ export type strimziUIContextType = {
 interface addModule {
   /** function called to add a module to the UI server */
   (
-    mountLogger: (moduleName: string) => entryExitLoggerType,
+    mountLogger: entryExitLoggerType,
     authFunction: expressMiddleware,
     configAtServerStart: serverConfig
   ): {
