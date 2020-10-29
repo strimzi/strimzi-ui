@@ -9,6 +9,8 @@ This directory contains code relating to the building of the UI at dev and produ
   - `moduleLoaders` - an object containing functions that will return module loading rules. These should be called when defining a build mode's `module.rules` value. The functions provided allow for custom values to be provided - see `webpack.common.js` for usage. Any common loaders should be provided/used this way, as it allows easy modification/extension, while keeping a sensible set of default values.
   - `plugins` - an object which contains functions which return the various plugins used across more than one build mode, with a common minimum configuration. These should be imported and called in a build mode's `plugins` array, with custom config passed to suit that mode. Any common plugins should be provided/used this way, as it allows easy modification/extension, while keeping a sensible set of default values.
   - `CONSTANTS` - an object which contains useful values for use in any build mode
-- `webpack.dev.js` - webpack development build mode. Stands up a configured instance of `webpack-dev-server` to supplement the common config/to enable faster development.
-- `webpack.prod.js` - webpack production build mode. Contains configuration to minify and compress all built output.
+- `webpack.client.dev.js` - webpack development build mode. Stands up a configured instance of `webpack-dev-server` to supplement the common config/to enable faster development.
+- `webpack.client.prod.js` - webpack production build mode for client code. Contains configuration to minify and compress all built output.
+- `webpack.server.prod.js` - webpack production build mode for server code. Contains configuration to minify and compress all built output.
 - `babelPresets.js` - babel transpiling configuration. See comments in the file which detail what options/plugins are in use.
+- `dockerfile` - a dockerfile which builds the Strimzi-ui, and when run hosts it on port 3000

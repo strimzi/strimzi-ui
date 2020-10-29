@@ -52,17 +52,15 @@ async function comment(message) {
 
 async function createComment() {
   try {
-    const bundleReport = core.getInput("BUNDLE_REPORT");
-    const overallBundleSizeChange = core.getInput("OVERALL_BUNDLE_SIZE_CHANGE");
+    const bundleReportContent = core.getInput("BUNDLE_REPORT") ? JSON.parse(core.getInput("BUNDLE_REPORT")) : {};
     const testCoverage = core.getInput("TEST_COVERAGE");
 
     const title = '# PR Report';
-    const bundleText = `## Bundle Sizes\n<details><summary>View bundle sizes</summary><br>\n\n${bundleReport}\n</details>`;
-    const bundleOverviewText = `### Overall bundle size change: ${overallBundleSizeChange}`;
+    const bundleText = `## Bundle Sizes\n${Object.entries(bundleReportContent).reduce((acc, [codeArea, {bundle_report, overall_bundle_size_change}]) => `${acc}<details><summary>View bundle sizes for '${codeArea}'</summary><br>\n\n${bundle_report}\n##### Overall bundle size change: ${overall_bundle_size_change}\n</details>`, '')}`;
     const testText = `## Test Coverage\n<details><summary>View test coverage</summary><br>\n\n${testCoverage}\n</details>`;
     const footer = `Triggered by commit: ${github.context.sha}`;
 
-    const commentText = [title, bundleText, bundleOverviewText, testText, footer];
+    const commentText = [title, bundleText, testText, footer];
 
     await comment(commentText.join('\n\n'));
   } catch (error) {

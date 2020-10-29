@@ -56,4 +56,5 @@ const jestModuleMapper = Object.values(modules).reduce(
 module.exports = {
   webpackAliases,
   jestModuleMapper,
+  relativeClientAliases: relativeAliases,
 };

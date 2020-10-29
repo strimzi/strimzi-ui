@@ -14,17 +14,17 @@ For a given new Context `FeatureFlagContext`, the expected files are as follows:
 
 ```
 Contexts/
-  index.js
+  index.ts
   FeatureFlagContext/
     README.md
-    Context.js
+    Context.ts
 ```
 
 Where:
 
-- index.js acts as a barrel file, exporting all public elements of this context/the contexts contained in the Context directory
+- index.ts acts as a barrel file, exporting all public elements of this context/the contexts contained in the Context directory
 - README.md is the readme for this Context, detailing design choices and usage
-- Context.js is the implementation of this context
+- Context.ts is the implementation of this context
 
 ## Available contexts
 

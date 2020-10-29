@@ -1,0 +1,18 @@
+{
+  "extends": "../utils/dev_config/tsconfig.common.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "outDir": "../js/server",
+    "baseUrl": "./",
+    "paths": {
+      "api": ["api/"],
+      "client": ["client/"],
+      "config": ["config"],
+      "core": ["core/"],
+      "log": ["log/"],
+      "mockapi": ["mockapi/"],
+      "serverConfig": ["serverConfig"]
+    }
+  },
+  "include": ["."]
+}

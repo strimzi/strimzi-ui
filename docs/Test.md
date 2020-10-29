@@ -60,11 +60,7 @@ Common step definitions should be defined in `test_common/jest_cucumber_support/
 
 ### Server Testing
 
-The strimzi-ui server should be tested from outside the server, as a user would
-access it (indirectly) through via the UI. It should be behaviourally driven
-using _Jest_ and _Cucumber_ to talk to each enpoint and check that the response
-received is correct. The test code for the server is in the `server/test`
-directory.
+The strimzi-ui server should be tested by driving requests to the server, as a user would (indirectly) through via the UI. It should be tested behaviorally, using _Jest_ and _Cucumber_ interacting with a [`supertest`](https://github.com/visionmedia/supertest) instance of the server. Test feature files will reside in their respective modules, and common server test step code is kept in `server/test`.
 
 ### End to End testing
 

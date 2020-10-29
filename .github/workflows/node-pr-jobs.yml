@@ -16,24 +16,29 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Upload Master Bundle Report
-        run: echo "MASTER_REPORT=$(cat generated/bundle-analyser/report.json)" >> $GITHUB_ENV
+      - name: Upload Master Bundle Report for client and server
+        run: | 
+          echo "CLIENT_MASTER_REPORT=$(cat generated/bundle-analyser/client-report.json)" >> $GITHUB_ENV 
+          echo "SERVER_MASTER_REPORT=$(cat generated/bundle-analyser/server-report.json)" >> $GITHUB_ENV 
       - uses: actions/checkout@v2
       - name: Use Node.js 14.x
         uses: actions/setup-node@v1
         with:
           node-version: 14.x
-      - name: Install Dependencies
-        run: npm ci
+      - name: Install Dependencies and setup for CI
+        run: | 
+          npm ci
+          npm run addDevCerts
       - name: Build
         run: npm run build
-      - name: Caluclate bundle size
+      - name: Calculate bundle size
         id: bundle
         uses: ./.github/actions/bundle
         with:
-          MASTER_REPORT: ${{ env.MASTER_REPORT }}
+          CLIENT_MASTER_REPORT: ${{ env.CLIENT_MASTER_REPORT }}
+          SERVER_MASTER_REPORT: ${{ env.SERVER_MASTER_REPORT }}
       - name: Test
-        run: npm run test:unit
+        run: npm run test:jest -- --forceExit # force exit in case a test does not clean up after failure
       - name: Coverage report
         id: coverage
         if: ${{ always() }}
@@ -44,7 +49,6 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUNDLE_REPORT: ${{ steps.bundle.outputs.bundle_report }}
-          OVERALL_BUNDLE_SIZE_CHANGE: ${{ steps.bundle.outputs.overall_bundle_size_change }}
           TEST_COVERAGE: ${{ steps.coverage.outputs.test_coverage }}
 
   lint:

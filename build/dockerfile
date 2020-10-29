@@ -1,0 +1,34 @@
+#
+# Copyright Strimzi authors.
+# License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
+#
+# Note: this is provided for purposes of completing/illustrating a production build of the UI - this will be replaced in due course with a strimzi based image + node runtime w/ tini etc
+
+FROM node:lts-alpine as builder
+
+WORKDIR /usr/strimzi-ui/
+
+COPY --chown=root:root / /usr/strimzi-ui/
+
+# install all deps, and build client/server
+RUN npm install -q \
+  && npm run build
+# clear deps, and only install prod deps - needed as server build does not bundle them/node provided functions
+RUN rm -rf /node_modules \ 
+  && npm install -q --only=production \
+  && npm dedupe
+
+# ---------------------------------------------------------------------------- #
+
+FROM node:lts-alpine
+
+# copy required built output to image
+COPY --from=builder --chown=root:root /usr/strimzi-ui/LICENSE ./
+COPY --from=builder --chown=root:root /usr/strimzi-ui/dist ./dist
+COPY --from=builder --chown=root:root /usr/strimzi-ui/node_modules ./node_modules
+
+USER node
+
+EXPOSE 3000
+
+ENTRYPOINT [ "node" , "/dist/server/main.js" ]

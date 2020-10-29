@@ -7,6 +7,7 @@ const { jestModuleMapper } = require('../utils/tooling/aliasHelper.js');
 const config = {
   rootDir: '../',
   clearMocks: true,
+  testTimeout: 10000, // required for server tests, which take ~3 seconds to start
   coverageDirectory: 'coverage',
   coveragePathIgnorePatterns: [
     '/node_modules/',
@@ -21,7 +22,12 @@ const config = {
     '/.github/',
     '/.out/',
   ],
-  collectCoverageFrom: ['**/*.{js,jsx,ts,tsx}', '!**/*.config.*'],
+  collectCoverageFrom: [
+    '**/*.{js,jsx,ts,tsx}',
+    '!**/*.config.*',
+    '!server/*.*',
+    '!client/Bootstrap/index.ts',
+  ],
   coverageReporters: ['json', 'text', 'lcov', 'json-summary'],
   coverageThreshold: {
     global: {
@@ -31,7 +37,7 @@ const config = {
       statements: 100,
     },
   },
-  moduleDirectories: ['node_modules', 'client'],
+  moduleDirectories: ['node_modules', 'client', 'server'],
   moduleFileExtensions: ['js', 'feature', 'ts'],
   testEnvironment: 'jsdom',
   testMatch: ['**/*.spec.ts', '**/*.steps.ts'],
@@ -46,7 +52,12 @@ const config = {
   moduleNameMapper: {
     ...jestModuleMapper,
   },
-  setupFiles: ['./test_common/jest_cucumber_support'],
+  setupFiles: ['<rootDir>/test_common/jest_cucumber_support/index.ts'],
+  globals: {
+    'ts-jest': {
+      tsconfig: '<rootDir>/test_common/tsconfig.test.json',
+    },
+  },
 };
 
 module.exports = config;
