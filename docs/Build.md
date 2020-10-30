@@ -168,7 +168,7 @@ dist/
             ...
         ...
     server/
-        main.bundle.js
+        main.js
         ...
 ```
 
@@ -204,6 +204,6 @@ The UI build is used in a `dockerfile` to produce an image that can then be depl
 - Run `npm run build`, which in turn runs a production build of the client and server
 - Clear installed dependencies, and install just production (shipped) dependencies
 - Move the built UI directory `dist` and `node_modules` to the required location
-- Sets the entrypoint to a script/command which runs the UI Server: `node dist/server/main.bundle.js`
+- Sets the entrypoint to a script/command which runs the UI Server: `node dist/server/main.js`
 
 Further details to be added once https://github.com/strimzi/proposals/pull/6 has been finalized.
