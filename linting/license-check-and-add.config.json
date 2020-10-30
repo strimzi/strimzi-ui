@@ -8,7 +8,8 @@
     "**.pptx",
     "./build/dockerfile",
     "./generated/**",
-    "./coverage/**"
+    "./coverage/**",
+    "./.idea/**"
   ],
   "licenseFormats": {
     "tsx|jsx|ts|js|css|scss": {
