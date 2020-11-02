@@ -66,7 +66,7 @@ Following introspection, the returned result to consumers will be as follows:
 }
 ```
 
-Given this context involves data fetching, not only will the result of the introspection be returned, but so will status information for consumers to make use of if needed.
+Given this context involves data fetching, not only will the result of the introspection be returned, but also will status information for consumers to make use of if needed.
 
 The result of the introspection is a mapping of the expected fields, operation and subscriptions to `true` and `false`, based on if the expected capability is present by name and or type. Users of the Context/Hook to easily check if a capability is available as follows:
 
@@ -75,5 +75,3 @@ const { Topic } = entities;
 ...
 const  canCreate =  Topic.operations.create;
 ```
-
-_Note_: Implementation to follow in a later PR

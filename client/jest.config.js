@@ -25,6 +25,7 @@ const config = {
     '!**/*types.ts',
     '!**/*.assets.{ts,tsx}',
     '!jest.config.js',
+    '!**/mock/**/*',
     // Wrapper around graphql - not something we need/wish to test
     '!Bootstrap/GraphQLClient/**',
   ],
