@@ -1,0 +1,67 @@
+# Copyright Strimzi authors.
+# License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
+name: Node
+
+on: [pull_request_target]
+
+jobs:
+  build-current:
+    runs-on: ubuntu-latest
+    name: Build and Test
+    steps:
+      - name: Get PR head
+        id: pr_head
+        run: |
+          OWNER=$(jq -r '.pull_request.base.repo.owner.login' "$GITHUB_EVENT_PATH")
+          REPO=$(jq -r '.pull_request.base.repo.name' "$GITHUB_EVENT_PATH")
+          PR_REPO="$OWNER/$REPO"
+          PR_BRANCH=$(jq -r '.pull_request.head.ref' "$GITHUB_EVENT_PATH")
+          echo "::set-output name=repo::$PR_REPO"
+          echo "::set-output name=branch::$PR_BRANCH"
+      - name: Checkout master
+        uses: actions/checkout@v2
+        with:
+          ref: master
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Upload Master Bundle Report for client and server
+        run: |
+          echo "CLIENT_MASTER_REPORT=$(cat generated/bundle-analyser/client-report.json)" >> $GITHUB_ENV 
+          echo "SERVER_MASTER_REPORT=$(cat generated/bundle-analyser/server-report.json)" >> $GITHUB_ENV 
+      - name: Checkout PR Branch
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ steps.pr_head.outputs.repo }}
+          ref: ${{steps.pr_head.outputs.branch}}
+          fetch-depth: 0
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Install Dependencies and setup for CI
+        run: |
+          npm ci
+          npm run addDevCerts
+      - name: Build
+        run: npm run build
+      - name: Calculate bundle size
+        id: bundle
+        uses: ./.github/actions/bundle
+        with:
+          CLIENT_MASTER_REPORT: ${{ env.CLIENT_MASTER_REPORT }}
+          SERVER_MASTER_REPORT: ${{ env.SERVER_MASTER_REPORT }}
+      - name: Test
+        run: npm run test:jest -- --forceExit # force exit in case a test does not clean up after failure
+      - name: Coverage report
+        id: coverage
+        if: ${{ always() }}
+        uses: ./.github/actions/coverage-report
+      - name: Comment on PR
+        if: ${{ always() }}
+        uses: ./.github/actions/commenter
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUNDLE_REPORT: ${{ steps.bundle.outputs.bundle_report }}
+          TEST_COVERAGE: ${{ steps.coverage.outputs.test_coverage }}
