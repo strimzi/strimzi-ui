@@ -9,15 +9,22 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Test
     steps:
-      - uses: actions/checkout@v2
+      - name: Get PR head
+        id: pr_head
+        run: |
+          PR_HEAD=$(jq -r '.pull_request.head.repo.full_name' "$GITHUB_EVENT_PATH")
+          echo "::set-output name=head::$PR_HEAD"
+      - name: Checkout PR head
+        uses: actions/checkout@v2
         with:
-          ref: master
+          repository: ${{ steps.pr_head.outputs.head }}
+          fetch-depth: 0
       - name: Install Dependencies
         run: npm ci
       - name: Build
         run: npm run build
       - name: Upload Master Bundle Report for client and server
-        run: | 
+        run: |
           echo "CLIENT_MASTER_REPORT=$(cat generated/bundle-analyser/client-report.json)" >> $GITHUB_ENV 
           echo "SERVER_MASTER_REPORT=$(cat generated/bundle-analyser/server-report.json)" >> $GITHUB_ENV 
       - uses: actions/checkout@v2
@@ -26,7 +33,7 @@ jobs:
         with:
           node-version: 14.x
       - name: Install Dependencies and setup for CI
-        run: | 
+        run: |
           npm ci
           npm run addDevCerts
       - name: Build
@@ -55,7 +62,16 @@ jobs:
     runs-on: ubuntu-latest
     name: Linter
     steps:
-      - uses: actions/checkout@v2
+      - name: Get PR head
+        id: pr_head
+        run: |
+          PR_HEAD=$(jq -r '.pull_request.head.repo.full_name' "$GITHUB_EVENT_PATH")
+          echo "::set-output name=head::$PR_HEAD"
+      - name: Checkout PR head
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ steps.pr_head.outputs.head }}
+          fetch-depth: 0
       - name: Use Node.js 14.x
         uses: actions/setup-node@v1
         with:
@@ -69,7 +85,16 @@ jobs:
     runs-on: ubuntu-latest
     name: E2E Tests
     steps:
-      - uses: actions/checkout@v2
+      - name: Get PR head
+        id: pr_head
+        run: |
+          PR_HEAD=$(jq -r '.pull_request.head.repo.full_name' "$GITHUB_EVENT_PATH")
+          echo "::set-output name=head::$PR_HEAD"
+      - name: Checkout PR head
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ steps.pr_head.outputs.head }}
+          fetch-depth: 0
       - uses: actions/setup-node@v1
         with:
           node-version: 14.x
@@ -88,7 +113,16 @@ jobs:
     name: PR Storybook
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Get PR head
+        id: pr_head
+        run: |
+          PR_HEAD=$(jq -r '.pull_request.head.repo.full_name' "$GITHUB_EVENT_PATH")
+          echo "::set-output name=head::$PR_HEAD"
+      - name: Checkout PR head
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ steps.pr_head.outputs.head }}
+          fetch-depth: 0
       - name: Use Node.js 14.x
         uses: actions/setup-node@v1
         with:
