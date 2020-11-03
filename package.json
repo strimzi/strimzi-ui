@@ -42,9 +42,6 @@
   "bugs": {},
   "homepage": "https://github.com/strimzi/strimzi-ui#readme",
   "dependencies": {
-    "@babel/core": "^7.10.5",
-    "@babel/preset-env": "^7.10.4",
-    "babel-loader": "^8.1.0",
     "compression-webpack-plugin": "^4.0.0",
     "express": "^4.17.1",
     "express-static-gzip": "^2.0.8",

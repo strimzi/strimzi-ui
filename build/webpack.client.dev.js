@@ -20,6 +20,7 @@ const { webpackDevServer, devServer } = devEnvValues;
 
 const {
   withHTMLPlugin,
+  withNormalModuleReplacementPlugin,
   withMiniCssExtractPlugin,
   withWebpackBundleAnalyzerPlugin,
   withTsconfigPathsPlugin,
@@ -45,13 +46,14 @@ const devSpecificConfig = {
     rules: [
       withStylingModuleLoader(['style-loader']),
       withTSModuleLoader('../client/tsconfig.json'),
-      withJSModuleLoader(),
+      withJSModuleLoader('../client/tsconfig.json'),
       withFontModuleLoader(),
       withImageModuleLoader(),
     ],
   },
   plugins: [
     withHTMLPlugin(),
+    withNormalModuleReplacementPlugin(),
     withMiniCssExtractPlugin({
       hmr: true, // enable hmr as well as standard config
     }),
