@@ -13,9 +13,10 @@ jobs:
       - name: Get PR head
         id: pr_head
         run: |
-          OWNER=$(jq -r '.pull_request.base.repo.owner.login' "$GITHUB_EVENT_PATH")
+          LABEL=$(jq -r '.pull_request.head.label' "$GITHUB_EVENT_PATH")
           REPO=$(jq -r '.pull_request.base.repo.name' "$GITHUB_EVENT_PATH")
-          PR_REPO="$OWNER/$REPO"
+          OWNER=${LABEL%:*}
+          PR_REPO=$("$OWNER"/"$REPO")
           PR_BRANCH=$(jq -r '.pull_request.head.ref' "$GITHUB_EVENT_PATH")
           echo "::set-output name=repo::$PR_REPO"
           echo "::set-output name=branch::$PR_BRANCH"
