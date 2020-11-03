@@ -120,7 +120,7 @@ This UI makes use of:
   - React Hooks: to enable shareable common logic across components
   - React Lazy and Suspense: to enable asynchronous loading of component code where required
 - [Sass](https://sass-lang.com/) for styling. This adds a number of helpful features on top of the core css language to commonise and speed up style implementation
-- Webpack and Babel for building, bundling, treeshaking and transpiling the UI, and enabling day to day development. See [the build documentation](./Build.md#ui-build) for further details on build choices and setup.
+- Webpack and Typescript for building, bundling, treeshaking and transpiling the UI, and enabling day to day development. See [the build documentation](./Build.md#ui-build) for further details on build choices and setup.
 - [`Barrel files`](https://basarat.gitbook.io/typescript/main-1/barrel) and named exports. Barrel files (when combined with [Webpack aliases](./Build.md#webpack-aliases)) allow for many components/modules/functions/constants which are related to be imported and used via one import statement. This relies on exported components/modules/functions/constants to be individually named so they can be imported directly.
 - [`React Router`](https://github.com/ReactTraining/react-router) for it's declarative routing capabilities.
 
@@ -421,7 +421,7 @@ Tooling, such as [`npm audit`](https://docs.npmjs.com/cli/audit) make use of/uti
 
 The Strimzi-ui will not be published. Instead, it will consume a number of packages, and be built to provide a UI. Some of these packages will be used and shipped directly, but some will also generate and polyfill code in this repository to produce the the built UI. Thus, in the event of a security issue, we need to understand if the issue relates in any way to what we ship. We therefore categorise our dependencies as follows:
 
-- `dependencies` are any dependency which are either shipped bundled in the built output via direct usage (E.g. React), included in the dockerfile which will run the UI (E.g. Express) or generate output that is then built and shipped (I.e. babel transforms/plugins, Webpack plugins etc)
+- `dependencies` are any dependency which are either shipped bundled in the built output via direct usage (E.g. React), included in the dockerfile which will run the UI (E.g. Express) or generate output that is then built and shipped (I.e. typescript transforms/plugins, Webpack plugins etc)
 - `devDependencies` are used to support the development and test of the UI, but that are not shipped. E.g. Webpack, Jest, eslint
 
 The correct usage/catagorisation of dependencies will be checked on PR, alongside other checks, such as the licence that dependency comes with.

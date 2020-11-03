@@ -27,6 +27,7 @@ const {
 } = moduleLoaders;
 const {
   withHTMLPlugin,
+  withNormalModuleReplacementPlugin,
   withMiniCssExtractPlugin,
   withWebpackBundleAnalyzerPlugin,
   withTsconfigPathsPlugin,
@@ -49,7 +50,7 @@ const prodSpecificConfig = {
         },
       ]),
       withTSModuleLoader('../client/tsconfig.json'),
-      withJSModuleLoader(),
+      withJSModuleLoader('../client/tsconfig.json'),
       withFontModuleLoader(),
       withImageModuleLoader(),
     ],
@@ -89,6 +90,7 @@ const prodSpecificConfig = {
         useShortDoctype: true,
       },
     }),
+    withNormalModuleReplacementPlugin(),
     withMiniCssExtractPlugin(),
     // gzip compress all built js output
     new CompressionPlugin({

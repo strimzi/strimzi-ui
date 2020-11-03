@@ -44,6 +44,7 @@ Further details around how this UI is implemented can be found below:
 - [Linting](./docs/Linting.md)
 - [Test](./docs/Test.md)
 - [Contribution](./docs/Contribution.md)
+- [Coding Standards](./docs/Coding.md)
 
 ## Troubleshooting
 

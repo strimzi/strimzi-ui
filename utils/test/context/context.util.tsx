@@ -40,7 +40,9 @@ const renderWithContextProviders = (
   providers: Array<ProviderEntry>
 ): RenderResult =>
   render(ui, {
-    wrapper: ({ children }) => contextWrapper(providers, children),
+    wrapper: ({ children }) => {
+      return contextWrapper(providers, children);
+    },
     ...options,
   });
 

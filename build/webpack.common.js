@@ -3,10 +3,10 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 const path = require('path');
+const webpack = require('webpack');
 const merge = require('lodash.merge');
 
 const { PRODUCTION, DEVELOPMENT } = require('../utils/tooling/constants.js');
-const babelPresets = require('./babelPresets.js');
 
 // constants
 const UI_TITLE = 'Strimzi UI';
@@ -57,6 +57,16 @@ const withWebpackBundleAnalyzerPlugin = returnPluginWithConfig(
 );
 
 const withTsconfigPathsPlugin = returnPluginWithConfig(TsconfigPathsPlugin, {});
+
+const withNormalModuleReplacementPlugin = () =>
+  new webpack.NormalModuleReplacementPlugin(
+    /View.carbon/,
+    resource => {
+      if (process.env.cl === 'PATTERNFLY') {
+        resource.request = resource.request.replace('carbon', 'patternfly');
+      }
+    }
+  );
 
 // common rules configuration
 const returnModuleRuleWithConfig = (defaultConfig = {}, defaultUse = []) => (
@@ -109,21 +119,25 @@ const withTSModuleLoader = (tsConfigFile) =>
     ]
   )();
 
-const withJSModuleLoader = returnModuleRuleWithConfig(
-  {
-    test: /\.js?$/,
-    exclude: /(node_modules)/,
-  },
-  [
+const withJSModuleLoader = (tsConfigFile) => 
+  returnModuleRuleWithConfig(
     {
-      loader: 'babel-loader',
-      options: {
-        cacheDirectory: true,
-        presets: babelPresets,
-      },
+      test: /\.js?$/,
+      exclude: /(node_modules)/,
     },
-  ]
-);
+    [
+      {
+        loader: 'ts-loader',
+        options: {
+          configFile: path.resolve(
+            __dirname,
+            tsConfigFile || 'tsconfig.common.json'
+          ),
+          onlyCompileBundledFiles: true,
+        },
+      },
+    ]
+  )();
 
 const withFontModuleLoader = returnModuleRuleWithConfig(
   {
@@ -186,6 +200,7 @@ module.exports = {
   returnBasicConfigMergedWith,
   plugins: {
     withHTMLPlugin,
+    withNormalModuleReplacementPlugin,
     withMiniCssExtractPlugin,
     withWebpackBundleAnalyzerPlugin,
     withTsconfigPathsPlugin,
