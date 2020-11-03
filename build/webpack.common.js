@@ -5,7 +5,6 @@
 const path = require('path');
 const webpack = require('webpack');
 const merge = require('lodash.merge');
-
 const { PRODUCTION, DEVELOPMENT } = require('../utils/tooling/constants.js');
 
 // constants
@@ -39,7 +38,7 @@ const withHTMLPlugin = returnPluginWithConfig(HtmlPlugin, {
   template: `${BOOTSTRAP_DIR}/index.html`, // source template
   title: UI_TITLE, // HTML title
   favicon: `${IMAGES_DIR}/favicon.ico`, // favicon for this page
-  inject: 'head', // any/all built content linked into HTML head element
+  inject: true,
 });
 
 const withMiniCssExtractPlugin = returnPluginWithConfig(MiniCssExtractPlugin, {
@@ -59,14 +58,11 @@ const withWebpackBundleAnalyzerPlugin = returnPluginWithConfig(
 const withTsconfigPathsPlugin = returnPluginWithConfig(TsconfigPathsPlugin, {});
 
 const withNormalModuleReplacementPlugin = () =>
-  new webpack.NormalModuleReplacementPlugin(
-    /View.carbon/,
-    resource => {
-      if (process.env.cl === 'PATTERNFLY') {
-        resource.request = resource.request.replace('carbon', 'patternfly');
-      }
+  new webpack.NormalModuleReplacementPlugin(/.carbon./, (resource) => {
+    if (process.env.cl === 'PATTERNFLY') {
+      resource.request = resource.request.replace('carbon', 'patternfly');
     }
-  );
+  });
 
 // common rules configuration
 const returnModuleRuleWithConfig = (defaultConfig = {}, defaultUse = []) => (
@@ -99,30 +95,10 @@ const withStylingModuleLoader = returnModuleRuleWithConfig(
   ]
 );
 
-const withTSModuleLoader = (tsConfigFile) =>
+const withTypeScriptModuleLoader = (tsConfigFile) =>
   returnModuleRuleWithConfig(
     {
-      test: /\.(tsx|ts)?$/,
-      exclude: /(node_modules)/,
-    },
-    [
-      {
-        loader: 'ts-loader',
-        options: {
-          configFile: path.resolve(
-            __dirname,
-            tsConfigFile || 'tsconfig.common.json'
-          ),
-          onlyCompileBundledFiles: true,
-        },
-      },
-    ]
-  )();
-
-const withJSModuleLoader = (tsConfigFile) => 
-  returnModuleRuleWithConfig(
-    {
-      test: /\.js?$/,
+      test: /\.(t|j)sx?$/,
       exclude: /(node_modules)/,
     },
     [
@@ -174,7 +150,7 @@ const withImageModuleLoader = returnModuleRuleWithConfig(
 const returnBasicConfigMergedWith = (customConfigurationForBuildMode = {}) =>
   merge(
     {
-      entry: `${BOOTSTRAP_DIR}/index.ts`,
+      entry: `${BOOTSTRAP_DIR}/index.tsx`,
       target: 'web', // build for browsers (Webpack default)
       output: {
         path: BUILD_DIR,
@@ -182,7 +158,7 @@ const returnBasicConfigMergedWith = (customConfigurationForBuildMode = {}) =>
         filename: '[name].bundle.js',
       },
       module: {
-        // given the dynamic nature of rules and configuration, none a re provided by default. Use the exported `moduleLoaders` to return loaders with some default configs
+        // given the dynamic nature of rules and configuration, none are provided by default. Use the exported `moduleLoaders` to return loaders with some default configs
         rules: [],
       },
       // given different build modes will require different plugins/plugin configuration, none are provided by default. Use the exported `plugins` for commonly used plugins with default configuration
@@ -207,10 +183,9 @@ module.exports = {
   },
   moduleLoaders: {
     withStylingModuleLoader,
-    withTSModuleLoader,
-    withJSModuleLoader,
     withFontModuleLoader,
     withImageModuleLoader,
+    withTypeScriptModuleLoader,
   },
   CONSTANTS: {
     UI_TITLE,

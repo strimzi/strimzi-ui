@@ -16,14 +16,13 @@ const {
   moduleLoaders,
   CONSTANTS,
 } = require('./webpack.common.js');
-const { relativeClientAliases } = require('../utils/tooling/aliasHelper.js');
+
 const { HEADER_TEXT } = require('../utils/tooling/constants.js');
 const {
   withStylingModuleLoader,
-  withTSModuleLoader,
-  withJSModuleLoader,
   withFontModuleLoader,
   withImageModuleLoader,
+  withTypeScriptModuleLoader,
 } = moduleLoaders;
 const {
   withHTMLPlugin,
@@ -49,8 +48,7 @@ const prodSpecificConfig = {
           loader: MiniCssExtractPlugin.loader,
         },
       ]),
-      withTSModuleLoader('../client/tsconfig.json'),
-      withJSModuleLoader('../client/tsconfig.json'),
+      withTypeScriptModuleLoader('../client/tsconfig.json'),
       withFontModuleLoader(),
       withImageModuleLoader(),
     ],
@@ -112,14 +110,7 @@ const prodSpecificConfig = {
     }),
   ],
   resolve: {
-    alias: {
-      ...relativeClientAliases,
-    },
-    plugins: [
-      withTsconfigPathsPlugin({
-        configFile: './client/tsconfig.json',
-      }),
-    ],
+    plugins: [withTsconfigPathsPlugin({ configFile: 'client/tsconfig.json' })],
   },
 };
 

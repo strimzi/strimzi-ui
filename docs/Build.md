@@ -17,64 +17,9 @@ To maintain a small built bundle size, we take advantage of [Webpack's treeshaki
 
 Webpack (and it's plugins) are highly customisable. This section will detail the choices we have made around how and what is built, where it is built to, and the roles and responsibilities of the various plugins which enable this.
 
-#### Webpack aliases
-
-The UI makes extensive use of Webpack's [alias](https://webpack.js.org/configuration/resolve/#resolvealias) features. This is done for two reasons:
-
-1. It allows for abstraction at build time. By importing view layers via an alias the resolution of that alias can be changed at build time, enabling the ability to swap view layer implementations without needing to make changes in the production code. For instance:
-
-- If a component has [multiple view layer implementations](./Architecture.md#swap-able-view-layers):
-
-```
-  ...
-  View.carbon.ts
-  View.patternfly.ts
-  ...
-```
-
-- And the component exports itself via the View alias:
-
-```
-export * from 'View'
-```
-
-- And the View alias is defined as follows:
-
-```
-...
-    View: `./View.${VL_SUFFIX}.ts`
-...
-```
-
-where `VL_SUFFIX` is a suffix, in this case mapping to in this case either `carbon` or `patternfly`. At build time, one of the two layers is resolved, and thus available for use elsewhere.
-
-2. It makes importing code far cleaner and easier. For example, a traditional import of a module in another directory:
-
-```
-import { myFunction } from '../../Modules/MyModule';
-```
-
-with the following Webpack configuration:
-
-```
-...
-alias: {
-    MyModule: path.resolve(__dirname, 'Modules/MyModule')
-}
-...
-```
-
-becomes
-
-```
-import { myFunction } from 'MyModule'
-```
-
-For convenience, all top level module directories from `client` will be automatically aliased via a helper in the webpack configuration, as well defining dynamic view and styling aliases as described above, as well as an alias for model code.
-
 #### Webpack configuration and plugins
 
-In addition to aliasing, the webpack configuration will be as follows:
+The webpack configuration will be as follows:
 
 | Option                          | Value                                                                                                                                                                   |                                                                                                                                                                                                                                                        Purpose |
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
@@ -82,7 +27,7 @@ In addition to aliasing, the webpack configuration will be as follows:
 | mode                            | `production` or `development` (provided via config file used)                                                                                                           |                                                                                                                                       Build mode. If production, code will be minified and have developer helpers (warnings etc) removed from the built output |
 | target                          | `web` or `node` (provided via config file used)                                                                                                                         |                                                                                The build target. The client side code will be built for `web`, and server `node`, reflecting where the code runs (and thus what Webpack will/will not include in it's output). |
 | output.path                     | `dist/client` or `dist/server` (via constant)                                                                                                                           |                                                                                                           All output to be placed in the `dist` directory, with client code going into the `client` directory, and all server code into `server` respectively. |
-| output.publicPath               | `` (empty string) | The public path of static/public content included by Webpack. Is relative to the URL.                                                               |
+| output.publicPath               | `` (empty string)                                                                                                                                                       |                                                                                                                                                                          The public path of static/public content included by Webpack. Is relative to the URL. |
 | output.filename                 | `[name].bundle.js`                                                                                                                                                      |                                                                                                                                                                 Name of the built entry bundle. Will be `main.bundle.js` once built as we have one entry point |
 | module.rules                    | Array of rules - [see here for details](#module-rules)                                                                                                                  |                                                                                                                                         Rules/tests to run on modules being built. Depending on the file being parsed, different transformations should be run |
 | plugins                         | Array of plugins - [see here for details](#webpack-plugins)                                                                                                             |                                                                                                                                                                                         Additional tools to customise the build to produce the required output |
@@ -124,6 +69,7 @@ We also make use of the following plugins:
 | BannerPlugin                       |                                                                                                                                                                                                            Used to add a copyright header to built css code. Other types handled by other plugins (eg TerserPlugin) |
 | webpack-node-externals             |                                                                        Excludes any code from `node_modules`. Useful when building node.js bundles, due to OS/dynamic requirements of those modules. Expectation is these will be installed/provided at build time via an `npm install` alongside the built output. |
 | tsconfig-paths-webpack-plugin      |                                                                                                                                                                                                              Reads a specified `tsconfig.json` file, and generates Webpack aliases for any specified `path` values. |
+| NormalModuleReplacementPlugin      |                                                                                                                                                                                             Used to provide a swappable view layer - intercepts "import" statements and replaces with different location for module |
 
 Where appropriate, plugins will be provided via helper functions from a common configuration file, but allow for modification to their configuration. [See this section for more details](#ui-build-implementation).
 
@@ -138,6 +84,26 @@ These options will all be provided to the TerserPlugin via it's constructor.
 | terserOptions.keep_classnames | `true`                                  |                      Keep original class names |
 | terserOptions.keep_fnames     | `true`                                  |                   Keep original function names |
 | terserOptions.mangle.safari10 | `true`                                  |               Works around known Safari issues |
+
+##### Swappable view layers
+
+`NormalModuleReplacementPlugin` is used to support swapping between [multiple view layer implementations](./Architecture.md#swap-able-view-layers) at build time:
+
+```ts
+  ...
+  Component.carbon.ts
+  Component.patternfly.ts
+  Component.ts
+  ...
+```
+
+- And the component exports the carbon implementation:
+
+```ts
+export * from 'Component.carbon.js';
+```
+
+By setting `process.env.cl=PATTERNFLY` - webpack will replace `carbon` with `patternfly` in the export statement.
 
 #### Webpack output
 
@@ -191,6 +157,69 @@ To enable efficient development, this UI makes use of [webpack-dev-server](https
 | port             | `8080`                                                            |                                                                                                                                                                                                                                                                                                             The port to use for the server. Can be overridden using the `WDS_PORT` environment variable. |
 
 By default, `webpack-dev-server` will host the UI at `https://localhost:8080/`. Both the hostname and port can be overridden/changed via the `WDS_HOSTNAME` and `WDS_PORT` environment variables respectively.
+
+### Module resolution
+
+The UI makes extensive use of Typescript's [module resolution](https://www.typescriptlang.org/docs/handbook/module-resolution.html) features. This makes importing code far cleaner and easier. For example, a traditional import of a module in another directory:
+
+````
+- Modules
+  - MyModule
+    - index.ts
+- App
+  - Page
+    - index.ts
+
+```ts
+import { myFunction } from '../../Modules/MyModule';
+````
+
+with the following typescript configuration:
+
+```json
+{
+  "baseUrl": "."
+}
+```
+
+can be referenced as:
+
+```ts
+import { myFunction } from 'Modules/MyModule';
+```
+
+Typescript will resolve the relative path against the base url.
+
+Additionally, custom paths can be configured to act like top level modules:
+
+````
+- utils
+  - test
+    - index.ts
+- App
+  - Page
+    - index.ts
+
+```ts
+import { myFunction } from '../../Modules/MyModule';
+````
+
+with the following typescript configuration:
+
+```json
+{
+    "baseUrl": ".",
+    "paths: {
+        "test-utils": ["utils/test/index.ts"] //Relative to "baseUrl"
+    }
+}
+```
+
+can be referenced as:
+
+```ts
+import { testFunction } from 'test-utils';
+```
 
 ### UI Build implementation
 
