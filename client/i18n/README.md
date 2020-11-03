@@ -44,23 +44,30 @@ export const myComponent = () => {
 
 If you're using the `t` function - the key will be rendered if the translation is missing in the desired language or any fallbacks. Inserts are ignored.
 
-If you're using the `Trans` component, any children will be rendered but not the `ii18nkey` prop.
+If you're using the `Trans` component, any children will be rendered but not the `i18nkey` prop.
 
 ## Basic formatting in translations
 
 The `<Trans>` component can be used to render translated messages that contain basic formatting tags - `<br>, <strong>, <i>, <p>` can all be embedded directly into the translation string. `<Trans>` takes `translate` as a property `t` to allow it to re-render when language changes. `i18nKey` is passed in to point to the right translation. Inserts are passed as singleton key:value objects.
 
 ```tsx
-import {Trans, useTranslation} from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 export const myComponent = () => {
-    const {translate} = useTranslation();
-    return (
-        <>
-            <div><Trans t={translate} i18nKey="simple.format></Trans></div>
-            <div><Trans t={translate} i18nKey="with.inserts>{{insert: "value1"}}{{another:"value2"}}</Trans></div>
-
-        </>);
-}
+  const { translate } = useTranslation();
+  return (
+    <>
+      <div>
+        <Trans t={translate} i18nKey='simple.format'></Trans>
+      </div>
+      <div>
+        <Trans t={translate} i18nKey='with.inserts'>
+          {{ insert: 'value1' }}
+          {{ another: 'value2' }}
+        </Trans>
+      </div>
+    </>
+  );
+};
 ```
 
 ### Providing translation values
@@ -81,16 +88,31 @@ export const myComponent = () => {
 The `<Trans>` component also supports interpolation of JSX elements into the translated string to provide additional formatting (e.g class names, headers, links) around the string content. These elements must be passed as children to `<Trans>`. Dynamic content should be supplied after elements as singleton children as before.
 
 ```tsx
-import {Trans, useTranslation} from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 export const myComponent = () => {
-    const {t: translate} = useTranslation();
-    return (
-        <>
-            <div><Trans t={translate} i18nKey="with.link><a href="."/></Trans></div>
-            <div><Trans t={translate} i18nKey="with.classname><div className="bold"/>{{topic: "mytopic"}}</Trans></div>
-            <div><Trans t={translate} i18nKey="with.custom><MyComp prop="value"/><SecondComp/></Trans></div>
-        </>);
-}
+  const { t: translate } = useTranslation();
+  return (
+    <>
+      <div>
+        <Trans t={translate} i18nKey='with.link'>
+          <a href='.' />
+        </Trans>
+      </div>
+      <div>
+        <Trans t={translate} i18nKey='with.classname'>
+          <div className='bold' />
+          {{ topic: 'mytopic' }}
+        </Trans>
+      </div>
+      <div>
+        <Trans t={translate} i18nKey='with.custom'>
+          <MyComp prop='value' />
+          <SecondComp />
+        </Trans>
+      </div>
+    </>
+  );
+};
 ```
 
 ### Providing translation values
@@ -109,12 +131,10 @@ Each element is referenced in the translation file by its array index (children 
 
 ### Notes/Findings with advanced formatting
 
-`eslint-plugin-i18next` will not flag content in `<Trans>` - this is because it is not guaranteed to be written to the page.
+`eslint-plugin-i18next` will not flag content in `<Trans>` - this is because it will only be written to the page if you include it in your interpolated tranlsation string.
 
-For example with translation file `{key: "Some unrelated text"}` - `<Trans t={t} i18nKey="key">This is a <MyComp>custom component</MyComp></Trans>` would render `Some unrelated text`.
+For example with translation file `{key: "Some unrelated text"}` - `<Trans t={t} i18nKey="key">This is a <MyComp>custom component</MyComp></Trans>` would render `Some unrelated text` because the children are not being used in the translation string with key `key`.
 
-However with translation file `{key: "Insert <0/> here and <0>also here</0>"}` - `<Trans t={t} i18nKey="key">This is text with a <a href="">link</a></Trans>` would render `Insert This is text with a here and This is text with a`. The string is child `0` and string nodes cannot have children, and child `1` was not interpolated in the string.
+However with translation file `{key: "Insert <0/> here and <0>also here</0>"}` - `<Trans t={t} i18nKey="key">This is text with a <a href="">link</a></Trans>` would render `Insert This is text with a here and This is text with a`. This is because string `This is text with a ` is child `0`.
 
-For readability, you could copy/paste the English format - `{key: "Insert <1/> here and <3>also here</3>"}` - `<Trans t={t} i18nKey="key">Insert <div className="x"/> here and <div className="z">also here</div></Trans>` - but you then have to remember to reference the right array indices including the text nodes.
-
-It seems less error prone to only include inserts/custom elements as children to `<Trans>`.
+To avoid any confusion, `<Trans>` components must only have self closing elements `<MyComp/>` and `{key:value}` tuple objects as children.
