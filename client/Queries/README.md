@@ -8,7 +8,9 @@ This directory is home to all GraphQL queries. These should be imported by the a
   - query set (e.g. topics)
     - index.ts - containing all gql queries for that set
 
-## Example
+## Examples
+
+### API
 
 ```typescript
 // topics/index.ts
@@ -22,15 +24,15 @@ export const GET_TOPICS = gql`
 `;
 
 export const TOPIC_SUBSCRIPTION = gql`
- subscription {
-   ...
- }
+  subscription {
+    ...
+  }
 `;
 
 export const CREATE_TOPIC = gql`
- mutation {
-   ...
- }
+  mutation {
+    ...
+  }
 `;
 ```
 
@@ -67,5 +69,38 @@ const TopicModel = () => {
   const { loading, error, data } = getTopics();
   const { sub_loading, sub_error, sub_data } = topicsSubscription();
   ...
+};
+```
+
+### Config
+
+When fetching config, a context will need to be provided so that Apollo goes to the correct server.
+
+```typescript
+// config/index.ts
+
+import gql from 'graphql-tag';
+
+const GET_CONFIG = gql`
+  query {
+    ...
+  }
+`;
+```
+
+```typescript
+// config.hook.ts
+
+import { GET_CONFIG } from '@/Queries/topics';
+import { useQuery } from '@apollo/client';
+
+const useConfig = () => {
+  const getConfig = () =>
+    useQuery(GET_CONFIG, {
+      context: {
+        purpose: 'config',
+      },
+    });
+  return getConfig;
 };
 ```
