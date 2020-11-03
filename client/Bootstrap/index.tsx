@@ -4,8 +4,10 @@
  */
 
 import './style.scss';
+import { init } from 'i18n';
 import ReactDOM from 'react-dom';
 import React from 'react';
 import { Home } from 'Panels/Home';
 
+init(); //Bootstrap i18next support
 ReactDOM.render(<Home />, document.getElementById('root'));
