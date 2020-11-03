@@ -93,7 +93,21 @@ Further details will be added to this section once https://github.com/strimzi/pr
 
 ### Transport layer
 
-Further details will be added to this section once https://github.com/strimzi/proposals/pull/6 and https://github.com/strimzi/proposals/pull/9 have been finalized.
+The Strimzi-ui makes use of both HTTP and WebSockets. This section details what each protocol is responsible for.
+
+#### HTTP
+
+Currently, HTTP is only used to retrieve static assets from the UI server.
+
+#### WebSockets
+
+[GraphQL](https://graphql.org/)
+
+All messages with GraphQL are done over a WebSocket, even standard queries. WebSockets are required by GraphQL to do subscriptions. Subscriptions allow the client to listen for data changes from the server so that it can stay updated in real-time. All other queries are bundled into the same websocket so a clean network traffic log can be kept. The WebSocket will be held with the UI server, which will then proxy any websocket messages to the GraphQL admin server. This proxy allows for custom Apollo errors to be injected into the websocket so that the client can handle additional errors such as session expiration. The proxy is also responsible for injecting an authorization header for the client so that a connection can be established to the admin server. For full details of the WebSocket flow, [view our proposal](https://github.com/strimzi/proposals/blob/master/011-strimzi-ui.md#session-management-and-authentication).
+
+[Logging](#client-side-logging)
+
+Client logs are sent to the UI server over a persistent websocket so that the logs of both components can co-exist.
 
 ### Strimzi integration
 
@@ -123,6 +137,7 @@ This UI makes use of:
 - Webpack and Typescript for building, bundling, treeshaking and transpiling the UI, and enabling day to day development. See [the build documentation](./Build.md#ui-build) for further details on build choices and setup.
 - [`Barrel files`](https://basarat.gitbook.io/typescript/main-1/barrel) and named exports. Barrel files (when combined with [Webpack aliases](./Build.md#webpack-aliases)) allow for many components/modules/functions/constants which are related to be imported and used via one import statement. This relies on exported components/modules/functions/constants to be individually named so they can be imported directly.
 - [`React Router`](https://github.com/ReactTraining/react-router) for it's declarative routing capabilities.
+- [Apollo](https://www.apollographql.com/) for enabling rich communication with a GraphQL server.
 
 ##### File name conventions
 
