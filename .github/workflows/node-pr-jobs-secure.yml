@@ -7,7 +7,7 @@ on: [pull_request_target]
 
 jobs:
   build-current:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Build and Test
     steps:
       - name: Get PR head
