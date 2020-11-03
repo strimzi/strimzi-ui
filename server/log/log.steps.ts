@@ -9,7 +9,7 @@ Then(
   'I get the expected log response',
   stepWithWorld((world) => {
     const { request } = world;
-    return request.expect(200);
+    return request.expect(426);
   })
 );
 
