@@ -2,12 +2,8 @@
 # License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
 name: Node
 
-# Lots of this file is temporarily disabled due to this issue: https://github.com/strimzi/strimzi-ui/issues/72
-
 # Running target makes it secure as this is the only way to get hold of github secrets
-# on: [pull_request_target]
-
-on: [pull_request]
+on: [pull_request_target]
 
 jobs:
   build-current:
@@ -28,10 +24,10 @@ jobs:
           echo "SERVER_MASTER_REPORT=$(cat generated/bundle-analyser/server-report.json)" >> $GITHUB_ENV 
       - name: Checkout PR Branch
         uses: actions/checkout@v2
-        # with:
-        #   repository: ${{ steps.pr_head.outputs.repo }}
-        #   ref: ${{steps.pr_head.outputs.branch}}
-        #   fetch-depth: 0
+        with:
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+          ref: ${{github.event.pull_request.head.ref}}
+          fetch-depth: 0
       - name: Use Node.js 14.x
         uses: actions/setup-node@v1
         with:
@@ -42,22 +38,22 @@ jobs:
           npm run addDevCerts
       - name: Build
         run: npm run build
-      # - name: Calculate bundle size
-      #   id: bundle
-      #   uses: ./.github/actions/bundle
-      #   with:
-      #     CLIENT_MASTER_REPORT: ${{ env.CLIENT_MASTER_REPORT }}
-      #     SERVER_MASTER_REPORT: ${{ env.SERVER_MASTER_REPORT }}
+      - name: Calculate bundle size
+        id: bundle
+        uses: ./.github/actions/bundle
+        with:
+          CLIENT_MASTER_REPORT: ${{ env.CLIENT_MASTER_REPORT }}
+          SERVER_MASTER_REPORT: ${{ env.SERVER_MASTER_REPORT }}
       - name: Test
         run: npm run test:jest -- --forceExit # force exit in case a test does not clean up after failure
-      # - name: Coverage report
-      #   id: coverage
-      #   if: ${{ always() }}
-      #   uses: ./.github/actions/coverage-report
-      # - name: Comment on PR
-      #   if: ${{ always() }}
-      #   uses: ./.github/actions/commenter
-      #   with:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     BUNDLE_REPORT: ${{ steps.bundle.outputs.bundle_report }}
-      #     TEST_COVERAGE: ${{ steps.coverage.outputs.test_coverage }}
+      - name: Coverage report
+        id: coverage
+        if: ${{ always() }}
+        uses: ./.github/actions/coverage-report
+      - name: Comment on PR
+        if: ${{ always() }}
+        uses: ./.github/actions/commenter
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUNDLE_REPORT: ${{ steps.bundle.outputs.bundle_report }}
+          TEST_COVERAGE: ${{ steps.coverage.outputs.test_coverage }}
