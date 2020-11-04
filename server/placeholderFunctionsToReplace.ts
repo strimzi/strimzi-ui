@@ -5,7 +5,7 @@
 // placeholder functions - to be replaced by actual implementation later
 
 import express from 'express';
-import { createLogger, authenticationConfigType } from 'types';
+import { authenticationConfigType } from 'types';
 
 // https://github.com/orgs/strimzi/projects/2#card-44265081
 // function which returns a piece of express middleware for a given auth strategy
@@ -26,37 +26,4 @@ const authFunction: (
   }
 };
 
-//https://github.com/orgs/strimzi/projects/2#card-46109274
-const log: (
-  prefix: string,
-  requestId: string,
-  messageSource: string,
-  handler: string,
-  msg: string,
-  ...params: unknown[]
-) => void = (prefix, requestId, messageSource, handler, msg, ...params) =>
-  console.log(
-    `${prefix} : ${new Date()} ${requestId} - ${messageSource} - ${handler} - ${msg} ${params.reduce(
-      (acc, param) => `- ${acc} ${param}`,
-      ''
-    )}`
-  );
-
-//https://github.com/orgs/strimzi/projects/2#card-46109274
-const generateLoggers: createLogger = (prefix, moduleName, requestID) => ({
-  entry: (fnName, ...params) => {
-    log(prefix, requestID, moduleName, fnName, `entry`, ...params);
-    return {
-      exit: (params) => {
-        log(prefix, requestID, moduleName, fnName, 'exit', params);
-        return params; // return params so you could do return exit(.....)
-      },
-      debug: (msg, ...params) =>
-        log(prefix, requestID, moduleName, fnName, `debug: ${msg}`, ...params), // entry logs and returns exit/debug functions
-    };
-  },
-  event: (eventName, msg, ...params) =>
-    log(prefix, requestID, moduleName, eventName, msg, ...params),
-});
-
-export { generateLoggers, log, authFunction };
+export { authFunction };

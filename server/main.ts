@@ -8,61 +8,39 @@ import https from 'https';
 
 import { loadConfig, watchConfig, getServerName } from 'serverConfig';
 import { returnExpress } from 'core';
-import { log } from 'placeholderFunctionsToReplace';
+import { generateLogger, updateRootLoggerOptions } from 'logging';
 
+let logger = generateLogger('main');
 const errorHandler: (err: Error, ...others: unknown[]) => void = (
   err,
   ...others
 ) => {
-  log(
-    serverName,
-    'runtime',
-    'main',
-    'Error',
-    `Error thrown: ${err.message}`,
-    err,
-    others
-  );
-  // trace the error to syserr, but dont kill the process
-  // eslint-disable-next-line no-console
-  console.trace();
+  logger.error({ err, ...others }, `Error thrown: ${err.message}`);
 };
 
-const serverName = getServerName();
-
-log(
-  serverName,
-  'startup',
-  'main',
-  'server starting',
-  `Strimzi ui server initialising`
-);
+logger.info('Strimzi ui server initialising');
 
 loadConfig((loadedInitialConfig) => {
   let config = loadedInitialConfig;
 
-  log(
-    serverName,
-    'startup',
-    'main',
-    'server starting',
-    `Strimzi ui server starting with config`,
-    JSON.stringify(config)
+  logger.info(
+    { config }, // include the config in the log event JSON
+    'Strimzi ui server starting with config'
   );
+  updateRootLoggerOptions(config.logging, false);
+  logger = generateLogger('main');
 
   watchConfig((latestConfig) => {
-    log(
-      serverName,
-      'runtime',
-      'main',
-      'configReload',
-      `Strimzi ui server configuration changing to for future requests:`,
-      JSON.stringify(latestConfig)
-    );
     config = latestConfig;
-  }); // load config and update config value
+    logger.info(
+      { config }, // include the updated config in the log event JSON
+      'Strimzi ui server configuration update'
+    );
+    updateRootLoggerOptions(config.logging, true);
+    logger = generateLogger('main');
+  }, logger); // load config and update config value
 
-  const expressAppForServer = returnExpress(serverName, () => config);
+  const expressAppForServer = returnExpress(getServerName(), () => config);
 
   const { cert, key, ciphers, minTLS } = config.client.transport;
   let server;
@@ -70,13 +48,7 @@ loadConfig((loadedInitialConfig) => {
 
   if (cert && key) {
     isServerSecure = true;
-    log(
-      serverName,
-      'startup',
-      'main',
-      'server starting',
-      `Strimzi ui server will server via HTTPS`
-    );
+    logger.info('Strimzi ui server will serve via HTTPS');
     const httpsConfig = {
       key,
       cert,
@@ -85,22 +57,12 @@ loadConfig((loadedInitialConfig) => {
     };
     server = https.createServer(httpsConfig, expressAppForServer);
   } else {
-    log(
-      serverName,
-      'startup',
-      'main',
-      'server starting',
-      `Strimzi ui server will server via HTTP`
-    );
+    logger.info('Strimzi ui server will serve via HTTP');
     server = http.createServer(expressAppForServer);
   }
 
   const instance = server.listen(config.port, config.hostname, () =>
-    log(
-      serverName,
-      'startup',
-      'main',
-      'server ready',
+    logger.info(
       `Strimzi ui server ready at http${isServerSecure ? 's' : ''}://${
         config.hostname
       }:${config.port}`
@@ -109,19 +71,13 @@ loadConfig((loadedInitialConfig) => {
 
   const shutdown = (server) => () =>
     server.close(() => {
-      log(
-        serverName,
-        'teardown',
-        'main',
-        'server closing',
-        `Strimzi ui server closed`
-      );
+      logger.info('Strimzi ui server closed');
       process.exit(0);
     });
 
   process.on('SIGTERM', shutdown(instance));
   process.on('SIGINT', shutdown(instance));
-});
+}, logger);
 
 // catch errors gracefully
 process.on('uncaughtException', errorHandler);

@@ -9,9 +9,8 @@ const moduleName = 'log';
 
 export const LogModule: UIServerModule = {
   moduleName,
-  addModule: (logGenerator, authFn) => {
-    const { entry } = logGenerator(moduleName);
-    const { exit } = entry('addModule');
+  addModule: (logger, authFn) => {
+    const { exit } = logger.entry('addModule');
     const routerForModule = express.Router();
 
     // implementation to follow

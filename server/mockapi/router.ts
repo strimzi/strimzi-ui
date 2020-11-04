@@ -9,14 +9,13 @@ const moduleName = 'mockapi';
 
 export const MockApiModule: UIServerModule = {
   moduleName,
-  addModule: (logGenerator) => {
-    const { entry } = logGenerator(moduleName);
-    const { exit } = entry('addModule');
+  addModule: (logger) => {
+    const { exit } = logger.entry('addModule');
     const routerForModule = express.Router();
 
     // endpoint used for test purposes
     routerForModule.get('/test', (_, res) => {
-      const { entry } = res.locals.strimziuicontext.loggers;
+      const { entry } = res.locals.strimziuicontext.logger;
       const { exit } = entry('`/test` handler');
       res.setHeader('x-strimzi-ui-module', moduleName);
       res.sendStatus(418);

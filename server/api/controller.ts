@@ -9,10 +9,10 @@ export const proxyErrorHandler: (
   req: strimziUIRequestType,
   res: strimziUiResponseType
 ) => void = (err, req, res) => {
-  const { entry } = res.locals.strimziuicontext.loggers;
-  const { exit, debug } = entry('proxyErrorHandler', req.url, err.message);
-  debug(`Error occurred during proxy`, err);
-  exit(500);
+  res.locals.strimziuicontext.logger.debug(
+    { err },
+    `Error occurred whilst proxying request '${req.url}'. ${err.message}`
+  );
   res.sendStatus(500);
 };
 
@@ -21,9 +21,9 @@ export const proxyStartHandler: (
   req: strimziUIRequestType,
   res: strimziUiResponseType
 ) => void = (_, req, res) => {
-  const { entry } = res.locals.strimziuicontext.loggers;
-  const { exit } = entry('proxyStartHandler');
-  exit(`Starting proxy of request '${req.url}' to the backend api`);
+  res.locals.strimziuicontext.logger.debug(
+    `Proxying request '${req.url}' to the backend api`
+  );
 };
 
 export const proxyCompleteHandler: (
@@ -34,9 +34,7 @@ export const proxyCompleteHandler: (
   req: strimziUIRequestType,
   res: strimziUiResponseType
 ) => void = ({ statusCode, statusMessage }, req, res) => {
-  const { entry } = res.locals.strimziuicontext.loggers;
-  const { exit } = entry('proxyCompleteHandler');
-  exit(
+  res.locals.strimziuicontext.logger.debug(
     `Response from backend api for request '${req.url}' : ${statusCode} - ${statusMessage}`
   );
 };
