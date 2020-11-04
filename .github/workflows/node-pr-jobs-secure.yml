@@ -10,17 +10,6 @@ jobs:
     runs-on: ubuntu-20.04
     name: Build and Test
     steps:
-      - name: Get PR head
-        id: pr_head
-        run: |
-          LABEL=$(jq -r '.pull_request.head.label' "$GITHUB_EVENT_PATH")
-          REPO=$(jq -r '.pull_request.base.repo.name' "$GITHUB_EVENT_PATH")
-          OWNER=${LABEL%:*}
-          OWNER+=/
-          PR_REPO="$OWNER$REPO"
-          PR_BRANCH=$(jq -r '.pull_request.head.ref' "$GITHUB_EVENT_PATH")
-          echo "::set-output name=repo::$PR_REPO"
-          echo "::set-output name=branch::$PR_BRANCH"
       - name: Checkout master
         uses: actions/checkout@v2
         with:
@@ -36,8 +25,8 @@ jobs:
       - name: Checkout PR Branch
         uses: actions/checkout@v2
         with:
-          repository: ${{ steps.pr_head.outputs.repo }}
-          ref: ${{steps.pr_head.outputs.branch}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+          ref: ${{github.event.pull_request.head.ref}}
           fetch-depth: 0
       - name: Use Node.js 14.x
         uses: actions/setup-node@v1
