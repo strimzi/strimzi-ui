@@ -59,9 +59,8 @@ const withTsconfigPathsPlugin = returnPluginWithConfig(TsconfigPathsPlugin, {});
 
 const withNormalModuleReplacementPlugin = () =>
   new webpack.NormalModuleReplacementPlugin(/.carbon./, (resource) => {
-    if (process.env.cl === 'PATTERNFLY') {
-      resource.request = resource.request.replace('carbon', 'patternfly');
-    }
+    const viewLayer = (process.env.VL || 'carbon').toLowerCase();
+    resource.request = resource.request.replace('carbon', viewLayer);
   });
 
 // common rules configuration

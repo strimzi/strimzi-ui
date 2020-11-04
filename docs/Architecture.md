@@ -382,33 +382,33 @@ One of the areas of extensibility this UI offers is that of the View layer imple
 | [Carbon design system](https://www.carbondesignsystem.com/) | `CARBON`                        | `*.carbon.ts`     | ✅                                                                                     |
 | [PatternFly](https://www.patternfly.org/v4/)                | `PATTERNFLY`                    | `*.patternfly.ts` |                                                                                        |
 
-This dynamic view layer capability is possible due to our [Webpack Aliasing strategy](./Build.md#webpack-aliases), and [React Hooks](https://reactjs.org/docs/hooks-intro.html#motivation).
+This dynamic view layer capability is possible due to [webpack swappable modules](./Build.md#swappable-view-layers), and [React Hooks](https://reactjs.org/docs/hooks-intro.html#motivation).
 
 React Hooks enable the sharing of common business logic between React components, without tightly coupling the given business logic to the rendering logic. The intent of Hooks are to share common utility logic between components, such as state management or translation tools. We use [(and have implemented our own)](../client/Hooks/README.md) hooks not only for this purpose, but to also provide business logic to components that need them in a `Model` hook. The `Model` hook owns all state management and business logic for a given component, and returns to the `View` layer any information it needs to render a result (in a reducer esq manner). Given a `Model` hook owning a component's state and logic, any number of `View` layer implementations could make use of that `Model`.
 
 These `View` layer implementations are expected to implement Framework specific rendering code, including importing any required styling, for the given component. Do note, if a component is either visually identical across all implementations, or only ever used in one framework, only one `View` layer implementation needs to be provided (and the View alias is not required).
 
-Given N `View` layer implementations for a component, we at build/development time use [a View Webpack alias](./Build.md#webpack-aliases) to then abstract these layers, and decide which is used in the UI. The provided `VL` environment variable value maps to a suffix, that is then substituted dynamically into the View Webpack alias. As an example, given a `Group` component `Bar`, it would contain the following files:
+Given N `View` layer implementations for a component, we at build time use webpack module replacement to replace the imported module. The provided `VL` environment variable value maps to a suffix, that is then substituted dynamically into the View Webpack alias. As an example, given a `Group` component `Bar`, it would contain the following files:
 
 ```
 Groups/
   Bar/
     index.ts
     View.carbon.ts
-    Styling.carbon.scss
+    style.carbon.scss
     View.patternfly.ts
-    Styling.patternfly.scss
+    style.patternfly.scss
     Model.ts
     ...
 ```
 
-At build time, the exported [`View` alias](./Build.md#webpack-aliases) used in `index.ts`:
+At build time, the exported `View` used in `index.ts`:
 
 ```
-export * from 'View';
+export * from 'View.carbon.ts';
 ```
 
-... will resolve to either one of `View.carbon.ts` or `View.patternfly.ts` (depending on the value of `VL`). In addition to the `View` alias, a `Styling` alias also will be provided, and is expected to be used to abstract between different (s)css implementations between the view layers.
+... will resolve to either one of `View.carbon.ts` or `View.patternfly.ts` (depending on the value of `VL`). In addition to the `View` swapping, each `View` can import their own styling.
 
 When used in other components, this would (in combination with the `Group`) alias mean a developer would use `Bar` in their code as follows:
 

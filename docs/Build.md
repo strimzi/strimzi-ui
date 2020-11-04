@@ -102,7 +102,7 @@ These options will all be provided to the TerserPlugin via it's constructor.
 export * from 'Component.carbon.ts';
 ```
 
-By supplying the env var `cl=PATTERNFLY` before running a build - webpack will replace `carbon` with `patternfly` in the export statement.
+By supplying the env var `VL=PATTERNFLY` before running a build - webpack will replace `carbon` with `patternfly` in the export statement.
 
 #### Webpack output
 
