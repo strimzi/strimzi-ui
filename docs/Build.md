@@ -47,8 +47,7 @@ Webpack allows file specific loaders or utilities to be invoked as a part of the
 | Rule                        | Plugin/loader(s)                                                                                        |                                                                                                                                                                                                   Purpose |
 | --------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | `/(\.css\|.scss)$/`         | `style-loader` (dev only), `miniCssExtractPlugin.loader` (production only), `css-loader`, `sass-loader` | Handle scss/css loading/references. If dev mode, use `style-loader` for speed, else use `miniCssExtractPlugin.loader` (in combination with the `miniCssExtractPlugin` plugin) to produce/emit css file(s) |
-| `/(\.ts\|.tsx)$/`           | `ts-loader`                                                                                             |                                                                                                                                                               Transpiles TypeScript files into JavaScript |
-| `/(\.js)$/`                 | `babel-loader`                                                                                          |                                                        Perform babel transpile on all JS files. This will be configured with presets for recent browsers, and enable caching to improve build performance |
+| `/(\.(t                     | j)sx?)\$/`                                                                                              |                                                                                                                                                                                               `ts-loader` | Perform ts compile on all JS/TS files. This will be configured with presets for recent browsers, and enable caching to improve build performance |
 | `/\.(woff(2)?\|ttf\|eot)$/` | `file-loader`                                                                                           |                 For any font file, use file-loader to package the font to the `output.path` and replace/update any imports of those fonts to this location. These will be directed to a 'fonts' directory |
 | `/\.(jpg\|gif\|png\|svg)$/` | `file-loader`                                                                                           |             For any image file, use file-loader to package the image to the `output.path` and replace/update any imports of those images to this location. These will be directed to a 'images' directory |
 
@@ -100,10 +99,10 @@ These options will all be provided to the TerserPlugin via it's constructor.
 - And the component exports the carbon implementation:
 
 ```ts
-export * from 'Component.carbon.js';
+export * from 'Component.carbon.ts';
 ```
 
-By setting `process.env.cl=PATTERNFLY` - webpack will replace `carbon` with `patternfly` in the export statement.
+By supplying the env var `cl=PATTERNFLY` before running a build - webpack will replace `carbon` with `patternfly` in the export statement.
 
 #### Webpack output
 
