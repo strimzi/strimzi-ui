@@ -48,8 +48,8 @@ jobs:
       #   with:
       #     CLIENT_MASTER_REPORT: ${{ env.CLIENT_MASTER_REPORT }}
       #     SERVER_MASTER_REPORT: ${{ env.SERVER_MASTER_REPORT }}
-      # - name: Test
-      #   run: npm run test:jest -- --forceExit # force exit in case a test does not clean up after failure
+      - name: Test
+        run: npm run test:jest -- --forceExit # force exit in case a test does not clean up after failure
       # - name: Coverage report
       #   id: coverage
       #   if: ${{ always() }}
