@@ -10,8 +10,8 @@ Strimzi UI provides a way for managing Strimzi and Kafka clusters (+ other compo
 
 This UI uses `npm` to provide dependency management. If you wish to develop the UI, you will need:
 
-- [npm version 6.4.1 or later](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-- [node 10.15.0 or later](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+- [npm version 6.14.8 or later](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+- [node 14.15.0 or later](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
 Once these prerequisites are met, all required dependencies to build and run the UI can be downloaded by running the following command:
 
