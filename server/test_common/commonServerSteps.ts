@@ -4,8 +4,12 @@
  */
 import request from 'supertest';
 import { returnExpress } from 'core';
-import { Given, When, And } from 'jest-cucumber-fusion';
-import { serverConfigType } from 'types';
+import { Given, When, And, Then } from 'jest-cucumber-fusion';
+import {
+  serverConfigType,
+  strimziUIRequestType,
+  strimziUIResponseType,
+} from 'types';
 import { getConfigForName } from './testConfigs';
 import express from 'express';
 import merge from 'lodash.merge';
@@ -15,6 +19,9 @@ import {
 } from '../../test_common/jest_cucumber_support/commonTestTypes';
 import { requests } from './testGQLRequests';
 
+import MockedWebSocket from 'ws';
+jest.mock('ws');
+
 type supertestRequestType = request.SuperTest<request.Test>;
 
 interface serverWorldType extends genericWorldType {
@@ -22,6 +29,7 @@ interface serverWorldType extends genericWorldType {
   request: request.Test;
   app: express.Application;
   configuration: serverConfigType;
+  websocket: WebSocket;
 }
 
 const serverWorld: serverWorldType = {
@@ -29,6 +37,7 @@ const serverWorld: serverWorldType = {
   request: {} as request.Test,
   app: {} as express.Application,
   configuration: getConfigForName('default'),
+  websocket: {} as WebSocket,
   context: {},
 };
 
@@ -66,9 +75,36 @@ And(
 And(
   'I run an instance of the Strimzi-UI server',
   stepWhichUpdatesWorld((world) => {
+    const app = returnExpress(() => world.configuration);
     return {
       ...world,
-      server: request(returnExpress(() => world.configuration)),
+      app,
+      server: request(app),
+    };
+  })
+);
+
+And(
+  'I enable WebSocket connections on the Strimzi-UI server',
+  stepWhichUpdatesWorld((world) => {
+    let { app } = world;
+    const websocket = getMockedWebSocket();
+
+    // Redirect calls to /websockettest/* back to the app with the prefix removed and the mock websocket set up.
+    app = app.use('/websockettest', (req, res) => {
+      (req as strimziUIRequestType).isWs = true;
+      (res as strimziUIResponseType).ws = websocket;
+      // req.url has `/websockettest` prefix removed, so calling the app will now route to the rest of the URL
+      req.app(req, res);
+      // Return the 101 switching protocols response
+      res.status(101).end();
+    });
+
+    return {
+      ...world,
+      app,
+      server: request(app),
+      websocket,
     };
   })
 );
@@ -96,6 +132,86 @@ When(
       request: server.post(endpoint as string).send(query),
     };
   })
+  );
 );
+
+When(
+  /^I make a WebSocket connection request to '(.+)'$/,
+  stepWithWorld(async (world, endpoint) => {
+    const { server } = world;
+
+    // Set up the websocket
+    await server.get(`/websockettest${endpoint}`).then(
+      (res) => {
+        expect(res.status).toBe(101);
+      },
+      (err) => {
+        throw err;
+      }
+    );
+  })
+);
+
+Then(
+  /^the WebSocket has received (\d+) messages$/,
+  stepWithWorld(async (world, messageCount) => {
+    const { websocket } = world;
+    if (websocket.onmessage != null) {
+      expect((<jest.Mock>websocket.onmessage).mock.calls.length).toBe(
+        parseInt(messageCount as string)
+      );
+    } else {
+      fail('Expected websocket.onmessage to be mocked');
+    }
+  })
+);
+
+And(
+  'I close the WebSocket',
+  stepWithWorld(async (world) => {
+    const { websocket } = world;
+    websocket.close(0, 'Test close');
+  })
+);
+
+And(
+  'the WebSocket is closed',
+  stepWithWorld(async (world) => {
+    const { websocket } = world;
+    if (websocket.onclose != null) {
+      expect((<jest.Mock>websocket.onclose).mock.calls.length).toBe(1);
+      expect((<jest.Mock>websocket.onclose).mock.calls[0][0].code).toBe(0);
+      expect((<jest.Mock>websocket.onclose).mock.calls[0][0].reason).toEqual(
+        'Test close'
+      );
+    } else {
+      fail('Expected websocket.onclose to be mocked');
+    }
+  })
+);
+
+const getMockedWebSocket: () => MockedWebSocket = () => {
+  const websocket = new MockedWebSocket('ws://testwebsocket:1234');
+
+  // Add mock `on`, `send` and `close` functions
+  websocket.on = (event, listener) => {
+    if (event === 'message') {
+      websocket.onmessage = jest.fn(listener);
+    } else if (event === 'close') {
+      websocket.onclose = jest.fn(listener);
+    }
+    return websocket;
+  };
+  websocket.send = (data) => websocket.onmessage(data);
+  websocket.close = (code: number, reason: string) =>
+    websocket.onclose({
+      code,
+      reason,
+      target: websocket,
+      wasClean: true,
+    });
+
+  return websocket;
+};
 
 export { stepWhichUpdatesWorld, stepWithWorld };
