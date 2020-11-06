@@ -6,3 +6,4 @@
 # Directories that start with dots are excluded by default, causing eslint warnings
 !.storybook/
 !.github/
+dist

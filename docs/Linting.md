@@ -10,7 +10,7 @@ These are the tools used to lint this codebase, along with what areas they are r
 | ------------------------------------------ | -----------------------------------------------------------------------------------------------------------: |
 | [Husky](https://github.com/typicode/husky) | Git hook integration. Allows the running of the below linting checks at various points of the git lifecycle. |
 | [commitlint](https://commitlint.js.org/)   |                                                                      [Git commit checks](#Git-commit-checks) |
-| [eslint](https://eslint.org/)              |                                                    [JS/React/a11y best practise/style enforcement](#JS-code) |
+| [eslint](https://eslint.org/)              |                                                  [Source code (js/typescript & react) enforcement](#JS-code) |
 | [stylelint](https://stylelint.io/)         |                                               [Styling (css, scss) code style enforcement](#scss-/-css-code) |
 | [prettier](https://prettier.io/)           |                                                                       [Code format enforcement](#code-style) |
 
@@ -52,11 +52,11 @@ The following must be present in all git commits made to this repository. These 
 
 These checks can only be run having made a `git commit`.
 
-### JS code
+### Source code
 
 These checks are enforced by `eslint`, and the configuration [here](../utils/linting/eslint.config.js).
 
-If required, these checks can be run manually by running `npm run lint:js`. Where possible, `eslint` will auto fix issues as they are discovered.
+If required, these checks can be run manually by running `npm run lint:src`. Where possible, `eslint` will auto fix issues as they are discovered.
 
 | Rule/Ruleset                      |                                                                                                                                                                                                                                             Rationale |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |

@@ -47,9 +47,10 @@ const createTableHeader = (tableHeadings) => {
 };
 
 const createBundleReportTable = (bundleReport, bundleSizes) => bundleReport.reduce((previousbundleText, bundle) => {
-  bundleSizes[bundle.label].current = bundle.parsedSize;
-  const currentSizeBytes = bundleSizes[bundle.label].current;
-  const masterSizeBytes = bundleSizes[bundle.label].master;
+  const bundleSize = bundleSizes[bundle.label] || {master: 0};
+  bundleSize.current = bundle.parsedSize;
+  const currentSizeBytes = bundleSize.current;
+  const masterSizeBytes = bundleSize.master;
 
   const currentSize = round(currentSizeBytes / 1024);
   const masterSize = round(masterSizeBytes / 1024);

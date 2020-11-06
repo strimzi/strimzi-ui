@@ -2,11 +2,12 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-
 const rulesets = [
   'eslint:recommended',
   'plugin:react/recommended',
   'plugin:react-hooks/recommended',
+  'plugin:@typescript-eslint/eslint-recommended',
+  'plugin:@typescript-eslint/recommended',
 ];
 
 const customRules = {
@@ -28,14 +29,15 @@ module.exports = {
   },
   // extend recommended rule sets - combine with prettier config, which must go last to work properly
   extends: rulesets.concat(['prettier']),
-  parser: 'babel-eslint', // use babel eslint parser - handles newer ECMAScript syntax
+  parser: '@typescript-eslint/parser',
   parserOptions: {
+    ecmaVersion: 2020,
     ecmaFeatures: {
       jsx: true,
     },
     sourceType: 'module',
   },
-  plugins: ['react', 'jest', 'cypress'],
+  plugins: ['react', 'jest', 'cypress', '@typescript-eslint'],
   // detect and use the version of react installed to guide rules used
   settings: {
     react: {
@@ -43,6 +45,18 @@ module.exports = {
     },
   },
   rules: customRules,
-  // ignore built output
-  ignorePatterns: ['**/dist'],
+  overrides: [
+    {
+      files: ['**/*.tsx'],
+      rules: {
+        'react/prop-types': 'off',
+      },
+    },
+    {
+      files: ['**/*.js'], //Allow commonjs modules for js files
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
+  ],
 };

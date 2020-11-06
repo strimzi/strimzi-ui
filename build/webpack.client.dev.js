@@ -11,7 +11,6 @@ const {
   CONSTANTS,
 } = require('./webpack.common.js');
 
-const { relativeClientAliases } = require('../utils/tooling/aliasHelper.js');
 const {
   devEnvToUseTls,
   devEnvValues,
@@ -27,26 +26,18 @@ const {
 } = plugins;
 const {
   withStylingModuleLoader,
-  withTSModuleLoader,
-  withJSModuleLoader,
   withFontModuleLoader,
   withImageModuleLoader,
+  withTypeScriptModuleLoader,
 } = moduleLoaders;
-const {
-  DEVELOPMENT,
-  BOOTSTRAP_DIR,
-  BUILD_DIR,
-  BUNDLE_ANALYSER_DIR,
-} = CONSTANTS;
+const { DEVELOPMENT, BUILD_DIR, BUNDLE_ANALYSER_DIR } = CONSTANTS;
 
 const devSpecificConfig = {
   mode: DEVELOPMENT,
-  entry: `${BOOTSTRAP_DIR}/index.ts`,
   module: {
     rules: [
       withStylingModuleLoader(['style-loader']),
-      withTSModuleLoader('../client/tsconfig.json'),
-      withJSModuleLoader('../client/tsconfig.json'),
+      withTypeScriptModuleLoader('../client/tsconfig.json'),
       withFontModuleLoader(),
       withImageModuleLoader(),
     ],
@@ -63,14 +54,7 @@ const devSpecificConfig = {
     }),
   ],
   resolve: {
-    alias: {
-      ...relativeClientAliases,
-    },
-    plugins: [
-      withTsconfigPathsPlugin({
-        configFile: './client/tsconfig.json',
-      }),
-    ],
+    plugins: [withTsconfigPathsPlugin({ configFile: 'client/tsconfig.json' })],
   },
   devServer: {
     contentBase: [BUILD_DIR, BUNDLE_ANALYSER_DIR], // static content from the build directory, but also the output of the WebpackBundleAnalyzer configured above (access via /bundles.html)

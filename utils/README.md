@@ -11,7 +11,7 @@ Configuration used for development purposes. See the [README](./dev_config/READM
 ### Tooling
 
 - `constants.js` - file containing development/build time constants.
-- `aliasHelper.js` - logic used to generate code aliases. Currently generates aliases for Webpack, but could also generate aliases for other tools, such as Jest.
+- `aliasHelper.js` - logic used to generate code aliases.
 
 ### Test
 
