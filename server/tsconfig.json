@@ -4,15 +4,7 @@
     "module": "CommonJS",
     "outDir": "../js/server",
     "baseUrl": "./",
-    "paths": {
-      "api": ["api/"],
-      "client": ["client/"],
-      "config": ["config"],
-      "core": ["core/"],
-      "log": ["log/"],
-      "mockapi": ["mockapi/"],
-      "serverConfig": ["serverConfig"]
-    }
+    "paths": {}
   },
   "include": ["."]
 }

@@ -3,8 +3,10 @@
 name: "Coverage report"
 description: "Report test coverage"
 outputs:
-  test_coverage:
-    description: "Text for test coverage"
+  test_coverage_client:
+    description: "Text for test coverage on client code"
+  test_coverage_server:
+    description: "Text for test coverage on server code"
 runs:
   using: "docker"
   image: "Dockerfile"

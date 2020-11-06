@@ -5,31 +5,36 @@
 const core = require("@actions/core");
 const fs = require("fs");
 
-async function formatCoverage() {
+async function formatCoverage(testType) {
   try {
     const coverage = JSON.parse(
-      fs.readFileSync("./coverage/coverage-summary.json")
+      fs.readFileSync(`./coverage/${testType}/coverage-summary.json`)
     );
 
-    let coverageText =
-      "| File | Lines | Statement | Functions | Branches |\n| --- | --- | --- | --- | --- |\n";
-
-    const regex = /^(.+)strimzi-ui\/(.+)$/;
-
-    coverageText += Object.entries(coverage).reduce((text, [key, value]) => {
-      console.log(key);
-
-      return `${text}| ${key != "total" ? key.match(regex)[2] : "Total"} | ${
-        value.lines.pct
-      }% | ${value.statements.pct}% | ${value.functions.pct}% | ${
-        value.branches.pct
-      }% |\n`;
-    }, '');
-
-    core.setOutput("test_coverage", coverageText);
+    core.setOutput(`test_coverage_${testType}`, coverageTable(coverage));
   } catch (error) {
     core.setFailed(error.message);
   }
 }
 
-formatCoverage();
+const coverageTable = (coverage) => {
+  let coverageText =
+    "| File | Lines | Statement | Functions | Branches |\n| --- | --- | --- | --- | --- |\n";
+
+  const regex = /^(.+)strimzi-ui\/(.+)$/;
+
+  coverageText += Object.entries(coverage).reduce((text, [key, value]) => {
+    console.log(key);
+
+    return `${text}| ${key != "total" ? key.match(regex)[2] : "Total"} | ${
+      value.lines.pct
+    }% | ${value.statements.pct}% | ${value.functions.pct}% | ${
+      value.branches.pct
+    }% |\n`;
+  }, '');
+
+  return coverageText;
+};
+
+return Promise.all([formatCoverage("client"),
+  formatCoverage("server")]);
