@@ -26,4 +26,4 @@ Where:
 
 ## Implemented hooks
 
-Hooks to be added here on implementation, with summary of purpose/usage and a link to it's README.
+- [useRouteConfig](./useRouteconfig/README.md) - Used to convert a page configuration into a useable React-router configuration.

@@ -2,12 +2,12 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-import { useRouteConfig } from './useRouteConfig.hook';
-import { PageConfig, RouterConfig } from './types';
-import HomePageComponent from '../../test_common/resources/Home.view';
-import TopicsPageComponent from '../../test_common/resources/Topics.view';
-import TopicsEditComponent from '../../test_common/resources/TopicsEdit.view';
-import ConsumerGroupsPageComponent from '../../test_common/resources/ConsumerGroups.view';
+import { useRouteConfig } from 'Hooks';
+import { PageConfig, RouterConfig } from 'Hooks/types';
+import HomePageComponent from '../../../test_common/resources/Home.view';
+import TopicsPageComponent from '../../../test_common/resources/Topics.view';
+import TopicsEditComponent from '../../../test_common/resources/TopicsEdit.view';
+import ConsumerGroupsPageComponent from '../../../test_common/resources/ConsumerGroups.view';
 
 const READ = '';
 
