@@ -6,7 +6,7 @@ import express from 'express';
 import { UIServerModule } from 'types';
 import bodyParser from 'body-parser';
 import { ApolloServer } from 'apollo-server-express';
-import { schema } from './controller';
+import { schema } from './data';
 
 const moduleName = 'mockapi';
 

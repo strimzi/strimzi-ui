@@ -13,24 +13,16 @@ type TestProviderWithValue<T> = {
 const contextWrapper: <T>(
   providers: Array<TestProviderWithValue<T>>,
   children: ReactNode
-) => JSX.Element = (providers, children) => {
-  const { provider: ProviderToMount, value } = providers.shift();
-  if (ProviderToMount) {
-    if (providers.length === 0) {
-      return <ProviderToMount value={value}>{children}</ProviderToMount>;
-    } else {
-      return (
-        <ProviderToMount value={value}>
-          {contextWrapper(providers, children)}
-        </ProviderToMount>
-      );
-    }
-  } else {
-    throw new Error(
-      'Provider array is empty. Please provide at least one provider'
-    );
-  }
-};
+) => JSX.Element = (providers = [], children = null) => (
+  <React.Fragment>
+    {providers.reduceRight(
+      (accJsx, { provider: ProviderToMount, value }) => (
+        <ProviderToMount value={value}>{accJsx}</ProviderToMount>
+      ),
+      children
+    )}
+  </React.Fragment>
+);
 
 const renderWithContextProviders: <T>(
   ui: ReactElement,
