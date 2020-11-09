@@ -5,8 +5,7 @@
 const { jestModuleMapper } = require('../utils/tooling/aliasHelper');
 const { resolve } = require('path');
 const config = {
-  rootDir: '../',
-  moduleDirectories: ['node_modules'],
+  rootDir: '.',
   clearMocks: true,
   testTimeout: 10000, // required for server tests, which take ~3 seconds to start
   setupFiles: [resolve(__dirname, 'jest_cucumber_support/index.ts')],
@@ -14,6 +13,8 @@ const config = {
   moduleNameMapper: {
     ...jestModuleMapper,
   },
+  coverageReporters: ['json', 'text', 'lcov', 'json-summary'],
+  moduleDirectories: ['node_modules', '<rootDir>'],
 };
 
 module.exports = config;

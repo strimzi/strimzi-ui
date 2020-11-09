@@ -44,8 +44,10 @@ jobs:
         with:
           CLIENT_MASTER_REPORT: ${{ env.CLIENT_MASTER_REPORT }}
           SERVER_MASTER_REPORT: ${{ env.SERVER_MASTER_REPORT }}
-      - name: Test
-        run: npm run test:jest -- --forceExit # force exit in case a test does not clean up after failure
+      - name: Test client code
+        run: npm run test:jest:client -- --forceExit # force exit in case a test does not clean up after failure
+      - name: Test server code
+        run: npm run test:jest:server -- --forceExit # force exit in case a test does not clean up after failure
       - name: Coverage report
         id: coverage
         if: ${{ always() }}
@@ -56,4 +58,5 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUNDLE_REPORT: ${{ steps.bundle.outputs.bundle_report }}
-          TEST_COVERAGE: ${{ steps.coverage.outputs.test_coverage }}
+          TEST_COVERAGE_CLIENT: ${{ steps.coverage.outputs.test_coverage_client }}
+          TEST_COVERAGE_SERVER: ${{ steps.coverage.outputs.test_coverage_server }}

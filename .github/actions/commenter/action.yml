@@ -9,8 +9,10 @@ inputs:
     description: "Markdown representation of bundle sizes"
   OVERALL_BUNDLE_SIZE_CHANGE:
     description: "Overall percentage change of bundle sizes between master and current"
-  TEST_COVERAGE:
-    description: "Test coverage report from jest tests"
+  TEST_COVERAGE_CLIENT:
+    description: "Test coverage report from jest tests for client code"
+  TEST_COVERAGE_SERVER:
+    description: "Test coverage report from jest tests for server code"
 runs:
   using: "docker"
   image: "Dockerfile"
