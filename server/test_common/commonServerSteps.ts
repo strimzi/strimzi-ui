@@ -132,7 +132,6 @@ When(
       request: server.post(endpoint as string).send(query),
     };
   })
-  );
 );
 
 When(

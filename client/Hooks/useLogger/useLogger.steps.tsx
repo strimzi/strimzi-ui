@@ -1,0 +1,128 @@
+/*
+ * Copyright Strimzi authors.
+ * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
+ */
+import { And, Given, When, Then, Fusion, After } from 'jest-cucumber-fusion';
+import { renderHook } from '@testing-library/react-hooks';
+import { Server } from 'mock-socket';
+
+import { useLogger, LogLevel, MESSAGE_BUFFER_MAX_SIZE } from '.';
+
+let log: (clientLevel: LogLevel, msg: string) => void;
+let rerenderHook: (newProps?: unknown) => void;
+let mockWebSocketServer: Server;
+let onConnectionPromise: Promise<void>;
+let onMessagePromise: Promise<string>;
+let sentMessagesCount = 0;
+let verifiedClient = true;
+
+After(() => {
+  sentMessagesCount = 0;
+  mockWebSocketServer.close();
+  verifiedClient = true;
+});
+
+Given('a logging WebSocket server', () => {
+  mockWebSocketServer = new Server('ws://localhost:3000/log', {
+    verifyClient: () => verifiedClient,
+  });
+
+  onConnectionPromise = new Promise((onConnectionResolve) =>
+    mockWebSocketServer.on('connection', (socket) => {
+      onMessagePromise = new Promise((onMessageResolve) =>
+        socket.on('message', (data) => onMessageResolve(data as string))
+      );
+      onConnectionResolve();
+    })
+  );
+});
+
+const useLoggerHookIsRendered = 'the useLogger hook is rendered';
+const useLoggerHookIsRenderedFn = () => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const renderedHook = renderHook(() => useLogger('TestComponent'));
+  log = renderedHook.result.current;
+  expect(log).not.toBeNull();
+  expect(log).not.toBeUndefined();
+  rerenderHook = renderedHook.rerender;
+  expect(rerenderHook).not.toBeNull();
+  expect(rerenderHook).not.toBeUndefined();
+};
+When(useLoggerHookIsRendered, useLoggerHookIsRenderedFn);
+And(useLoggerHookIsRendered, useLoggerHookIsRenderedFn);
+
+And('the useLogger hook is re-rendered', () => {
+  rerenderHook();
+});
+
+When('the useLogger hook is rendered with an empty componentName', () => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const renderedHook = renderHook(() => useLogger(''));
+  log = renderedHook.result.current;
+  expect(log).not.toBeNull();
+  expect(log).not.toBeUndefined();
+});
+
+And(/^(\d+) messages* (?:are|is) logged$/, (messagesCount) => {
+  const requestedMessagesCount =
+    parseInt(messagesCount as string) + sentMessagesCount;
+  for (
+    let index = sentMessagesCount + 1;
+    index <= requestedMessagesCount;
+    index++
+  ) {
+    log('warn', `useLogger test message ${index}`);
+  }
+  sentMessagesCount = requestedMessagesCount;
+});
+
+const useLoggerHookIsConnected =
+  'the useLogger hook is connnected to the WebSocket server';
+const useLoggerHookIsConnectedFn = () => {
+  expect(mockWebSocketServer.clients().length).toBe(1);
+  return onConnectionPromise;
+};
+Then(useLoggerHookIsConnected, useLoggerHookIsConnectedFn);
+And(useLoggerHookIsConnected, useLoggerHookIsConnectedFn);
+
+Then('the useLogger hook does not connnect to the WebSocket server', () => {
+  expect(mockWebSocketServer.clients().length).toBe(0);
+});
+
+const loggingMessagesAreReceived = /^(\d+) logging messages* (?:are|is) received by the WebSocket server$/;
+const loggingMessagesAreReceivedFn = async (messagesCount) => {
+  const expectedLoggingMessagesCount = parseInt(messagesCount as string);
+
+  const receivedMessageEvent = await onMessagePromise;
+  expect(receivedMessageEvent).not.toBeNull();
+  const parsedLoggingMessages = JSON.parse(receivedMessageEvent);
+  expect(parsedLoggingMessages.length).toBe(expectedLoggingMessagesCount);
+
+  let startingIndex = 1;
+  if (sentMessagesCount > MESSAGE_BUFFER_MAX_SIZE) {
+    expect(parsedLoggingMessages.length).toBe(MESSAGE_BUFFER_MAX_SIZE);
+    startingIndex = sentMessagesCount - MESSAGE_BUFFER_MAX_SIZE + 1;
+  }
+
+  for (let index = 0; index < expectedLoggingMessagesCount; index++) {
+    expect(parsedLoggingMessages[index].clientLevel).toEqual('warn');
+    expect(parsedLoggingMessages[index].componentName).toEqual('TestComponent');
+    expect(parsedLoggingMessages[index].msg).toEqual(
+      `useLogger test message ${index + startingIndex}`
+    );
+  }
+};
+Then(loggingMessagesAreReceived, loggingMessagesAreReceivedFn);
+And(loggingMessagesAreReceived, loggingMessagesAreReceivedFn);
+
+And('the WebSocket server rejects the useLogger connection', () => {
+  mockWebSocketServer.simulate('error');
+});
+
+Then('the useLogger hook is disconnnected from the WebSocket server', () => {
+  expect(mockWebSocketServer.clients().length).toBe(1);
+  // Should be Websocket.CLOSED but is currently undefined due to https://github.com/thoov/mock-socket/pull/240
+  expect(mockWebSocketServer.clients()[0].readyState).toBeUndefined();
+});
+
+Fusion('useLogger.feature');

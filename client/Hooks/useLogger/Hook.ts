@@ -4,14 +4,14 @@
  */
 import { useEffect, useRef } from 'react';
 
-const MESSAGE_BUFFER_MAX_SIZE = 100;
+export const MESSAGE_BUFFER_MAX_SIZE = 100;
 // TODO: Replace with the regex from the LOGGING query param
-const defaultLoggingRegex = /.*/;
+const defaultLoggingRegex = /.+/;
 // TODO: Replace with the web socket address from config
 const defaultWebSocketAddress = 'ws://localhost:3000/log';
 const defaultClientID = 'defaultClientID';
 
-type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
+export type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
 
 interface loggerMessage {
   clientTime: number;
@@ -21,9 +21,9 @@ interface loggerMessage {
   msg: string;
 }
 
-export const useLogger: (string) => (LogLevel, string) => void = (
+export const useLogger: (
   componentName: string
-) => {
+) => (clientLevel: LogLevel, msg: string) => void = (componentName: string) => {
   // TODO: store the logger websocket in context, so you get one for the whole UI, rather than one every time you call useLogger.
   const loggerWebSocketRef = useRef<WebSocket | null>(null);
   const loggerMessageBufferRef = useRef<loggerMessage[]>([]);
@@ -31,28 +31,29 @@ export const useLogger: (string) => (LogLevel, string) => void = (
   useEffect(() => {
     // Check if the component should be logged
     if (defaultLoggingRegex.test(componentName)) {
+      const loggerWebSocket = loggerWebSocketRef.current;
       const loggerMessageBuffer = loggerMessageBufferRef.current;
 
-      if (!loggerWebSocketRef.current) {
+      if (!loggerWebSocket) {
         // WebSocket client does not exist - create it
         const webSocket = new WebSocket(defaultWebSocketAddress);
         webSocket.onopen = () => {
           if (loggerMessageBuffer.length > 0) {
+            // WebSocket is now open, send anything in the message buffer and clear it
             webSocket.send(JSON.stringify(loggerMessageBuffer));
-            // Clear the message buffer
             loggerMessageBuffer.length = 0;
           }
         };
         webSocket.onclose = () => {
-          // Clear the message buffer
+          // WebSocket is closing, clear the message buffer
           loggerMessageBuffer.length = 0;
         };
-        webSocket.onerror = (evt) => console.error('WebSocket error:', evt);
+        webSocket.onerror = (err) => console.error('WebSocket error:', err);
+
         loggerWebSocketRef.current = webSocket;
-      } else if (loggerWebSocketRef.current.readyState === WebSocket.OPEN) {
-        // WebSocket is in OPEN state, send any buffered messages and the new message
-        loggerWebSocketRef.current.send(JSON.stringify(loggerMessageBuffer));
-        // Clear the message buffer
+      } else if (loggerWebSocket.readyState === WebSocket.OPEN) {
+        // WebSocket is in OPEN state, send anything in the message buffer and clear it
+        loggerWebSocket.send(JSON.stringify(loggerMessageBuffer));
         loggerMessageBuffer.length = 0;
       }
     }
