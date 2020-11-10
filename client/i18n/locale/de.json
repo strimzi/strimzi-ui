@@ -1,0 +1,10 @@
+{
+  "home": {
+    "basic": "DE Welcome to the Strimzi UI",
+    "insert": "DE This includes an {{insert}}",
+    "formatted": "DE This includes <strong>formatting</strong>",
+    "formattedInsert": "DE This includes a formatted <strong>{{insert}}</strong> and {{another}}",
+    "customInserts": "DE This paragraph contains multiple inserts. First {{insert}} is a <0>div with a classname</0>. Second is <1>bold</1>. Third is <2>italic</2>. Finally there is a <3>link</3>.",
+    "customContent": "DE This is <0>Something</0>"
+  }
+}
