@@ -291,7 +291,7 @@ describe('useRouteConfig tests', () => {
         },
         {
           path: '/topics/:name/edit',
-          key: 'route-Topics.Edit',
+          key: 'route-Edittopic',
           componentForRoute: TopicsEditComponent,
         },
       ],

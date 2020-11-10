@@ -9,9 +9,13 @@ const isTopLevelNav = (path) => path.match(/\//g).length === 1;
 const extractTopLevelPath = (path) => path.match(/\/[^/]*/g)[0];
 
 const generateKey = (name, prefix, properties) =>
-  `${prefix}-${name.replace(/ /g, '')}${
+  `${prefix}-${removeWhitespace(removePathVars(name))}${
     properties && properties.mode ? `.${properties.mode}` : ''
   }`;
+
+const removeWhitespace = (name) => name.replace(/ /g, '');
+
+const removePathVars = (name) => name.replace(/\${([^}]*)\}/g, '');
 
 const useRouteConfig = (input: PageConfig): RouterConfig => {
   const output: RouterConfig = {
