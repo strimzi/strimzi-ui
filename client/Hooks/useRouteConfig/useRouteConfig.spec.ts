@@ -373,4 +373,47 @@ describe('useRouteConfig tests', () => {
 
     expect(output.meta).toEqual(expectedOutput.meta);
   });
+
+  it('if a nested route has a parent that doesn\'t exists, don\'t create leafs for the parent', () => {
+    const input: PageConfig = {
+      ConsumerGroups: {
+        contentComponent: ConsumerGroupsPageComponent,
+        contexts: [
+          {
+            path: '/topics/:name/consumergroups',
+            name: 'Consumer Groups',
+            feature_flag: 'PAGE.TOPIC.CONSUMER_GROUPS',
+            order: 0,
+            icon: 'myicon.svg',
+            pageType: NORMAL,
+            properties: {
+              mode: 'Topic',
+            },
+          },
+        ],
+      },
+    };
+
+    const expectedOutput: RouterConfig = {
+      links: [],
+      routes: [],
+      meta: {
+        '/topics/:name/consumergroups': {
+          name: 'Consumer Groups',
+          pageType: NORMAL,
+          order: 0,
+          properties: {
+            mode: 'Topic',
+          },
+          isTopLevel: false,
+          icon: 'myicon.svg',
+          leaves: [],
+        }
+      }
+    };
+
+    const output = useRouteConfig(input);
+
+    expect(output.meta).toEqual(expectedOutput.meta);
+  });
 });
