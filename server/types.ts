@@ -67,7 +67,7 @@ type sessionConfigType = {
   name: string;
 };
 
-export type serverConfig = {
+export type serverConfigType = {
   /** authentication configuration */
   authentication: authenticationConfigType;
   /** client (browser) facing configuration */
@@ -105,7 +105,7 @@ export type entryExitLoggerType = Logger & {
 
 export type strimziUIContextType = {
   /** configuration passed to the server */
-  config: serverConfig;
+  config: serverConfigType;
   /** the unique id for this request */
   requestID: string;
   /** a pre-configured logger object to use for the life of this request */
@@ -117,7 +117,7 @@ interface addModule {
   (
     mountLogger: entryExitLoggerType,
     authFunction: expressMiddleware,
-    configAtServerStart: serverConfig
+    configAtServerStart: serverConfigType
   ): {
     /** the root/mounting point for requests made to this module */
     mountPoint: string;

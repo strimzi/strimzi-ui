@@ -4,12 +4,15 @@
  */
 
 import { Config, Literal } from './types';
+import { version as strimziUiVersion } from '../package.json';
 
 /**
  * static configuration - literal values for the client and server that can be defined at develop time
  */
 
-const client: Config<Literal> = {};
+const client: Config<Literal> = {
+  version: strimziUiVersion,
+};
 
 const server: Config<Literal> = {
   defaultServerConfig: {

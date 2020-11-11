@@ -28,6 +28,7 @@ export const ApiModule: UIServerModule = {
       minVersion: minTLS,
       changeOrigin: true,
       secure: cert ? true : false,
+      ws: true,
     };
 
     logger.debug({ proxyConfig }, `api proxy configuration`);

@@ -84,6 +84,7 @@
     "@storybook/react": "^6.0.28",
     "@testing-library/jest-dom": "^5.11.5",
     "@testing-library/react": "^11.1.1",
+    "@testing-library/user-event": "^12.2.2",
     "@types/cypress-cucumber-preprocessor": "^4.0.0",
     "@types/express": "^4.17.8",
     "@types/jest": "^26.0.15",

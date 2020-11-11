@@ -10,3 +10,8 @@ import { client as staticClient, server as staticServer } from './static';
 export const featureFlags = processConfig([rawFeatureFlags]);
 export const client = processConfig([staticClient, runtimeClient]);
 export const server = processConfig([staticServer, runtimeServer]);
+
+
+export type exposedClientType = typeof client.publicValues;
+export type exposedFeatureFlagsType = typeof featureFlags.publicValues;
+export type exposedServerType = typeof server.publicValues;

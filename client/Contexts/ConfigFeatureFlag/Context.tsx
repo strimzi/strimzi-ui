@@ -2,41 +2,56 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-import React, { createContext, FunctionComponent, useState } from 'react';
+import React, { createContext, FunctionComponent, useContext } from 'react';
+import { useQuery } from '@apollo/client';
+import { GET_CONFIG } from 'Queries/Config';
+import {
+  apolloQueryResponseType,
+  ConfigFeatureFlagType,
+  defaultClientConfig,
+  defaultConfigFeatureFlagValue,
+} from './ConfigFeatureFlag.assets';
 
-// Temporary config/feature flag definition - to be filled out in later PR with server calls. Add values here and in `strimzi-ui/config` directory
-const config = { example: { value: true } };
-const featureFlags = { capability: { enabled: false } };
-
-// Loading/Error/Trigger Refetch etc
-const contextStates = {
-  loading: false,
-  error: false,
-  isComplete: true,
-  triggerRefetch: () => true,
-};
-
-const ConfigFeatureFlag = createContext({
-  config: {},
-  featureFlags: {},
-  ...contextStates,
-});
+const ConfigFeatureFlag = createContext(defaultConfigFeatureFlagValue);
+/** useConfigFeatureFlag - hook which returns the current value of the ConfigFeatureFlag context */
+const useConfigFeatureFlag: () => ConfigFeatureFlagType = () =>
+  useContext(ConfigFeatureFlag);
+/** ConfigFeatureFlagConsumer - consumer component of the ConfigFeatureFlag context */
 const ConfigFeatureFlagConsumer = ConfigFeatureFlag.Consumer;
+/** ConfigFeatureFlagProvider - component which sets up and provides a value to the ConfigFeatureFlag context. Should only be used in the Bootstrap `index.ts` entry point file */
 const ConfigFeatureFlagProvider: FunctionComponent = ({
   children,
   ...others
 }) => {
-  // get the retrieved config
-  const [configInState] = useState({ config, featureFlags });
+  // make the query for the config
+  const { loading, error, data, refetch } = useQuery(GET_CONFIG, {
+    context: {
+      purpose: 'config',
+    },
+  });
+  const { client, featureFlags }: apolloQueryResponseType =
+    data || defaultClientConfig;
+  const value: ConfigFeatureFlagType = {
+    client,
+    featureFlags,
+    loading,
+    error: error ? true : false,
+    isComplete: !(loading || error) && !loading && !error,
+    triggerRefetch: () => {
+      refetch();
+    },
+    rawResponse: error ? error : data ? data : defaultClientConfig,
+  };
 
   return (
-    <ConfigFeatureFlag.Provider
-      {...others}
-      value={{ ...configInState, ...contextStates }}
-    >
+    <ConfigFeatureFlag.Provider {...others} value={value}>
       {children}
     </ConfigFeatureFlag.Provider>
   );
 };
 
-export { ConfigFeatureFlagProvider, ConfigFeatureFlagConsumer };
+export {
+  ConfigFeatureFlagProvider,
+  ConfigFeatureFlagConsumer,
+  useConfigFeatureFlag,
+};
