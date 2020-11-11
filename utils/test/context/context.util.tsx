@@ -4,6 +4,12 @@
  */
 import React, { Provider, ReactElement, ReactNode } from 'react';
 import { render, RenderResult } from '@testing-library/react';
+import {
+  _ConfigFeatureFlag_TestProvider,
+  defaultClientConfig,
+  apolloQueryResponseType,
+  defaultConfigFeatureFlagValue,
+} from 'Contexts';
 
 type TestProviderWithValue<T> = {
   value: T;
@@ -36,4 +42,37 @@ const renderWithContextProviders: <T>(
     ...options,
   });
 
-export { renderWithContextProviders };
+/** withConfigFeatureFlagContext renders the given `ui` JSX with a ConfigFeatureFlag provider seeded with default values. Use this if your components indirectly use/require a value from the ConfigFeatureFlag context, else use `withCustomConfigFeatureFlagContext` so the value from ConfigFeatureFlag can be controlled  */
+const withConfigFeatureFlagContext: (
+  ui: ReactElement,
+  options?: Record<string, unknown>
+) => RenderResult = (ui, options = {}) =>
+  renderWithContextProviders(ui, options, [
+    {
+      provider: _ConfigFeatureFlag_TestProvider,
+      value: defaultConfigFeatureFlagValue,
+    },
+  ]);
+
+/** withCustomConfigFeatureFlagContext renders the given `ui` JSX with a ConfigFeatureFlag provider provided via `configFeatureFlagValue`. */
+const withCustomConfigFeatureFlagContext: (
+  configFeatureFlagValue: apolloQueryResponseType,
+  ui: ReactElement,
+  options?: Record<string, unknown>
+) => RenderResult = (
+  configFeatureFlagValue = defaultClientConfig,
+  ui,
+  options = {}
+) =>
+  renderWithContextProviders(ui, options, [
+    {
+      provider: _ConfigFeatureFlag_TestProvider,
+      value: { ...defaultConfigFeatureFlagValue, ...configFeatureFlagValue },
+    },
+  ]);
+
+export {
+  renderWithContextProviders,
+  withConfigFeatureFlagContext,
+  withCustomConfigFeatureFlagContext,
+};

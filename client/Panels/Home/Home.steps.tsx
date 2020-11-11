@@ -3,7 +3,8 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 import { Given, When, Then, Fusion } from 'jest-cucumber-fusion';
-import { render, RenderResult } from '@testing-library/react';
+import { RenderResult } from '@testing-library/react';
+import { withConfigFeatureFlagContext } from 'utils/test';
 import { Home } from '.';
 import React, { ReactElement } from 'react';
 
@@ -15,7 +16,7 @@ Given('a Home component', () => {
 });
 
 When('it is rendered', () => {
-  renderResult = render(component);
+  renderResult = withConfigFeatureFlagContext(component);
 });
 
 Then('it should display text', () => {

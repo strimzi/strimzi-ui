@@ -13,7 +13,10 @@ import {
   ConfigFeatureFlagConsumer,
   useConfigFeatureFlag,
 } from './Context';
-import { defaultClientConfig } from './ConfigFeatureFlag.assets';
+import {
+  ConfigFeatureFlagType,
+  defaultClientConfig,
+} from './ConfigFeatureFlag.assets';
 
 describe('ConfigFeatureFlag', () => {
   const mockClientResponse = {
@@ -118,7 +121,7 @@ describe('ConfigFeatureFlag', () => {
                   expect(loading).toBe(true);
                   expect(error).toBe(false);
                   expect(isComplete).toBe(false);
-                  expect(rawResponse).toEqual(defaultClientConfig);
+                  expect(rawResponse).toEqual({});
                   expect(triggerRefetch).toEqual(expect.any(Function));
                   return <p>{JSON.stringify(isComplete)}</p>;
                 }}
@@ -129,24 +132,90 @@ describe('ConfigFeatureFlag', () => {
       });
     });
     describe('response handling logic', () => {
+      // define common expected states, namespaces so RTL getByText can identify them
+      const namespaceValue: (
+        ns: string
+      ) => (value: unknown) => Record<string, typeof value> = (ns) => (
+        value
+      ) => ({ [ns]: value });
+      const clientNs = namespaceValue('client');
+      const featureFlagsNs = namespaceValue('featureFlags');
+      const statusNs = namespaceValue('status');
+      const functionNs = namespaceValue('functions');
+
+      const emptyClientResponse = clientNs(defaultClientConfig.client);
+      const emptyFeatureFlagResponse = featureFlagsNs(
+        defaultClientConfig.featureFlags
+      );
+
+      const returnClientResponse = clientNs(mockClientResponse);
+      const returnFeatureFlagResponse = featureFlagsNs(mockFeatureFlagResponse);
+
+      const initialLoadingStatus = statusNs({
+        loading: true,
+        error: false,
+        isComplete: false,
+        rawResponse: {},
+      });
+
+      const errorStatus = statusNs({
+        loading: false,
+        error: true,
+        isComplete: false,
+        rawResponse: {
+          graphQLErrors: [],
+          networkError: {},
+          message: mockError.message,
+        },
+      });
+
+      const successStatus = statusNs({
+        loading: false,
+        error: false,
+        isComplete: true,
+        rawResponse: {
+          client: mockClientResponse,
+          featureFlags: mockFeatureFlagResponse,
+        },
+      });
+
+      const testRenderFunc: (value: ConfigFeatureFlagType) => JSX.Element = ({
+        client,
+        featureFlags,
+        loading,
+        error,
+        isComplete,
+        rawResponse,
+        triggerRefetch,
+      }) => (
+        <React.Fragment>
+          <p>{JSON.stringify(clientNs(client))}</p>
+          <p>{JSON.stringify(featureFlagsNs(featureFlags))}</p>
+          <p>
+            {JSON.stringify(
+              statusNs({ loading, error, isComplete, rawResponse })
+            )}
+          </p>
+          <p>
+            {JSON.stringify(
+              functionNs({
+                triggerRefetch: typeof triggerRefetch === 'function',
+              })
+            )}
+          </p>
+        </React.Fragment>
+      );
+
       it('returns the expected values when in loading state', () => {
-        const expectedClient = defaultClientConfig.client;
-        const expectedFeatureFlags = defaultClientConfig.featureFlags;
+        const expectedClient = emptyClientResponse;
+        const expectedFeatureFlags = emptyFeatureFlagResponse;
+        const expectedStatus = initialLoadingStatus;
         const { getByText } = render(
           withApolloProviderReturning(
             noOpResponse,
             <ConfigFeatureFlagProvider>
               <ConfigFeatureFlagConsumer>
-                {({ client, featureFlags, loading, error, isComplete }) => {
-                  const status = { loading, error, isComplete };
-                  return (
-                    <React.Fragment>
-                      <p>{JSON.stringify(client)}</p>
-                      <p>{JSON.stringify(featureFlags)}</p>
-                      <p>{JSON.stringify(status)}</p>
-                    </React.Fragment>
-                  );
-                }}
+                {testRenderFunc}
               </ConfigFeatureFlagConsumer>
             </ConfigFeatureFlagProvider>
           )
@@ -156,46 +225,31 @@ describe('ConfigFeatureFlag', () => {
           expect(
             getByText(JSON.stringify(expectedFeatureFlags))
           ).toBeInTheDocument();
-          expect(
-            getByText(
-              JSON.stringify({ loading: true, error: false, isComplete: false })
-            )
-          ).toBeInTheDocument();
+          expect(getByText(JSON.stringify(expectedStatus))).toBeInTheDocument();
         });
       });
 
       it('returns the expected values when the query completes', async () => {
-        const expectedClient = mockClientResponse;
-        const expectedFeatureFlags = mockFeatureFlagResponse;
+        const expectedClient = returnClientResponse;
+        const expectedFeatureFlags = returnFeatureFlagResponse;
+        const expectedStatusLoading = initialLoadingStatus;
+        const expectedStatusLoaded = successStatus;
         const { getByText } = render(
           withApolloProviderReturning(
             successResponse,
             <ConfigFeatureFlagProvider>
               <ConfigFeatureFlagConsumer>
-                {({ client, featureFlags, loading, error, isComplete }) => {
-                  const status = { loading, error, isComplete };
-                  return (
-                    <React.Fragment>
-                      <p>{JSON.stringify(client)}</p>
-                      <p>{JSON.stringify(featureFlags)}</p>
-                      <p>{JSON.stringify(status)}</p>
-                    </React.Fragment>
-                  );
-                }}
+                {testRenderFunc}
               </ConfigFeatureFlagConsumer>
             </ConfigFeatureFlagProvider>
           )
         );
         expect(
-          getByText(
-            JSON.stringify({ loading: true, error: false, isComplete: false })
-          )
+          getByText(JSON.stringify(expectedStatusLoading))
         ).toBeInTheDocument();
         await apolloMockResponse();
         expect(
-          getByText(
-            JSON.stringify({ loading: false, error: false, isComplete: true })
-          )
+          getByText(JSON.stringify(expectedStatusLoaded))
         ).toBeInTheDocument();
         expect(getByText(JSON.stringify(expectedClient))).toBeInTheDocument();
         expect(
@@ -204,58 +258,26 @@ describe('ConfigFeatureFlag', () => {
       });
 
       it('returns the expected values when the query errors', async () => {
-        const expectedClient = defaultClientConfig.client;
-        const expectedFeatureFlags = defaultClientConfig.featureFlags;
+        const expectedClient = emptyClientResponse;
+        const expectedFeatureFlags = emptyFeatureFlagResponse;
+        const expectedStatusLoading = initialLoadingStatus;
+        const expectedStatusError = errorStatus;
         const { getByText } = render(
           withApolloProviderReturning(
             errorResponse,
             <ConfigFeatureFlagProvider>
               <ConfigFeatureFlagConsumer>
-                {({
-                  client,
-                  featureFlags,
-                  loading,
-                  error,
-                  isComplete,
-                  rawResponse,
-                }) => {
-                  const status = { loading, error, isComplete, rawResponse };
-                  return (
-                    <React.Fragment>
-                      <p>{JSON.stringify(client)}</p>
-                      <p>{JSON.stringify(featureFlags)}</p>
-                      <p>{JSON.stringify(status)}</p>
-                    </React.Fragment>
-                  );
-                }}
+                {testRenderFunc}
               </ConfigFeatureFlagConsumer>
             </ConfigFeatureFlagProvider>
           )
         );
         expect(
-          getByText(
-            JSON.stringify({
-              loading: true,
-              error: false,
-              isComplete: false,
-              rawResponse: defaultClientConfig,
-            })
-          )
+          getByText(JSON.stringify(expectedStatusLoading))
         ).toBeInTheDocument();
         await apolloMockResponse();
         expect(
-          getByText(
-            JSON.stringify({
-              loading: false,
-              error: true,
-              isComplete: false,
-              rawResponse: {
-                graphQLErrors: [],
-                networkError: {},
-                message: mockError.message,
-              },
-            })
-          )
+          getByText(JSON.stringify(expectedStatusError))
         ).toBeInTheDocument();
         expect(getByText(JSON.stringify(expectedClient))).toBeInTheDocument();
         expect(
@@ -264,24 +286,26 @@ describe('ConfigFeatureFlag', () => {
       });
 
       it('triggers a re query of config data when `triggerRefetch` is invoked', async () => {
+        const expectedClientError = emptyClientResponse;
+        const expectedFeatureFlagsError = emptyFeatureFlagResponse;
+        const expectedStatusError = errorStatus;
+
+        const expectedClientComplete = returnClientResponse;
+        const expectedFeatureFlagsComplete = featureFlagsNs(
+          mockFeatureFlagResponse
+        );
+        const expectedStatusComplete = successStatus;
+
         const { getByText } = render(
           withApolloProviderReturning(
             [...errorResponse, ...successResponse],
             <ConfigFeatureFlagProvider>
               <ConfigFeatureFlagConsumer>
-                {({
-                  client,
-                  featureFlags,
-                  error,
-                  isComplete,
-                  triggerRefetch,
-                }) => {
-                  const status = { error, isComplete };
+                {(values) => {
+                  const { triggerRefetch } = values;
                   return (
                     <React.Fragment>
-                      <p>{JSON.stringify(client)}</p>
-                      <p>{JSON.stringify(featureFlags)}</p>
-                      <p>{JSON.stringify(status)}</p>
+                      {testRenderFunc(values)}
                       <button onClick={triggerRefetch}>Refetch</button>
                     </React.Fragment>
                   );
@@ -293,26 +317,26 @@ describe('ConfigFeatureFlag', () => {
         // 1st tick - error state
         await apolloMockResponse();
         expect(
-          getByText(JSON.stringify({ error: true, isComplete: false }))
+          getByText(JSON.stringify(expectedStatusError))
         ).toBeInTheDocument();
         expect(
-          getByText(JSON.stringify(defaultClientConfig.client))
+          getByText(JSON.stringify(expectedClientError))
         ).toBeInTheDocument();
         expect(
-          getByText(JSON.stringify(defaultClientConfig.featureFlags))
+          getByText(JSON.stringify(expectedFeatureFlagsError))
         ).toBeInTheDocument();
         // trigger the refetch
         userEvent.click(getByText('Refetch'));
         // 2nd tick - refetch should have completed
         await apolloMockResponse();
         expect(
-          getByText(JSON.stringify({ error: false, isComplete: true }))
+          getByText(JSON.stringify(expectedStatusComplete))
         ).toBeInTheDocument();
         expect(
-          getByText(JSON.stringify(mockClientResponse))
+          getByText(JSON.stringify(expectedClientComplete))
         ).toBeInTheDocument();
         expect(
-          getByText(JSON.stringify(mockFeatureFlagResponse))
+          getByText(JSON.stringify(expectedFeatureFlagsComplete))
         ).toBeInTheDocument();
       });
     });
@@ -333,12 +357,12 @@ describe('ConfigFeatureFlag', () => {
 
     // functions are not stringified, so expect the HookWrapper to return true if it is present
     const expectedHookValue = {
-      client: { version: '' },
+      client: {},
       featureFlags: {},
       loading: true,
       error: false,
       isComplete: false,
-      rawResponse: { client: { version: '' }, featureFlags: {} },
+      rawResponse: {},
       triggerRefetch: true,
     };
 

@@ -18,6 +18,8 @@ const useConfigFeatureFlag: () => ConfigFeatureFlagType = () =>
   useContext(ConfigFeatureFlag);
 /** ConfigFeatureFlagConsumer - consumer component of the ConfigFeatureFlag context */
 const ConfigFeatureFlagConsumer = ConfigFeatureFlag.Consumer;
+/** Test provider. Only to be used in tests */
+const _ConfigFeatureFlag_TestProvider = ConfigFeatureFlag.Provider;
 /** ConfigFeatureFlagProvider - component which sets up and provides a value to the ConfigFeatureFlag context. Should only be used in the Bootstrap `index.ts` entry point file */
 const ConfigFeatureFlagProvider: FunctionComponent = ({
   children,
@@ -40,7 +42,7 @@ const ConfigFeatureFlagProvider: FunctionComponent = ({
     triggerRefetch: () => {
       refetch();
     },
-    rawResponse: error ? error : data ? data : defaultClientConfig,
+    rawResponse: error ? error : data ? data : {},
   };
 
   return (
@@ -54,4 +56,5 @@ export {
   ConfigFeatureFlagProvider,
   ConfigFeatureFlagConsumer,
   useConfigFeatureFlag,
+  _ConfigFeatureFlag_TestProvider,
 };
