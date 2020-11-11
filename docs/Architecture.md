@@ -5,10 +5,10 @@ This document will cover the core Architectural decisions made for this UI, how 
 ## Contents
 
 - [Overview and objectives](#overview-and-objectives)
-- [Security](#security)
 - [Topology](#topology)
   - [Production](#production-topology)
   - [Development and test](#development-and-test-topology)
+- [Security](#security)
 - [Transport layer](#transport-layer)
 - [Strimzi integration](#strimzi-integration)
 - [Implementation details](#implementation-details)
@@ -50,12 +50,6 @@ In addition, we have set the following behaviours/goals/considerations for all d
 - Adopting a cloud like CI/CD development model: lots of small and often changes, appropriately flagged, with the `master` branch being shippable at any time
 - Use automation as much as possible to maintain a CI/CD model - things like automated dependency updates, issue management etc
 
-### Security
-
-The UI will include a (configurable - including off) security model, which will map authenticated users to roles (with authorizations associated), and thus reflect in what they can access and do in the UI itself.
-
-Further details will be added to this section once https://github.com/strimzi/proposals/pull/13, https://github.com/strimzi/proposals/pull/6 and https://github.com/strimzi/proposals/pull/9 have been finalized.
-
 ### Topology
 
 The following section will detail how the UI in this repository integrates with related/supporting components when deployed in production, but also at development and test time. A client side [component topology can be found here.](#component-topology)
@@ -91,9 +85,31 @@ In both cases, `webpack-dev-server` hosts the development UI (rather than the UI
 
 Further details will be added to this section once https://github.com/strimzi/proposals/pull/6 has been finalized.
 
+### Security
+
+This section builds upon the contents of the [Strimzi UI proposal](https://github.com/strimzi/proposals/blob/master/011-strimzi-ui.md#session-management-and-authentication) and [Strimzi UI and Admin security proposal](https://github.com/strimzi/proposals/blob/master/010-UI-and-admin-server-security.md).
+
+The UI needs to concern itself with two key parts of security - authentication (who am I) and authorization (what can I do). A Strimzi Kafka cluster can be configured to provide either just authentication (you need user credentials), or authentication and authorization (user credentials with access control).
+
+The UI server will not communicate directly with the Kafka cluster, but instead perform actions via a Strimzi admin deployment. As such - the UI will need to provide valid credentials to Strimzi admin on behalf of the current user.
+
+The UI could simply make requests assuming authorization and handle cases when permission is denied. However, this would provide a poor UX. To avoid this, the UI will instead introspect the user's permissions and disable features accordingly.
+
+A user should only have to enter/generate credentials once - so there must be a persistent session while they are using the UI that contains their credentials. These can be forwarded on to Strimzi admin on any request.
+
+The following capabilities will be implemented:
+
+- Mechanism to supply connection details for a cluster (connection to Strimzi admin server), that contains authorization and authentication types
+- Mechanism to support authentication via an OAUTH identity provider (keycloak initially)
+- Mechanism to introspect a user's access scope (either through Strimzi admin or keycloak directly)
+- Create and maintain a session for the user
+- Present user credentials when communicating with Strimzi admin
+- Identifiying when user credentials are no longer valid
+- Removing user credentials/ending a session
+
 ### Transport layer
 
-The Strimzi-ui makes use of both HTTP and WebSockets. This section details what each protocol is responsible for.
+The Strimzi UI makes use of both HTTP and WebSockets. This section details what each protocol is responsible for.
 
 #### HTTP
 
@@ -134,14 +150,14 @@ This UI makes use of:
   - React Hooks: to enable shareable common logic across components
   - React Lazy and Suspense: to enable asynchronous loading of component code where required
 - [Sass](https://sass-lang.com/) for styling. This adds a number of helpful features on top of the core css language to commonise and speed up style implementation
-- Webpack and Typescript for building, bundling, treeshaking and transpiling the UI, and enabling day to day development. See [the build documentation](./Build.md#ui-build) for further details on build choices and setup.
+- Webpack and Typescript for building, bundling, treeshaking and transpiling the UI, and enabling day to day development. See [the build documentation](./Build.md#UI-build) for further details on build choices and setup.
 - [`Barrel files`](https://basarat.gitbook.io/typescript/main-1/barrel) and named exports. Barrel files (when combined with [path mapping](./Build.md#module-aliases)) allow for many components/modules/functions/constants which are related to be imported and used via one import statement. This relies on exported components/modules/functions/constants to be individually named so they can be imported directly.
 - [`React Router`](https://github.com/ReactTraining/react-router) for it's declarative routing capabilities.
 - [Apollo](https://www.apollographql.com/) for enabling rich communication with a GraphQL server.
 
 ##### File name conventions
 
-As mentioned above, the Strimzi-ui, inspired by the MVC pattern, separates business logic from rendering logic. This means a component's logic will be split across multiple files. In addition, for capabilities such as [swappable view layers](#swappable-view-layers) to work, file names need to be known and consistent. Thus, a set of file name conventions should be followed to not only enable these capabilities, but also to standardise and make the codebase more approachable.
+As mentioned above, the Strimzi UI, inspired by the MVC pattern, separates business logic from rendering logic. This means a component's logic will be split across multiple files. In addition, for capabilities such as [swappable view layers](#swappable-view-layers) to work, file names need to be known and consistent. Thus, a set of file name conventions should be followed to not only enable these capabilities, but also to standardise and make the codebase more approachable.
 
 | Filename                                     | Contains/used for                                                                                                                                                                                                                                                  | Alias (if available) |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------- |
@@ -163,12 +179,18 @@ As mentioned above, the Strimzi-ui, inspired by the MVC pattern, separates busin
 
 ##### Routing and navigation
 
-The Strimzi ui features routing and navigation support for all pages in the UI. This is implemented via the use of [`React Router`](https://github.com/ReactTraining/react-router) in the [`Navigation` Bootstrap component](../client/Bootstrap/Navigation/README.md), combined with [metadata which describes the pages which make up the UI](../client/Pages/README.md). Each page describes itself declaratively, including but not limited to; what it is called, which path it should reside on, how it should be rendered, and what requirements from a backend and security point of view it has. This enables pages, and their structure/relationship to other pages, to be not only more loosely coupled, but easily extensible.
+The Strimzi UI features routing and navigation support for all pages in the UI. This is implemented via the use of [`React Router`](https://github.com/ReactTraining/react-router) in the [`Navigation` Bootstrap component](../client/Bootstrap/Navigation/README.md), combined with [metadata which describes the pages which make up the UI](../client/Pages/README.md). Each page describes itself declaratively, including but not limited to; what it is called, which path it should reside on, how it should be rendered, and what requirements from a backend and security point of view it has. This enables pages, and their structure/relationship to other pages, to be not only more loosely coupled, but easily extensible.
 
 Further details on how the metadata and navigation work can be found below:
 
 - [`Navigation` component](../client/Bootstrap/Navigation/README.md)
 - [Page metadata structure](../client/Pages/README.md)
+
+##### User Authentication
+
+The UI will support two forms of user authentication - OAuth and SASL. The OAuth flow will redirect the browser to a login page owned by the identity provider and thus the UI does not have to render any login pages. For SASL, the Strimzi UI will render a login form, using Strimzi admin to verify the credentials as part of the login flow.
+
+To support this, the UI will provide a top level `/login` route, and a `/` route for the main 'Application'. This allows the UI to render a `/login` page without needing to fully load the main application (the `/` route will not match, this will not render the main components).
 
 ##### Introspection
 
@@ -178,11 +200,20 @@ Similarly, through the use of feature flags or more general configuration, capab
 
 GraphQL servers use a schema to describe the available types, their attributes, and how these can be manipulated (called mutations). Given this schema is retrievable at runtime, it can be inspected to determine what backend capabilities are available. This is known as [introspection](https://graphql.org/learn/introspection/).
 
-The Strimzi ui will perform an introspection of the backend server when it first loads in the user's browser. It will compare the retrieved schema to a model defined in the UI, and will store the result in a [React Context](../client/Contexts/Introspect/README.md) for use across the UI. This will allow the UI to then configure itself to show or hide capabilities based on what the backend supports. Examples of this include:
+The Strimzi UI will perform an introspection of the backend server when it first loads in the user's browser. It will compare the retrieved schema to a model defined in the UI, and will store the result in a [React Context](../client/Contexts/Introspect/README.md) for use across the UI. This will allow the UI to then configure itself to show or hide capabilities based on what the backend supports. Examples of this include:
 
 - By the navigation (in combination with the [#entity-model](#entity-model)) to show or hide whole pages if a minimum set of backend requirements are not met
 - By the [feature flag capability](#configuration-and-feature-flagging) in the UI to enable and disable individual features based on backend capability
 - By individual `Bootstrap`, `Panel` or `Group` components on a use case by use case basis
+
+###### User Authorization
+
+When the UI is configured to point to a Strimzi cluster with OAuth2.0(Keycloak) or OPA authorization, the UI will be able to request authorization details for the current user. This can be used for two purposes:
+
+1. Request user permissions when the page first loads - and augment the entity model to deny capabilities based off authorization
+2. Perform one off authorization checks against a particular resource - for example, when visiting a topic by a bookmark
+
+In a simple authorization (KafkaUser) scenario, authorization checks will always return `true` because the UI backend will not be able to intropsect the user.
 
 ##### Component topology
 
@@ -204,7 +235,7 @@ At the server, a websocket listener on the `/log` endpoint logs the received cli
 
 #### Server
 
-This section will detail the purpose and implementation choices made around the Strimzi ui's UI server.
+This section will detail the purpose and implementation choices made around the Strimzi UI's UI server.
 
 ##### Server Technologies and patterns used
 
@@ -216,6 +247,7 @@ The server, like the client code, makes use of a number of technologies and patt
   - [Helmet](https://helmetjs.github.io/) to provide common/best practice HTTP header security options/settings
   - [express-session](https://github.com/expressjs/session) and [connect-redis](https://github.com/tj/connect-redis) for session management and simple Redis integration
   - [body-parser](https://github.com/expressjs/body-parser) and [cookie-parser](https://github.com/expressjs/cookie-parser) for additional request parsing and sanitisation
+  - [passport.js](http://www.passportjs.org/) for user authentication and authorization
 - [node-http-proxy](https://github.com/http-party/node-http-proxy) to provide HTTP and WS proxy support
 - [pino](https://github.com/pinojs/pino) and [pino-http](https://github.com/pinojs/pino-http#readme) to provide fast, low-overhead logging and HTTP request logging respectively. The [pino-pretty](https://github.com/pinojs/pino-pretty) module can be used to prettify the logging output.
 - Code, defined in modules based on their responsibility, further separated into a [`Router`, `Controller`, `Data` pattern](#router-controller-data-pattern), a form of the [Model View Controller (MVC)](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) design pattern for keeping express, business, and additional data fetching logic separate
@@ -227,7 +259,7 @@ The UI server has been split into separate modules to deliberately separate the 
 | Module  | Responsibility                                                                                                                                                                                                                                                      | Configuration key (`modules.<name>`) | Context root |
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ------------ |
 | api     | Event handlers which will proxy GraphQL requests onto `Strimzi-admin`                                                                                                                                                                                               | api                                  | `/api`       |
-| config  | Event handlers which provide a GraphQL API to retrieve all Strimzi-ui configuration values                                                                                                                                                                          | config                               | `/config`    |
+| config  | Event handlers which provide a GraphQL API to retrieve all Strimzi UI configuration values                                                                                                                                                                          | config                               | `/config`    |
 | core    | The core Express server, responsible for bringing in all other modules, providing logging and auth checking capabilities as well common security settings. This is always enabled/present.                                                                          | N/A                                  | N/A          |
 | client  | Event handlers for serving the built client code to a web browser (the content of `dist/client`). Not enabled in dev mode, as `webpack-dev-server` will host client content.                                                                                        | client                               | `/`          |
 | mockapi | A mock implementation of the `Strimzi-admin` server. In addition to the implementation of the `Strimzi-admin` api, it also will provide additional dev/test handlers which can control server behaviour. Used in development and test scenarios, not in production. | mockapi                              | `/api`       |
@@ -263,22 +295,52 @@ All HTTP requests are logged at the `info`-level using [pino-http](https://githu
 
 Modules should infrequently log at the `warning` or `info` levels, as these messages will appear in the default log configuration. Most module level logging should be at the `debug` or `trace` levels. The `fatal` and `error` level logging messages should only be used when there are fundamental failures in the server code.
 
+##### User management
+
+`Passport.js` is an Express compatible authentication and authorization layer. It uses the concept of `strategies` to specify how to check credentials. Express routes can then be protected using a middleware function that handles validating and storing user credentials.
+
+###### Authentication
+
+When connecting to a Strimzi cluster with OAuth (keycloak) - the UI will use an OAuth strategy. This will redirect the user to the provider to log in - and start an OAuth flow. When the user has entered credentials into the provider - the browser is redirected back to Strimzi UI on a specific endpoint, and the Express server communicates with the provider to generate an access token for the user.
+
+When connecting to a Strimzi cluster with SASL - the UI will use a `local` strategy and expose a GET and POST `/login` express route. If the user has not logged in, the passport `authenticate` function will redirect to the `/login` endpoint which will return the application bundle. The browser will render a login page - which will POST to the `/login` endpoint to authenticate the credentials. This strategy will then send the credentials to Strimzi admin to validate.
+
+Passport strategies will also write a user object to the express `req.user` - which contains information about the user (basic profile and credentials).
+
+###### Authorization
+
+If the Kafka cluster uses simple authorization, it will not be possible introspect a user's permissions. Instead, requests will fail with a 403 status code, which the UI will need to handle.
+
+If the Kafka cluster uses Keycloak or OPA authorization the UI will configure the Passport strategy for [authorization](http://www.passportjs.org/docs/authorize/). Once a user has been authenticated, the strategy `verify` callback can be used to lookup the authorization for the user and add it to the `req.account` object.
+
+An `auth` graphql query field will then be created to allow the permissions to be retrieved by the browser when the application loads. An additional `auth` query with resource variale will be creatd for "one time" authorization checks.
+
+###### User session
+
+In a web application, the browser is making a series of requests on behalf of a user session. It would not be feasible to ask for credentials for _every_ request. Instead, Passport will be integrated with [express session middleware](https://github.com/expressjs/session) - which is used to provide a shared object across requests from the same client. The middleware adds a cookie to the first request that identifies the session, and will deserialize the correct shared object into the `req` object in subsequent requests. On first authentication, Passport will serialize user information into the session, ensuring that subsequent requests can access the user's credentials when it makes requests to Strimzi admin. In addition, Passport will trigger authentication if it finds that the credentials have expired or are missing.
+
+The session will initially be stored inside an in memory store, as it is not a major problem for a user to reauthenticate if the server restarts. This can be later updated to use a persistent store for the session data.
+
+###### Downstream authentication
+
+Any requests that are made against Strimzi admin will provide the credentials stored in the user session. If there is a timing window whereby the credentials expire after they have been attached to the request, the UI will handle the authentication failure and trigger a reauthentication.
+
 #### Entity model
 
 A UI typically allows a user to interact with resources. These resources are types of known entity (E.g. a Topic), which typically can be created, read, updated or deleted. Entities are often protected by authorization controls, restricting a user's access or ability to create, read, update or delete a given named entity or entity type. In the case of authorization for example, different mechanisms may be used to grant or reject the ability to create for instance. The ability to 'retrieve' an entity may vary (i.e retrieve the whole entity, or just a particular attribute) by use case. From a UI point of view, the 'how' of an operation on an entity is not important. What is important is if we can or cannot, and how the UI should ultimately respond to that.
 
-Thus, to help encapsulate these cases and capabilities, the Strimzi ui (both client and server) uses a simple 'entity model' to help describe/define what entities are used in a given scenario, and what operations need to be performed on them. These operations typically will take the form of CRUD actions (although additional actions can also be provided/checked on a case by case basis), which will be checked at runtime via a defined callback for that action, with the callback being provided appropriate state so it can return a `true` or `false` result, indicating if 'this' action on 'this' entity is currently possible. Keys for common operations on any entity (I.e. `CREATE`,`READ`,`UPDATE` and `DELETE`) will be defined in [`entityModelConstants.ts`](../utils/entityModelConstants.ts), with more specific keys being added as required.
+Thus, to help encapsulate these cases and capabilities, the Strimzi UI (both client and server) uses a simple 'entity model' to help describe/define what entities are used in a given scenario, and what operations need to be performed on them. These operations typically will take the form of CRUD actions (although additional actions can also be provided/checked on a case by case basis), which will be checked at runtime via a defined callback for that action, with the callback being provided appropriate state so it can return a `true` or `false` result, indicating if 'this' action on 'this' entity is currently possible. Keys for common operations on any entity (I.e. `CREATE`,`READ`,`UPDATE` and `DELETE`) will be defined in [`entityModelConstants.ts`](../utils/entityModelConstants.ts), with more specific keys being added as required.
 
-In the case of the Strimzi ui, this approach is used currently to describe backend capability required to show a page at minimum, and what authorization rights a user requires to access a page at minimum ([More details available here](../client/Pages/README.md)). In this case, the callbacks are provided with either [the result of GraphQL introspection](#introspection)) or current known authorization state respectively, which are then processed/checked in the callback to return the required `true`/`false` result.
+In the case of the Strimzi UI, this approach is used currently to describe backend capability required to show a page at minimum, and what authorization rights a user requires to access a page at minimum ([More details available here](../client/Pages/README.md)). In this case, the callbacks are provided with [the result of GraphQL introspection](#introspection)) and user introspection - which are then processed/checked in the callback to return the required `true`/`false` result.
 
-For example, assuming we are checking backend API capability state (which we destructure to just have topic state) for the minimum requirements to show a Topic page, the model would look as follows:
+For example, assuming we are checking backend API capability state for the minimum requirements to show a Topic page, the model would look as follows (introspection results passed in as parameters and destructured accordingly):
 
 ```
 {
   Topic: {
-    CREATE: ({topic}) => topic.operations.addTopic,
-    READ: ({topic}) => topic.field.name && topic.field.partitions && topic.field.replicas,
-    liveUpdates: ({topic}) => topic.subscriptions.topicsUpdated
+    CREATE: ({topic}, {topicAuth}) => topic.operations.addTopic && topicAuth.addTopics,
+    READ: ({topic}, {topicAuth}) => topic.field.name && topic.field.partitions && topic.field.replicas && topicAuth.readTopics,
+    liveUpdates: ({topic}, {topicAuth}) => topic.subscriptions.topicsUpdated && topicAuth.readTopics
   }
 }
 ```
@@ -289,16 +351,16 @@ _Note_: Implementation to follow in a later PR.
 
 #### Configuration and feature flagging
 
-This section will detail the approach to how configuration is handled and used in the Strimzi-ui. The intent of having this configuration strategy is to allow for the flexibility to dynamically change and alter the functionality and capability of the UI with minimal/no code changes required.
+This section will detail the approach to how configuration is handled and used in the Strimzi UI. The intent of having this configuration strategy is to allow for the flexibility to dynamically change and alter the functionality and capability of the UI with minimal/no code changes required.
 
 ##### Configuration types and usage
 
-All configuration fundamentally are key value pairs, which enables the abstraction of the value, and where it is used. These values are either known constants in advance, or need to be derived at runtime based on the environment. Depending on the use case (eg [feature flags](#feature-flags)), these values may be structured/heavily nested. For simplicity, all configuration in the Strimzi-ui is catagorised into one of two types:
+All configuration fundamentally are key value pairs, which enables the abstraction of the value, and where it is used. These values are either known constants in advance, or need to be derived at runtime based on the environment. Depending on the use case (eg [feature flags](#feature-flags)), these values may be structured/heavily nested. For simplicity, all configuration in the Strimzi UI is catagorised into one of two types:
 
 - `static values` - where the value is known in advance/can be defined literally
 - `runtime values` - where the value needs to be calculated at 'runtime'
 
-All configuration for the Strimzi-ui is defined in the [config](../config) directory.
+All configuration for the Strimzi UI is defined in the [config](../config) directory.
 
 In the case of `static` configuration values, these are defined literally as required. In the case of `runtime` configuration values, these are also defined in the config directory. However, these are defined as functions rather than values, which will be invoked at _server_ runtime. These functions will have access to configuration (in read only form) and other process information (eg environment variables), and thus be able to return the required value based on the current operating environment. The intent is that the result of the function will be the value available to the rest of the UI.
 
@@ -375,7 +437,7 @@ The READMEs for each of these component types will cover the expectations from a
 
 #### Swappable view layers
 
-One of the areas of extensibility this UI offers is that of the View layer implementation it uses. This allows the Strimzi-ui to quickly change it's look and feel if a user needs it to, while maintaining the same core business and backend logic that make the UI work. Implemented view layer implementations for the Strimzi-ui are detailed below, along with what environment variable (`VL`) value would need to be provided to build the UI using a particular View layer implementation:
+One of the areas of extensibility this UI offers is that of the View layer implementation it uses. This allows the Strimzi UI to quickly change it's look and feel if a user needs it to, while maintaining the same core business and backend logic that make the UI work. Implemented view layer implementations for the Strimzi UI are detailed below, along with what environment variable (`VL`) value would need to be provided to build the UI using a particular View layer implementation:
 
 | Framework/Library used in view layer                        | Environment variable value `VL` | Code suffix       | Default (if environment variable not provided/all components have view layer provided) |
 | ----------------------------------------------------------- | ------------------------------- | ----------------- | -------------------------------------------------------------------------------------- |
@@ -434,7 +496,7 @@ This UI will make use of a number of third party dependencies to operate at deve
 
 Tooling, such as [`npm audit`](https://docs.npmjs.com/cli/audit) make use of/utilise these sections to report when a dependency has a known vulnerability, and can thus call out if an issue is shipped by this package, assuming that dependencies are correctly catagorised based on their usage. Given the nature of JavaScript and where it is used, having these tools report issues when they occur is incredibly valuable.
 
-The Strimzi-ui will not be published. Instead, it will consume a number of packages, and be built to provide a UI. Some of these packages will be used and shipped directly, but some will also generate and polyfill code in this repository to produce the the built UI. Thus, in the event of a security issue, we need to understand if the issue relates in any way to what we ship. We therefore categorise our dependencies as follows:
+The Strimzi UI will not be published. Instead, it will consume a number of packages, and be built to provide a UI. Some of these packages will be used and shipped directly, but some will also generate and polyfill code in this repository to produce the the built UI. Thus, in the event of a security issue, we need to understand if the issue relates in any way to what we ship. We therefore categorise our dependencies as follows:
 
 - `dependencies` are any dependency which are either shipped bundled in the built output via direct usage (E.g. React), included in the dockerfile which will run the UI (E.g. Express) or generate output that is then built and shipped (I.e. typescript transforms/plugins, Webpack plugins etc)
 - `devDependencies` are used to support the development and test of the UI, but that are not shipped. E.g. Webpack, Jest, eslint
@@ -463,7 +525,7 @@ The addons included in the Strimzi UI Storybook configuration include:
 
 #### Mock admin server
 
-A helpful tool to aid UI development is the ability to have a representative mock backend available locally to develop against and control at test time. The Strimzi-ui features such a server, and this section will provide further details on it.
+A helpful tool to aid UI development is the ability to have a representative mock backend available locally to develop against and control at test time. The Strimzi UI features such a server, and this section will provide further details on it.
 
 Given the modular and configurable nature of the UI Server, the same [server code base](#server) will be re used for the purposes of hosting this mock `Strimzi-admin` capability, in a [second running instance, proxied to by the UI Server.](#development-and-test-topology) This second instance will be proxied to via the `proxy.hostname` and `proxy.port` configuration values, as a real `Strimzi-admin` backend instance would be when deployed in production (thus using the UI server fully as well).
 
