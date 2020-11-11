@@ -71,16 +71,24 @@ loadConfig((loadedInitialConfig) => {
   );
 
   const wss = new WebSocket.Server({ noServer: true });
-  instance.on('upgrade', (req, socket, head) =>
-    wss.handleUpgrade(req, socket, head, (ws) => {
-      const res = new http.ServerResponse(req) as strimziUIResponseType;
-      // add/mark the request as a websocket request
-      req.isWs = true;
-      res.ws = ws;
-      // call the express app as usual
-      expressApp(req, res);
-    })
-  );
+  instance.on('upgrade', (req, socket, head) => {
+    const { upgrade, connection } = req.headers;
+    logger.trace(
+      { headers: { upgrade, connection } },
+      `Upgrade request received for ${req.url}`
+    );
+
+    if (upgrade === 'websocket') {
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        const res = new http.ServerResponse(req) as strimziUIResponseType;
+        // add/mark the request as a websocket request
+        req.isWs = true;
+        res.ws = ws;
+        // call the express app as usual
+        expressApp(req, res);
+      });
+    }
+  });
 
   const shutdown = (server) => () =>
     server.close(() => {

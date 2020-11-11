@@ -6,9 +6,9 @@ import { And, Given, When, Then, Fusion, After } from 'jest-cucumber-fusion';
 import { renderHook } from '@testing-library/react-hooks';
 import { Server } from 'mock-socket';
 
-import { useLogger, LogLevel, MESSAGE_BUFFER_MAX_SIZE } from '.';
+import { useLogger, LoggerType, MESSAGE_BUFFER_MAX_SIZE } from '.';
 
-let log: (clientLevel: LogLevel, msg: string) => void;
+let logger: LoggerType;
 let rerenderHook: (newProps?: unknown) => void;
 let mockWebSocketServer: Server;
 let onConnectionPromise: Promise<void>;
@@ -41,9 +41,9 @@ const useLoggerHookIsRendered = 'the useLogger hook is rendered';
 const useLoggerHookIsRenderedFn = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const renderedHook = renderHook(() => useLogger('TestComponent'));
-  log = renderedHook.result.current;
-  expect(log).not.toBeNull();
-  expect(log).not.toBeUndefined();
+  logger = renderedHook.result.current;
+  expect(logger).not.toBeNull();
+  expect(logger).not.toBeUndefined();
   rerenderHook = renderedHook.rerender;
   expect(rerenderHook).not.toBeNull();
   expect(rerenderHook).not.toBeUndefined();
@@ -58,23 +58,26 @@ And('the useLogger hook is re-rendered', () => {
 When('the useLogger hook is rendered with an empty componentName', () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const renderedHook = renderHook(() => useLogger(''));
-  log = renderedHook.result.current;
-  expect(log).not.toBeNull();
-  expect(log).not.toBeUndefined();
+  logger = renderedHook.result.current;
+  expect(logger).not.toBeNull();
+  expect(logger).not.toBeUndefined();
 });
 
-And(/^(\d+) messages* (?:are|is) logged$/, (messagesCount) => {
-  const requestedMessagesCount =
-    parseInt(messagesCount as string) + sentMessagesCount;
-  for (
-    let index = sentMessagesCount + 1;
-    index <= requestedMessagesCount;
-    index++
-  ) {
-    log('warn', `useLogger test message ${index}`);
+And(
+  /^(\d+) (fatal|error|warn|info|debug|trace)-level messages* (?:are|is) logged$/,
+  (messagesCount, logLevel) => {
+    const requestedMessagesCount =
+      parseInt(messagesCount as string) + sentMessagesCount;
+    for (
+      let index = sentMessagesCount + 1;
+      index <= requestedMessagesCount;
+      index++
+    ) {
+      logger[logLevel as string](`useLogger test message ${index}`);
+    }
+    sentMessagesCount = requestedMessagesCount;
   }
-  sentMessagesCount = requestedMessagesCount;
-});
+);
 
 const useLoggerHookIsConnected =
   'the useLogger hook is connnected to the WebSocket server';
@@ -89,8 +92,8 @@ Then('the useLogger hook does not connnect to the WebSocket server', () => {
   expect(mockWebSocketServer.clients().length).toBe(0);
 });
 
-const loggingMessagesAreReceived = /^(\d+) logging messages* (?:are|is) received by the WebSocket server$/;
-const loggingMessagesAreReceivedFn = async (messagesCount) => {
+const loggingMessagesAreReceived = /^(\d+) (fatal|error|warn|info|debug|trace)-level logging messages* (?:are|is) received by the WebSocket server$/;
+const loggingMessagesAreReceivedFn = async (messagesCount, logLevel) => {
   const expectedLoggingMessagesCount = parseInt(messagesCount as string);
 
   const receivedMessageEvent = await onMessagePromise;
@@ -105,7 +108,7 @@ const loggingMessagesAreReceivedFn = async (messagesCount) => {
   }
 
   for (let index = 0; index < expectedLoggingMessagesCount; index++) {
-    expect(parsedLoggingMessages[index].clientLevel).toEqual('warn');
+    expect(parsedLoggingMessages[index].clientLevel).toEqual(logLevel);
     expect(parsedLoggingMessages[index].componentName).toEqual('TestComponent');
     expect(parsedLoggingMessages[index].msg).toEqual(
       `useLogger test message ${index + startingIndex}`

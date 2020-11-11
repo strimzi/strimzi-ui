@@ -52,6 +52,19 @@ And(
 );
 
 And(
+  'I send a logging WebSocket message that is not a JSON array',
+  stepWithWorld(async (world) => {
+    const { websocket } = world;
+    websocket.send(
+      JSON.stringify({
+        clientLevel: 'warn',
+        msg: 'test logging message',
+      })
+    );
+  })
+);
+
+And(
   'I send an unparsable string logging WebSocket message',
   stepWithWorld(async (world) => {
     const { websocket } = world;

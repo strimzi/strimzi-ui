@@ -155,13 +155,9 @@ Then(
   /^the WebSocket has received (\d+) messages$/,
   stepWithWorld(async (world, messageCount) => {
     const { websocket } = world;
-    if (websocket.onmessage != null) {
-      expect((<jest.Mock>websocket.onmessage).mock.calls.length).toBe(
-        parseInt(messageCount as string)
-      );
-    } else {
-      fail('Expected websocket.onmessage to be mocked');
-    }
+    expect(websocket.onmessage).toHaveBeenCalledTimes(
+      parseInt(messageCount as string)
+    );
   })
 );
 
@@ -177,15 +173,13 @@ And(
   'the WebSocket is closed',
   stepWithWorld(async (world) => {
     const { websocket } = world;
-    if (websocket.onclose != null) {
-      expect((<jest.Mock>websocket.onclose).mock.calls.length).toBe(1);
-      expect((<jest.Mock>websocket.onclose).mock.calls[0][0].code).toBe(0);
-      expect((<jest.Mock>websocket.onclose).mock.calls[0][0].reason).toEqual(
-        'Test close'
-      );
-    } else {
-      fail('Expected websocket.onclose to be mocked');
-    }
+    expect(websocket.onclose).toHaveBeenCalledTimes(1);
+    expect(websocket.onclose).toHaveBeenCalledWith({
+      code: 0,
+      reason: 'Test close',
+      target: websocket,
+      wasClean: true,
+    });
   })
 );
 

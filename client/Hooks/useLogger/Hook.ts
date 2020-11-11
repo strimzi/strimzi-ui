@@ -3,27 +3,46 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 import { useEffect, useRef } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 export const MESSAGE_BUFFER_MAX_SIZE = 100;
 // TODO: Replace with the regex from the LOGGING query param
 const defaultLoggingRegex = /.+/;
 // TODO: Replace with the web socket address from config
 const defaultWebSocketAddress = 'ws://localhost:3000/log';
-const defaultClientID = 'defaultClientID';
 
-export type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
+// Unique client ID created when this module is loaded
+const clientID = uuidv4();
+
+export type LogLevelType =
+  | 'fatal'
+  | 'error'
+  | 'warn'
+  | 'info'
+  | 'debug'
+  | 'trace';
 
 interface loggerMessage {
   clientTime: number;
   clientID: string;
-  clientLevel: LogLevel;
+  clientLevel: LogLevelType;
   componentName: string;
   msg: string;
 }
 
-export const useLogger: (
+export type LoggerType = {
+  log: (clientLevel: LogLevelType, msg: string) => void;
+  fatal: (msg: string) => void;
+  error: (msg: string) => void;
+  warn: (msg: string) => void;
+  info: (msg: string) => void;
+  debug: (msg: string) => void;
+  trace: (msg: string) => void;
+};
+
+export const useLogger: (componentName: string) => LoggerType = (
   componentName: string
-) => (clientLevel: LogLevel, msg: string) => void = (componentName: string) => {
+) => {
   // TODO: store the logger websocket in context, so you get one for the whole UI, rather than one every time you call useLogger.
   const loggerWebSocketRef = useRef<WebSocket | null>(null);
   const loggerMessageBufferRef = useRef<loggerMessage[]>([]);
@@ -59,7 +78,7 @@ export const useLogger: (
     }
   });
 
-  const logger = (clientLevel: LogLevel, msg: string) => {
+  const log = (clientLevel: LogLevelType, msg: string) => {
     // Check if the component should be logged
     if (defaultLoggingRegex.test(componentName)) {
       const loggerWebSocket = loggerWebSocketRef.current;
@@ -68,7 +87,7 @@ export const useLogger: (
       // Add a new new message to the buffer
       loggerMessageBuffer.push({
         clientTime: Date.now(), // client timestamp in ms
-        clientID: defaultClientID, // client ID
+        clientID, // client ID
         clientLevel, // logging level
         componentName, // client component name
         msg, // log message
@@ -91,5 +110,16 @@ export const useLogger: (
     }
   };
 
-  return logger;
+  const genLog = (clientLevel: LogLevelType) => (msg: string) =>
+    log(clientLevel, msg);
+
+  return {
+    log,
+    fatal: genLog('fatal'),
+    error: genLog('error'),
+    warn: genLog('warn'),
+    info: genLog('info'),
+    debug: genLog('debug'),
+    trace: genLog('trace'),
+  };
 };

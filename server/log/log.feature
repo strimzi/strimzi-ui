@@ -17,8 +17,9 @@ Feature: log module
     When I make a WebSocket connection request to '/log'
     And I send a logging WebSocket message
     And I send a logging WebSocket message without a clientLevel
+    And I send a logging WebSocket message that is not a JSON array
     And I send an unparsable string logging WebSocket message
     And I send a non-string logging WebSocket message
     And I close the WebSocket
-    Then the WebSocket has received 4 messages
+    Then the WebSocket has received 5 messages
     And the WebSocket is closed

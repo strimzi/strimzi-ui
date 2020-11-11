@@ -25,8 +25,8 @@ export const LogModule: UIServerModule = {
       const { isWs } = req as strimziUIRequestType;
       const { ws } = res as strimziUIResponseType;
       if (isWs) {
-        ws.on('message', handleMessage(logger));
-        ws.on('close', handleClose(logger));
+        ws.on('message', messageHandler(logger));
+        ws.on('close', closeHandler(logger));
       } else {
         // Return 426 Upgrade Required if this isn't a websocket request
         res.sendStatus(426);
@@ -37,35 +37,31 @@ export const LogModule: UIServerModule = {
   },
 };
 
-const handleMessage: (logger: Logger) => (data: Data) => void = (logger) => (
+const messageHandler: (logger: Logger) => (data: Data) => void = (logger) => (
   data
 ) => {
   if (typeof data === 'string') {
     try {
       JSON.parse(data).forEach((clientLogEvent: ClientLoggingEvent) => {
         if (clientLogEvent.clientLevel) {
-          logger[clientLogEvent.clientLevel](
-            clientLogEvent,
-            clientLogEvent.msg
-          );
+          logger[clientLogEvent.clientLevel](clientLogEvent);
         } else {
-          logger.debug(clientLogEvent, clientLogEvent.msg);
+          logger.debug(clientLogEvent);
         }
       });
-    } catch (error) {
+    } catch (err) {
       // Ignore any data that cannot be parsed
-      logger.trace(
-        { error },
-        `handleMessage failed: ${error.message}, ${data}`
-      );
+      logger.trace({ err }, `messageHandler failed: ${err.message}, ${data}`);
     }
   } else {
     // Ignore any non-string data
-    logger.trace(`handleMessage ignoring data of type ${typeof data}`);
+    logger.trace(
+      `messageHandler ignoring data of type ${typeof data}: ${data}`
+    );
   }
 };
 
-const handleClose: (
+const closeHandler: (
   logger: Logger
 ) => (code: number, reason: string) => void = (logger) => (code, reason) =>
   logger.debug(`WebSocket listener closed. (${code}) ${reason}`);
