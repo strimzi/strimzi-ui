@@ -22,6 +22,8 @@ const config = {
     '!**/index.{js,ts,jsx,tsx}',
     '!**/*.steps.*',
     '!**/*.d.ts',
+    '!**/*types.ts',
+    '!**/*.assets.{ts,tsx}',
     '!jest.config.js',
     // Wrapper around graphql - not something we need/wish to test
     '!Bootstrap/GraphQLClient/**',

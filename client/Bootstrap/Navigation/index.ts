@@ -2,10 +2,4 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-import React, { ReactElement } from 'react';
-
-const Topics = (): ReactElement => {
-  return <div>Topics</div>;
-};
-
-export default Topics;
+export * from './useRouteConfig/useRouteConfig.hook';

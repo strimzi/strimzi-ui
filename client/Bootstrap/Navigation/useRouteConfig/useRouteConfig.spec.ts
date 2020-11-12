@@ -2,12 +2,12 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-import { useRouteConfig } from 'Hooks';
-import { PageConfig, RouterConfig } from 'Hooks/types';
-import HomePageComponent from '../../../test_common/resources/Home.view';
-import TopicsPageComponent from '../../../test_common/resources/Topics.view';
-import TopicsEditComponent from '../../../test_common/resources/TopicsEdit.view';
-import ConsumerGroupsPageComponent from '../../../test_common/resources/ConsumerGroups.view';
+import { useRouteConfig } from 'Bootstrap/Navigation';
+import {
+  PageConfig,
+  RouterConfig,
+} from 'Bootstrap/Navigation/useRouteConfig/useRouteConfig.types';
+import { generateSimplePage } from './useRouteConfig.assets';
 
 const READ = '';
 
@@ -17,9 +17,11 @@ const FULLSCREEN = 'fullscreen';
 
 describe('useRouteConfig tests', () => {
   it('Given a single page config, transform into correct router data', () => {
+    const HomePage = generateSimplePage('Home');
+
     const input: PageConfig = {
       Homepage: {
-        contentComponent: HomePageComponent,
+        contentComponent: HomePage,
         contexts: [
           {
             path: '/homepage',
@@ -49,7 +51,7 @@ describe('useRouteConfig tests', () => {
         {
           path: '/homepage',
           key: 'route-Home',
-          componentForRoute: HomePageComponent,
+          componentForRoute: HomePage,
         },
       ],
       meta: {
@@ -71,9 +73,12 @@ describe('useRouteConfig tests', () => {
   });
 
   it('Given a multi page config, transform into correct router data', () => {
+    const HomePage = generateSimplePage('Home');
+    const TopicsPage = generateSimplePage('Topics');
+
     const input: PageConfig = {
       Homepage: {
-        contentComponent: HomePageComponent,
+        contentComponent: HomePage,
         contexts: [
           {
             path: '/homepage',
@@ -90,7 +95,7 @@ describe('useRouteConfig tests', () => {
         ],
       },
       Topics: {
-        contentComponent: TopicsPageComponent,
+        contentComponent: TopicsPage,
         contexts: [
           {
             path: '/topics',
@@ -129,12 +134,12 @@ describe('useRouteConfig tests', () => {
         {
           path: '/homepage',
           key: 'route-Home',
-          componentForRoute: HomePageComponent,
+          componentForRoute: HomePage,
         },
         {
           path: '/topics',
           key: 'route-Topics',
-          componentForRoute: TopicsPageComponent,
+          componentForRoute: TopicsPage,
         },
       ],
       meta: {
@@ -165,9 +170,12 @@ describe('useRouteConfig tests', () => {
   });
 
   it('Given a nested, multi-instance page config, only include top level links but full routes', () => {
+    const TopicsPage = generateSimplePage('Topics');
+    const ConsumerGroupsPage = generateSimplePage('Consumer Groups');
+
     const input: PageConfig = {
       Topics: {
-        contentComponent: TopicsPageComponent,
+        contentComponent: TopicsPage,
         contexts: [
           {
             path: '/topics',
@@ -180,7 +188,7 @@ describe('useRouteConfig tests', () => {
         ],
       },
       ConsumerGroups: {
-        contentComponent: ConsumerGroupsPageComponent,
+        contentComponent: ConsumerGroupsPage,
         contexts: [
           {
             path: '/consumergroups',
@@ -223,17 +231,17 @@ describe('useRouteConfig tests', () => {
         {
           path: '/topics',
           key: 'route-Topics',
-          componentForRoute: TopicsPageComponent,
+          componentForRoute: TopicsPage,
         },
         {
           path: '/consumergroups',
           key: 'route-ConsumerGroups.Cluster',
-          componentForRoute: ConsumerGroupsPageComponent,
+          componentForRoute: ConsumerGroupsPage,
         },
         {
           path: '/topics/:name/consumergroups',
           key: 'route-ConsumerGroups.Topic',
-          componentForRoute: ConsumerGroupsPageComponent,
+          componentForRoute: ConsumerGroupsPage,
         },
       ],
       meta: {},
@@ -246,9 +254,12 @@ describe('useRouteConfig tests', () => {
   });
 
   it("Given a top level nested path, don't create a link but keep a route", () => {
+    const TopicsPage = generateSimplePage('Topics');
+    const EditTopicsPage = generateSimplePage('Edit Topics');
+
     const input: PageConfig = {
       Topics: {
-        contentComponent: TopicsPageComponent,
+        contentComponent: TopicsPage,
         contexts: [
           {
             path: '/topics',
@@ -261,7 +272,7 @@ describe('useRouteConfig tests', () => {
         ],
       },
       TopicsEdit: {
-        contentComponent: TopicsEditComponent,
+        contentComponent: EditTopicsPage,
         contexts: [
           {
             path: '/topics/:name/edit',
@@ -287,12 +298,12 @@ describe('useRouteConfig tests', () => {
         {
           path: '/topics',
           key: 'route-Topics',
-          componentForRoute: TopicsPageComponent,
+          componentForRoute: TopicsPage,
         },
         {
           path: '/topics/:name/edit',
           key: 'route-Edittopic',
-          componentForRoute: TopicsEditComponent,
+          componentForRoute: EditTopicsPage,
         },
       ],
       meta: {},
@@ -305,9 +316,12 @@ describe('useRouteConfig tests', () => {
   });
 
   it('Given nested pages, generate a leaves array correctly', () => {
+    const TopicsPage = generateSimplePage('Topics');
+    const ConsumerGroupsPage = generateSimplePage('Consumer Groups');
+
     const input: PageConfig = {
       Topics: {
-        contentComponent: TopicsPageComponent,
+        contentComponent: TopicsPage,
         contexts: [
           {
             path: '/topics',
@@ -320,7 +334,7 @@ describe('useRouteConfig tests', () => {
         ],
       },
       ConsumerGroups: {
-        contentComponent: ConsumerGroupsPageComponent,
+        contentComponent: ConsumerGroupsPage,
         contexts: [
           {
             path: '/topics/:name/consumergroups',
@@ -374,10 +388,12 @@ describe('useRouteConfig tests', () => {
     expect(output.meta).toEqual(expectedOutput.meta);
   });
 
-  it('if a nested route has a parent that doesn\'t exists, don\'t create leafs for the parent', () => {
+  it("if a nested route has a parent that doesn't exists, don't create leafs for the parent", () => {
+    const ConsumerGroupsPage = generateSimplePage('Consumer Groups');
+
     const input: PageConfig = {
       ConsumerGroups: {
-        contentComponent: ConsumerGroupsPageComponent,
+        contentComponent: ConsumerGroupsPage,
         contexts: [
           {
             path: '/topics/:name/consumergroups',
@@ -408,8 +424,8 @@ describe('useRouteConfig tests', () => {
           isTopLevel: false,
           icon: 'myicon.svg',
           leaves: [],
-        }
-      }
+        },
+      },
     };
 
     const output = useRouteConfig(input);

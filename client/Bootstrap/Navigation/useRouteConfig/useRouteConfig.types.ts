@@ -4,11 +4,11 @@
  */
 import { FunctionComponent } from 'react';
 
-export type PageProperties = {
+type PageProperties = {
   mode: string;
 };
 
-export type Context = {
+type PageConfigContext = {
   path: string;
   name: string;
   feature_flag: string;
@@ -22,26 +22,19 @@ export type Context = {
   };
 };
 
-export type PageConfig = Record<string, Page>;
-
-export type Page = {
-  contentComponent: FunctionComponent | (() => FunctionComponent);
-  contexts: Array<Context>;
-};
-
-export type Link = {
+type Link = {
   to: string;
   key: string;
   children: string;
 };
 
-export type Route = {
+type Route = {
   path: string;
   key: string;
   componentForRoute: FunctionComponent | (() => FunctionComponent);
 };
 
-export type Meta = {
+type Meta = {
   name: string;
   pageType: string;
   order: number;
@@ -54,12 +47,23 @@ export type Meta = {
   }>;
 };
 
+/** Type of input to useRouteConfig */
+export type PageConfig = Record<string, Page>;
+
+/** Type of a page which is part of a page config */
+export type Page = {
+  contentComponent: FunctionComponent | (() => FunctionComponent);
+  contexts: Array<PageConfigContext>;
+};
+
+/** Type of output from useRouteConfig */
 export type RouterConfig = {
   links: Array<Link>;
   routes: Array<Route>;
   meta: Map<string, Meta> | Record<string, unknown>;
 };
 
+/** Type describing a relationship between a child nav and it's parent nav */
 export type Leaf = {
   parent: string;
   child: {
