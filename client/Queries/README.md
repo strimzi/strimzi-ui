@@ -39,7 +39,7 @@ export const CREATE_TOPIC = gql`
 ```typescript
 // useTopic.hook.ts
 
-import { CREATE_TOPIC, TOPIC_SUBSCRIPTION, GET_TOPICS } from '@/Queries/topics';
+import { CREATE_TOPIC, TOPIC_SUBSCRIPTION, GET_TOPICS } from 'Queries/topics';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
 
 const useTopic = () => {
@@ -60,7 +60,7 @@ export default useTopic;
 ```typescript
 // topics.model.ts
 
-import { useTopic } from '@/Hooks';
+import { useTopic } from 'Hooks';
 
 const TopicModel = () => {
   const { addTopic, getTopics, topicSubscription } = useTopic();
@@ -91,7 +91,7 @@ const GET_CONFIG = gql`
 ```typescript
 // config.hook.ts
 
-import { GET_CONFIG } from '@/Queries/topics';
+import { GET_CONFIG } from 'Queries/topics';
 import { useQuery } from '@apollo/client';
 
 const useConfig = () => {

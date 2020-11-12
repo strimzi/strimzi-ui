@@ -13,21 +13,31 @@ For a given Group component `HeadingWithToggle`, the expected files are as follo
 ```
 Groups/
   index.ts
+  types.ts
   HeadingWithToggle/
     index.ts
     README.md
     View.ts
     Model.ts
     Styling.scss
+    HeadingWithToggle.feature
+    HeadingWithToggle.steps.ts
+    HeadingWithToggle.assets.ts
+    HeadingWithtoggle.types.ts
 ```
 
 Where:
 
 - index.ts acts as a barrel file, exporting all public elements of this component/the components in the Groups directory
+- types.ts acts as a barrel file, exporting all the public types of each context
 - README.md is the readme for this component, detailing design choices and usage
 - View.ts is the view logic for this component
 - Model.ts (_optional_) is the model (business) logic for this component
 - Styling.scss (_optional_) is the styling for this component
+- HeadingWithToggle.feature is the feature definitionn file to test this component
+- HeadingWithToggle.steps.ts are the steps for the component feature
+- HeadingWithToggle.assets.ts are the test assets for this component
+- HeadingWithToggle.types.ts are the types for this component
 
 ## Components
 
