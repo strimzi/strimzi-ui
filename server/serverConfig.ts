@@ -8,7 +8,7 @@ import { resolve } from 'path';
 import merge from 'lodash.merge';
 import { server } from 'ui-config';
 
-const { defaultServerConfig } = server.values;
+const { defaultConfig, serverConfigPath, serverName } = server.values;
 
 import { serverConfigType, loggerType } from 'types';
 
@@ -20,24 +20,21 @@ const requireForConfigLoad =
     : require;
 /* eslint-enable no-undef */
 
-const defaultConfig = (defaultServerConfig as unknown) as serverConfigType;
+const defaultServerConfig = (defaultConfig as unknown) as serverConfigType;
 
 export const getDefaultConfig: () => serverConfigType = () =>
-  merge({}, defaultConfig);
+  merge({}, defaultServerConfig);
 
-const pathToConfigFile = process.env.configPath
-  ? resolve(process.env.configPath)
-  : resolve('./server.config.json'); // default file config
+const pathToConfigFile = resolve(serverConfigPath as string);
 
 const configFileExists = existsSync(pathToConfigFile);
-export const getServerName: () => string = () =>
-  process.env.serverName || 'Strimzi-ui server';
+export const getServerName: () => string = () => serverName as string;
 
 export const loadConfig: (
   callback: (config: serverConfigType) => void,
   logger: loggerType
 ) => void = (callback, logger) => {
-  let config = merge({}, defaultConfig);
+  let config = merge({}, defaultServerConfig);
 
   if (configFileExists) {
     logger.info(`Using config file '${pathToConfigFile}'`);

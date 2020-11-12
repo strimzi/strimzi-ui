@@ -15,7 +15,7 @@ const client: Config<Literal> = {
 };
 
 const server: Config<Literal> = {
-  defaultServerConfig: {
+  defaultConfig: {
     configValue: {
       authentication: {
         strategy: 'none',

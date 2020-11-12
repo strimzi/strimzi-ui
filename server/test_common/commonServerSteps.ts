@@ -5,7 +5,7 @@
 import request from 'supertest';
 import { returnExpress } from 'core';
 import { Given, When, And } from 'jest-cucumber-fusion';
-import { serverConfig } from 'types';
+import { serverConfigType } from 'types';
 import { getConfigForName } from './testConfigs';
 import express from 'express';
 import merge from 'lodash.merge';
@@ -21,7 +21,7 @@ interface serverWorldType extends genericWorldType {
   server: supertestRequestType;
   request: request.Test;
   app: express.Application;
-  configuration: serverConfig;
+  configuration: serverConfigType;
 }
 
 const serverWorld: serverWorldType = {
