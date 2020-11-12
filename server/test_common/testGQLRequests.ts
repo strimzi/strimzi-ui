@@ -4,7 +4,7 @@
  */
 
 /**
- * Mock requests used to test the gql elements of the server. Query names referenced in feature files, E.g `When I make a 'mockTopicsQuery' gql request to ...`. These can be generated using GraphiQL and it' export feature
+ * Mock requests used to test the gql elements of the server. Query names referenced in feature files, E.g `When I make a 'mockTopicsQuery' gql request to ...`. These can be generated using GraphiQL and it's export feature
  */
 const mockTopicsQuery = {
   query: '{\n  topics {\n    name\n    partitions\n    replicas\n  }\n}\n',
