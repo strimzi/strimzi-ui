@@ -4,33 +4,29 @@
  */
 
 import merge from 'lodash.merge';
-import {
-  configurationType,
-  programmaticValue,
-  configurationLiteralValue,
-} from './types';
+import { PublicConfig, ProgrammaticValue, Config, Literal } from './types';
 
 /** helper function to get the value of an environment variable, or a defined fallback value */
 export const getEnvvarValue: (
   name: string,
-  fallback?: configurationLiteralValue
-) => () => configurationLiteralValue = (
-  name,
-  fallback = `No value for ENVVAR ${name}`
-) => () => process.env[name] || fallback;
+  fallback?: Literal
+) => () => Literal = (name, fallback = `No value for ENVVAR ${name}`) => () =>
+  process.env[name] || fallback;
 
 /** helper used to process a `configurationDeclaration` or `featureFlagDeclaration` (D) to a `configurationType` with values being of type (T) for use across the codebase */
-export const processConfig: <D, T>(config: Array<D>) => configurationType<T> = (
-  config
-) => {
+export const processConfig = <T extends Literal>(
+  config: Config<T>[]
+): PublicConfig<T> => {
   // merge all provided configs
-  const mergedConfig = config.reduce(
+  const mergedConfig = config.reduce<Config<T>>(
     (acc, thisConfig) => merge(acc, thisConfig),
-    {}
+    {} as Config<T>
   );
 
   // iterate through config
-  const processedConfiguration = Object.entries(mergedConfig).reduce(
+  const processedConfiguration: PublicConfig<T> = Object.entries(
+    mergedConfig
+  ).reduce(
     (acc, [key, value]) => {
       const valueType = typeof value;
       const isLiteralValue =
@@ -38,8 +34,7 @@ export const processConfig: <D, T>(config: Array<D>) => configurationType<T> = (
         valueType === 'boolean' ||
         valueType === 'number';
       const isConfigurationValue =
-        !isLiteralValue &&
-        (value as programmaticValue<unknown, unknown>).configValue;
+        !isLiteralValue && (value as ProgrammaticValue<T>).configValue;
 
       let publicValue, privateValue;
 
@@ -47,15 +42,14 @@ export const processConfig: <D, T>(config: Array<D>) => configurationType<T> = (
         publicValue = value;
         privateValue = value;
       } else if (isConfigurationValue) {
-        const { configValue, publicConfigValue } = value as programmaticValue<
-          unknown,
-          unknown
+        const { configValue, publicConfigValue } = value as ProgrammaticValue<
+          T
         >;
         privateValue =
           typeof configValue === 'function' ? configValue() : configValue;
         publicValue = publicConfigValue;
       } else {
-        const { values, publicValues } = processConfig([value]);
+        const { values, publicValues } = processConfig([value as Config<T>]);
         publicValue = publicValues;
         privateValue = values;
       }
@@ -68,7 +62,7 @@ export const processConfig: <D, T>(config: Array<D>) => configurationType<T> = (
     {
       values: {},
       publicValues: {},
-    }
+    } as PublicConfig<T>
   );
 
   return processedConfiguration;

@@ -3,15 +3,15 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import { configurationDeclaration } from './types';
+import { Config, Literal } from './types';
 
 /**
  * static configuration - literal values for the client and server that can be defined at develop time
  */
 
-const client: configurationDeclaration = {};
+const client: Config<Literal> = {};
 
-const server: configurationDeclaration = {
+const server: Config<Literal> = {
   defaultServerConfig: {
     configValue: {
       authentication: {
