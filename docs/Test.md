@@ -113,7 +113,11 @@ where certain tests may have been overlooked.
 
 ## Accessibility testing
 
-To be discussed at https://github.com/strimzi/strimzi-ui/issues/20
+Accessibility testing is done using the [PatternFly Accessibility](https://www.npmjs.com/package/@patternfly/patternfly-a11y) tool. This tool is designed to run [axe](https://www.deque.com/axe/) in Selenium using puppeter on different pages within the Selenium UI.
+
+The configuration file for running can be found in **a11y/a11y.js**. It contains any types of waits and additional navigation needed to get the page in the state where axe can analyze the page. Here is an example of a configuration file that tests [openshift](https://github.com/patternfly/patternfly-a11y/blob/master/test/os-config.js).
+
+The Client needs to be running prior to running a11y tests. After running the tests the results will be output in json format (**coverage/report.json**) and html format (**coverage/dist/index.html**).
 
 ## Test tooling used
 
