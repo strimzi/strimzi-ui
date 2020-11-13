@@ -16,10 +16,10 @@ Hooks/
   types.ts
   useFoo/
     README.md
-    Hook.ts
-    Hook.spec.ts
-    Hook.assets.ts
-    Hook.types.ts
+    useFoo.ts
+    useFoo.spec.ts
+    useFoo.assets.ts
+    useFoo.types.ts
 ```
 
 Where:
@@ -27,10 +27,10 @@ Where:
 - index.ts acts as a barrel file, exporting the hooks defined in the Hooks directory
 - types.ts acts as a barrel file, exporting all the public types of each context
 - README.md is the readme for this hook, detailing design choices and usage
-- Hook.ts is the hook implementation
-- Hook.spec.ts are the tests for this hook
-- Hook.assets.ts are the test assets for this hook
-- Hook.types.ts are the types for this hook
+- useFoo.ts is the hook implementation
+- useFoo.spec.ts are the tests for this hook
+- useFoo.assets.ts are the test assets for this hook
+- useFoo.types.ts are the types for this hook
 
 ## Implemented hooks
 
