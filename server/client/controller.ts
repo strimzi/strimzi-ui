@@ -4,7 +4,7 @@
  */
 
 import { resolve, sep } from 'path';
-import { existsSync, readdirSync } from 'fs';
+import { existsSync, readdirSync, readFileSync } from 'fs';
 
 // function to recursively get all files from a directory
 const getFilesInDirectory: (directory: string) => Array<string> = (directory) =>
@@ -34,6 +34,7 @@ export const getFiles: (
 ) => {
   totalNumberOfFiles: number;
   hasIndexFile: boolean;
+  indexFile: string;
   protectedFiles: Array<string>;
   builtClientDir: string;
 } = (publicDirectory) => {
@@ -55,9 +56,17 @@ export const getFiles: (
     [] as string[]
   );
 
+  const hasIndexFile = allFilesInClientDirectory.includes('/index.html');
+  const indexFile = hasIndexFile
+    ? readFileSync(resolve(`${builtClientDir}${sep}index.html`), {
+        encoding: 'utf-8',
+      })
+    : '';
+
   return {
     totalNumberOfFiles: allFilesInClientDirectory.length,
-    hasIndexFile: allFilesInClientDirectory.includes('/index.html'),
+    hasIndexFile,
+    indexFile,
     protectedFiles: protectedFiles,
     builtClientDir,
   };

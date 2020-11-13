@@ -10,10 +10,10 @@ interface ProcessedConfiguration<T> {
 
 /** external facing (ie for use in the UI) configuration object */
 export type PublicConfig<T> = {
-  /** internal private values */
-  values: Record<string, ProcessedConfiguration<T>>;
+  /** internal private configuration values */
+  values: Record<string, ProcessedConfiguration<T> | T>;
   /** public/external values. Will be exposed via the config module in the server */
-  publicValues: Record<string, ProcessedConfiguration<T>>;
+  publicValues: Record<string, ProcessedConfiguration<T> | T>;
 };
 
 /** internal configuration definition type - an object of which its values will either be of type `ConfigValue<T>`, or a sub instance of `Config<T>` */

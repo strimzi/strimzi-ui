@@ -24,14 +24,34 @@ const mockapiModuleConfig: () => serverConfigType = () =>
   merge(merge({}, defaultTestConfig()), {
     modules: { ...modules, mockapi: true },
   });
+
 const logModuleConfig: () => serverConfigType = () =>
   merge(merge({}, defaultTestConfig()), {
     modules: { ...modules, log: true },
   });
+
 const configModuleConfig: () => serverConfigType = () =>
   merge(merge({}, defaultTestConfig()), {
     modules: { ...modules, config: true },
   });
+
+const configModuleWithConfigOverrides: () => serverConfigType = () =>
+  merge(merge({}, configModuleConfig()), {
+    client: {
+      configOverrides: {
+        version: '34.0.0',
+      },
+    },
+    featureFlags: {
+      client: {
+        Home: {
+          showVersion: false,
+        },
+      },
+      testFlag: true,
+    },
+  });
+
 const clientModuleConfig: () => serverConfigType = () =>
   merge(merge({}, defaultTestConfig()), {
     client: {
@@ -70,23 +90,25 @@ const securedApiModuleConfig: () => serverConfigType = () =>
 
 export const getConfigForName: (name: string) => serverConfigType = (name) => {
   switch (name) {
-  default:
-  case 'default':
-  case 'production':
-    return defaultTestConfig();
-  case 'mockapi_only':
-    return mockapiModuleConfig();
-  case 'log_only':
-    return logModuleConfig();
-  case 'config_only':
-    return configModuleConfig();
-  case 'client_only':
-    return clientModuleConfig();
-  case 'api_only':
-    return apiModuleConfig();
-  case 'api_secured_only':
-    return securedApiModuleConfig();
-  case 'api_with_custom_context_root':
-    return apiModuleConfigWithCustomContextRoot();
+    default:
+    case 'default':
+    case 'production':
+      return defaultTestConfig();
+    case 'mockapi_only':
+      return mockapiModuleConfig();
+    case 'log_only':
+      return logModuleConfig();
+    case 'config_only':
+      return configModuleConfig();
+    case 'config_only_with_config_overrides':
+      return configModuleWithConfigOverrides();
+    case 'client_only':
+      return clientModuleConfig();
+    case 'api_only':
+      return apiModuleConfig();
+    case 'api_secured_only':
+      return securedApiModuleConfig();
+    case 'api_with_custom_context_root':
+      return apiModuleConfigWithCustomContextRoot();
   }
 };

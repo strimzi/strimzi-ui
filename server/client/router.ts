@@ -4,8 +4,9 @@
  */
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
+import { render } from 'mustache';
 import { getFiles } from './controller';
-import { UIServerModule } from 'types';
+import { serverConfigType, UIServerModule } from 'types';
 
 const moduleName = 'client';
 
@@ -21,6 +22,7 @@ export const ClientModule: UIServerModule = {
       protectedFiles,
       builtClientDir,
       hasIndexFile,
+      indexFile,
     } = getFiles(publicDir);
 
     logger.debug(
@@ -30,6 +32,28 @@ export const ClientModule: UIServerModule = {
 
     // add the auth middleware to all non public files
     protectedFiles.forEach((file) => routerForModule.get(`${file}`, authFn));
+
+    // return index.html, with configuration templated in
+    hasIndexFile &&
+      routerForModule.get('/index.html', (req, res) => {
+        const { entry, debug } = res.locals.strimziuicontext.logger;
+        const { exit } = entry('`/index.html handler');
+        const { authentication } = res.locals.strimziuicontext
+          .config as serverConfigType;
+        const bootstrapConfigs = {
+          authType: authentication.strategy,
+        };
+        debug(`Templating bootstrap config containing`, bootstrapConfigs);
+        res.send(
+          exit(
+            render(indexFile, {
+              bootstrapConfigs: encodeURIComponent(
+                JSON.stringify(bootstrapConfigs)
+              ),
+            })
+          )
+        );
+      });
 
     // host all files from the client dir
     routerForModule.get(

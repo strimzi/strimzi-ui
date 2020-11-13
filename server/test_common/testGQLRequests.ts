@@ -15,7 +15,13 @@ const getConfigAndFeatureFlagQuery = {
     '\n{\n  featureFlags {\n    _generatedTypeName\n  }\n  client {\n    _generatedTypeName\n  }\n  server {\n    _generatedTypeName\n  }\n}',
 };
 
+const getConfigAndFeatureFlagQueryWithConfigOverrides = {
+  query:
+    '{\n  server {\n    _generatedTypeName\n  }\n  featureFlags {\n    client {\n      Home {\n        showVersion\n      }\n    }\n    testFlag\n  }\n\tclient {\n    version\n  }\n}\n',
+};
+
 export const requests = {
   mockTopicsQuery,
   getConfigAndFeatureFlagQuery,
+  getConfigAndFeatureFlagQueryWithConfigOverrides,
 };

@@ -38,8 +38,7 @@ export const processConfig = <T extends Literal>(
         valueType === 'number';
       const isConfigurationValue =
         !isLiteralValue &&
-        (value as ProgrammaticValue<T>).configValue !==
-          undefined;
+        (value as ProgrammaticValue<T>).configValue !== undefined;
 
       let publicValue, privateValue;
 
