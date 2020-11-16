@@ -91,38 +91,34 @@ Then(
     const expectFailure = context.responseWillError ? true : false;
 
     // check mock call counts
-    await request.then(
-      (res) => {
-        // check all mock calls for expected values
-        expect(createProxyServer).toHaveBeenCalledTimes(1);
-
-        // confirm the API module configured the proxy as expected first
-        const { target, ca, secure } = createProxyServer.mock.calls[0][0];
-        if (securedConfig) {
-          expect(target.startsWith('https://')).toBe(true);
-          expect(ca).toBe(configuration.proxy.transport.cert);
-          expect(secure).toBe(true);
-        } else {
-          expect(target.startsWith('http://')).toBe(true);
-          expect(ca).toBeUndefined();
-          expect(secure).toBe(false);
-        }
-        // confirm the expected context root is added to the end of the target
-        expect(target.endsWith(expectedContextRoot)).toBe(true);
-
-        expect(placeholderProxyEvent).not.toBeCalled(); // confirm placeholder event handlers are not called (ie ones provided by API module are)
-        // confirm the API module handles the response
-        if (expectFailure) {
-          expect(res.status).toBe(500);
-        } else {
-          expect(res.status).toBe(200);
-          expect(res.text).toEqual(successResponseBody);
-        }
-      },
-      (err) => {
-        throw err;
+    await request.expect((res) => {
+      // confirm the API module handles the response
+      if (expectFailure) {
+        expect(res.status).toBe(500);
+      } else {
+        expect(res.status).toBe(200);
+        expect(res.text).toEqual(successResponseBody);
       }
-    );
+    });
+
+    // check all mock calls for expected values
+    expect(createProxyServer).toHaveBeenCalledTimes(1);
+
+    // confirm the API module configured the proxy as expected first
+    const { target, ca, secure } = createProxyServer.mock.calls[0][0];
+    if (securedConfig) {
+      expect(target.startsWith('https://')).toBe(true);
+      expect(ca).toBe(configuration.proxy.transport.cert);
+      expect(secure).toBe(true);
+    } else {
+      expect(target.startsWith('http://')).toBe(true);
+      expect(ca).toBeUndefined();
+      expect(secure).toBe(false);
+    }
+    // confirm the expected context root is added to the end of the target
+    expect(target.endsWith(expectedContextRoot)).toBe(true);
+
+    expect(placeholderProxyEvent).not.toBeCalled(); // confirm placeholder event handlers are not called (ie ones provided by API module are)
   })
 );
 
