@@ -12,7 +12,10 @@ import {
   ConfigFeatureFlagProvider,
   ConfigFeatureFlagConsumer,
 } from './Context';
-import { defaultClientConfig, defaultConfigFeatureFlagValue } from './ConfigFeatureFlag.assets';
+import {
+  defaultClientConfig,
+  defaultConfigFeatureFlagValue,
+} from './ConfigFeatureFlag.assets';
 
 import { ConfigFeatureFlagType } from './ConfigFeatureFlag.types';
 import { Literal } from 'ui-config/types';
@@ -72,13 +75,15 @@ describe('ConfigFeatureFlag', () => {
     },
   ];
 
-  const addContainerWithBootstrapMeta: (config?: Record<string, Literal>) => {container: HTMLElement} = (config) => {
+  const addContainerWithBootstrapMeta: (
+    config?: Record<string, Literal>
+  ) => { container: HTMLElement } = (config) => {
     const metaElement = document.createElement('meta');
     metaElement.name = 'bootstrapConfigs';
-    if(config) {
+    if (config) {
       metaElement.content = encodeURIComponent(JSON.stringify(config));
     }
-    return ({container: document.body.appendChild(metaElement)});
+    return { container: document.body.appendChild(metaElement) };
   };
 
   describe('`ConfigFeatureFlagProvider` and `ConfigFeatureFlagConsumer` components', () => {
@@ -118,7 +123,8 @@ describe('ConfigFeatureFlag', () => {
       });
 
       it('returns the expected default bootstrap configuration values', () => {
-        const bootstrapConfigValues = defaultConfigFeatureFlagValue.bootstrapConfig;
+        const bootstrapConfigValues =
+          defaultConfigFeatureFlagValue.bootstrapConfig;
         const { getByText } = render(
           withApolloProviderReturning(
             noOpResponse,
@@ -129,9 +135,12 @@ describe('ConfigFeatureFlag', () => {
                 }}
               </ConfigFeatureFlagConsumer>
             </ConfigFeatureFlagProvider>
-          )
-          , addContainerWithBootstrapMeta(bootstrapConfigValues));
-        expect(getByText(JSON.stringify(bootstrapConfigValues))).toBeInTheDocument();
+          ),
+          addContainerWithBootstrapMeta(bootstrapConfigValues)
+        );
+        expect(
+          getByText(JSON.stringify(bootstrapConfigValues))
+        ).toBeInTheDocument();
       });
 
       it('returns the expected state values on mount', () => {
@@ -210,7 +219,9 @@ describe('ConfigFeatureFlag', () => {
         },
       });
 
-      const defaultBootstrapConfig = bootstrapConfigNs(defaultConfigFeatureFlagValue.bootstrapConfig);
+      const defaultBootstrapConfig = bootstrapConfigNs(
+        defaultConfigFeatureFlagValue.bootstrapConfig
+      );
       const bootstrapConfigValue = {};
       const withBootstrapConfig = bootstrapConfigNs(bootstrapConfigValue);
 
@@ -263,7 +274,9 @@ describe('ConfigFeatureFlag', () => {
           expect(
             getByText(JSON.stringify(expectedFeatureFlags))
           ).toBeInTheDocument();
-          expect(getByText(JSON.stringify(expectedBootstrapConfig))).toBeInTheDocument();
+          expect(
+            getByText(JSON.stringify(expectedBootstrapConfig))
+          ).toBeInTheDocument();
           expect(getByText(JSON.stringify(expectedStatus))).toBeInTheDocument();
         });
       });
@@ -281,14 +294,17 @@ describe('ConfigFeatureFlag', () => {
                 {testRenderFunc}
               </ConfigFeatureFlagConsumer>
             </ConfigFeatureFlagProvider>
-          ), addContainerWithBootstrapMeta(expectedBootstrapConfig)
+          ),
+          addContainerWithBootstrapMeta(expectedBootstrapConfig)
         );
         act(() => {
           expect(getByText(JSON.stringify(expectedClient))).toBeInTheDocument();
           expect(
             getByText(JSON.stringify(expectedFeatureFlags))
           ).toBeInTheDocument();
-          expect(getByText(JSON.stringify(withBootstrapConfig))).toBeInTheDocument();
+          expect(
+            getByText(JSON.stringify(withBootstrapConfig))
+          ).toBeInTheDocument();
           expect(getByText(JSON.stringify(expectedStatus))).toBeInTheDocument();
         });
       });
@@ -305,14 +321,17 @@ describe('ConfigFeatureFlag', () => {
                 {testRenderFunc}
               </ConfigFeatureFlagConsumer>
             </ConfigFeatureFlagProvider>
-          ), addContainerWithBootstrapMeta()// no content provided
+          ),
+          addContainerWithBootstrapMeta() // no content provided
         );
         act(() => {
           expect(getByText(JSON.stringify(expectedClient))).toBeInTheDocument();
           expect(
             getByText(JSON.stringify(expectedFeatureFlags))
           ).toBeInTheDocument();
-          expect(getByText(JSON.stringify(defaultBootstrapConfig))).toBeInTheDocument();
+          expect(
+            getByText(JSON.stringify(defaultBootstrapConfig))
+          ).toBeInTheDocument();
           expect(getByText(JSON.stringify(expectedStatus))).toBeInTheDocument();
         });
       });
@@ -344,8 +363,9 @@ describe('ConfigFeatureFlag', () => {
         expect(
           getByText(JSON.stringify(expectedFeatureFlags))
         ).toBeInTheDocument();
-        expect(getByText(JSON.stringify(expectedBootstrapConfig))).toBeInTheDocument();
-
+        expect(
+          getByText(JSON.stringify(expectedBootstrapConfig))
+        ).toBeInTheDocument();
       });
 
       it('returns the expected values when the query errors', async () => {
@@ -375,7 +395,9 @@ describe('ConfigFeatureFlag', () => {
         expect(
           getByText(JSON.stringify(expectedFeatureFlags))
         ).toBeInTheDocument();
-        expect(getByText(JSON.stringify(expectedBootstrapConfig))).toBeInTheDocument();
+        expect(
+          getByText(JSON.stringify(expectedBootstrapConfig))
+        ).toBeInTheDocument();
       });
 
       it('triggers a re query of config data when `triggerRefetch` is invoked', async () => {

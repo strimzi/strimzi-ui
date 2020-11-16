@@ -5,7 +5,7 @@
 import express from 'express';
 import { SecureVersion } from 'tls';
 import { Logger, LoggerOptions } from 'pino';
-import { exposedClientType, exposedFeatureFlagsType } from 'ui-config';
+import { exposedClientType, exposedFeatureFlagsType } from 'ui-config/types';
 
 export type supportedAuthenticationStrategyTypes = 'none' | 'scram' | 'oauth';
 

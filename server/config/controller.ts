@@ -7,7 +7,7 @@ import merge from 'lodash.merge';
 import { jsonToSchema } from '@walmartlabs/json-to-simple-graphql-schema/lib';
 import { IResolvers } from 'apollo-server-express';
 import { serverConfigType } from 'types';
-import { featureFlags, client, server } from 'ui-config';
+import { featureFlags, client, server } from 'ui-config/index';
 
 type configSchemaResolverType = {
   typeDefs: string;

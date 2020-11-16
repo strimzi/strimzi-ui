@@ -12,12 +12,12 @@ import { render } from 'mustache';
 const getFilesInDirectory: (directory: string) => Array<string> = (directory) =>
   existsSync(directory)
     ? readdirSync(directory, { withFileTypes: true }).reduce((acc, fileObj) => {
-      return fileObj.isFile()
-        ? acc.concat([`${directory}${sep}${fileObj.name}`])
-        : acc.concat(
-          getFilesInDirectory(`${directory}${sep}${fileObj.name}`)
-        );
-    }, [] as string[])
+        return fileObj.isFile()
+          ? acc.concat([`${directory}${sep}${fileObj.name}`])
+          : acc.concat(
+              getFilesInDirectory(`${directory}${sep}${fileObj.name}`)
+            );
+      }, [] as string[])
     : [];
 
 // mark a subset of files as public - this means any user can access them. These entries will be used in a regex - if the test passes, it will be considered public
@@ -61,8 +61,8 @@ export const getFiles: (
   const hasIndexFile = allFilesInClientDirectory.includes('/index.html');
   const indexFile = hasIndexFile
     ? readFileSync(resolve(`${builtClientDir}${sep}index.html`), {
-      encoding: 'utf-8',
-    })
+        encoding: 'utf-8',
+      })
     : '';
 
   return {

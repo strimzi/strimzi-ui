@@ -6,7 +6,7 @@
 import { existsSync, watch } from 'fs';
 import { resolve } from 'path';
 import merge from 'lodash.merge';
-import { server } from 'ui-config';
+import { server } from 'ui-config/index';
 
 const { defaultConfig, serverConfigPath, serverName } = server.values;
 
