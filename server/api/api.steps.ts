@@ -90,7 +90,6 @@ Then(
 
     const expectFailure = context.responseWillError ? true : false;
 
-    // check mock call counts
     await request.expect((res) => {
       // confirm the API module handles the response
       if (expectFailure) {
