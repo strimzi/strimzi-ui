@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import * as availableModules from './modules';
 import { serverConfig, UIServerModule } from 'types';
 import { authFunction } from 'placeholderFunctionsToReplace';
+import session from 'express-session';
 import {
   generateLogger,
   generateHttpLogger,
@@ -24,6 +25,16 @@ export const returnExpress: (
 
   // add pino-http middleware
   app.use(generateHttpLogger());
+
+  //Add session middleware
+  const sessionOpts: session.SessionOptions = {
+    secret: 'CHANGEME',
+    name: serverName,
+    cookie: {
+      maxAge: 1000 * 3600 * 24 * 30,
+    },
+  };
+  app.use(session(sessionOpts));
 
   // for each module, call the function to add it to the routing table
   const routingTable = Object.values(availableModules).reduce(
