@@ -3,7 +3,11 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 import { ApolloError, QueryResult } from '@apollo/client';
-import { exposedClientType, exposedFeatureFlagsType } from 'ui-config';
+import {
+  exposedClientType,
+  exposedFeatureFlagsType,
+  Literal,
+} from 'ui-config/types';
 
 /** the response (`data`) value from the graphql config query (client/Queries/Config/index.ts) */
 export type apolloQueryResponseType = {
@@ -18,6 +22,8 @@ export type ConfigFeatureFlagType = {
   client: exposedClientType;
   /** retrieved feature flag values */
   featureFlags: exposedFeatureFlagsType;
+  /** core bootstrap config items - deliberately restricted to an object of `Literal` pairs */
+  bootstrapConfig: Record<string, Literal>;
   /** is the request for config in progress? `true` if so, else `false` */
   loading: boolean;
   /** did the request error? `true` if so, else `false` */

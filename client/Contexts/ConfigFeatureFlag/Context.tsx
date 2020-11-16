@@ -29,11 +29,31 @@ const ConfigFeatureFlagProvider: FunctionComponent = ({
       purpose: 'config',
     },
   });
+
+  // check to see if we have the raw bootstrap config element
+  const rawBootstrapConfigElement = document.querySelector(
+    'meta[name="bootstrapConfigs"]'
+  );
+
+  let bootstrapConfig;
+  if (rawBootstrapConfigElement !== null) {
+    const configElementContent = rawBootstrapConfigElement.getAttribute(
+      'content'
+    );
+    bootstrapConfig =
+      configElementContent !== null
+        ? JSON.parse(decodeURIComponent(configElementContent))
+        : defaultConfigFeatureFlagValue.bootstrapConfig;
+  } else {
+    bootstrapConfig = defaultConfigFeatureFlagValue.bootstrapConfig;
+  }
+
   const { client, featureFlags }: apolloQueryResponseType =
     data || defaultClientConfig;
   const value: ConfigFeatureFlagType = {
     client,
     featureFlags,
+    bootstrapConfig,
     loading,
     error: error ? true : false,
     isComplete: !(loading || error) && !loading && !error,

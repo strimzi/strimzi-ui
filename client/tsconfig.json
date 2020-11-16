@@ -7,7 +7,7 @@
     "baseUrl": ".",
     "paths": {
       "utils/*": ["../utils/*"],
-      "ui-config": ["../config"]
+      "ui-config/*": ["../config/*"]
     }
   }
 }

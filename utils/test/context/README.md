@@ -22,5 +22,5 @@ wrapped in the providers defined in the above function.
 ## Available functions
 
 - `renderWithContextProviders` - described above
-- `withConfigFeatureFlagContext` - uses `renderWithContextProviders` to render given JSX with a default `ConfigFeatureFlag` context provided
-- `withCustomConfigFeatureFlagContext` - same as `withConfigFeatureFlagContext`, but allows a specific value for the `ConfigFeatureFlag` context to be provided
+- `renderWithConfigFeatureFlagContext` - uses `renderWithContextProviders` to render given JSX with a default `ConfigFeatureFlag` context provided
+- `renderWithCustomConfigFeatureFlagContext` - same as `renderWithConfigFeatureFlagContext`, but allows a specific value for the `ConfigFeatureFlag` context to be provided

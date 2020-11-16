@@ -42,8 +42,8 @@ const renderWithContextProviders: <T>(
     ...options,
   });
 
-/** withConfigFeatureFlagContext renders the given `ui` JSX with a ConfigFeatureFlag provider seeded with default values. Use this if your components indirectly use/require a value from the ConfigFeatureFlag context, else use `withCustomConfigFeatureFlagContext` so the value from ConfigFeatureFlag can be controlled  */
-const withConfigFeatureFlagContext: (
+/** renderWithConfigFeatureFlagContext renders the given `ui` JSX with a ConfigFeatureFlag provider seeded with default values. Use this if your components indirectly use/require a value from the ConfigFeatureFlag context, else use `renderWithCustomConfigFeatureFlagContext` so the value from ConfigFeatureFlag can be controlled  */
+const renderWithConfigFeatureFlagContext: (
   ui: ReactElement,
   options?: Record<string, unknown>
 ) => RenderResult = (ui, options = {}) =>
@@ -54,8 +54,8 @@ const withConfigFeatureFlagContext: (
     },
   ]);
 
-/** withCustomConfigFeatureFlagContext renders the given `ui` JSX with a ConfigFeatureFlag provider provided via `configFeatureFlagValue`. */
-const withCustomConfigFeatureFlagContext: (
+/** renderWithCustomConfigFeatureFlagContext renders the given `ui` JSX with a ConfigFeatureFlag provider provided via `configFeatureFlagValue`. */
+const renderWithCustomConfigFeatureFlagContext: (
   configFeatureFlagValue: apolloQueryResponseType,
   ui: ReactElement,
   options?: Record<string, unknown>
@@ -73,6 +73,6 @@ const withCustomConfigFeatureFlagContext: (
 
 export {
   renderWithContextProviders,
-  withConfigFeatureFlagContext,
-  withCustomConfigFeatureFlagContext,
+  renderWithConfigFeatureFlagContext,
+  renderWithCustomConfigFeatureFlagContext,
 };

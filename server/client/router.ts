@@ -4,9 +4,8 @@
  */
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
-import { render } from 'mustache';
-import { getFiles } from './controller';
-import { serverConfigType, UIServerModule } from 'types';
+import { getFiles, renderIndexHtmlWithBootstrapConfig } from './controller';
+import { UIServerModule } from 'types';
 
 const moduleName = 'client';
 
@@ -35,25 +34,10 @@ export const ClientModule: UIServerModule = {
 
     // return index.html, with configuration templated in
     hasIndexFile &&
-      routerForModule.get('/index.html', (req, res) => {
-        const { entry, debug } = res.locals.strimziuicontext.logger;
-        const { exit } = entry('`/index.html handler');
-        const { authentication } = res.locals.strimziuicontext
-          .config as serverConfigType;
-        const bootstrapConfigs = {
-          authType: authentication.strategy,
-        };
-        debug(`Templating bootstrap config containing`, bootstrapConfigs);
-        res.send(
-          exit(
-            render(indexFile, {
-              bootstrapConfigs: encodeURIComponent(
-                JSON.stringify(bootstrapConfigs)
-              ),
-            })
-          )
-        );
-      });
+      routerForModule.get(
+        '/index.html',
+        renderIndexHtmlWithBootstrapConfig(indexFile)
+      );
 
     // host all files from the client dir
     routerForModule.get(

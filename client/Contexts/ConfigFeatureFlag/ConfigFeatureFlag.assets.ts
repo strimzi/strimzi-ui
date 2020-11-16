@@ -15,6 +15,9 @@ export const defaultClientConfig: apolloQueryResponseType = {
 /** default values/schema for this context */
 export const defaultConfigFeatureFlagValue: ConfigFeatureFlagType = {
   ...defaultClientConfig,
+  bootstrapConfig: {
+    auth: 'none',
+  },
   loading: false,
   error: false,
   isComplete: true,

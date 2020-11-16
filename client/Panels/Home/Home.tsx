@@ -17,8 +17,8 @@ const Home: FunctionComponent = ({ children }) => {
   return (
     <div className='home'>
       <img src={image} alt='Strimzi logo' />
-      Welcome to the Strimzi UI
-      {showVersion && isComplete && `Version: ${version}`}
+      <p>Welcome to the Strimzi UI</p>
+      {showVersion && isComplete && <p>{`Version: ${version}`}</p>}
       {children}
     </div>
   );

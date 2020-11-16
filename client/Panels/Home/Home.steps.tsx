@@ -4,7 +4,7 @@
  */
 import { Given, When, Then, Fusion } from 'jest-cucumber-fusion';
 import { RenderResult } from '@testing-library/react';
-import { withConfigFeatureFlagContext } from 'utils/test';
+import { renderWithCustomConfigFeatureFlagContext } from 'utils/test';
 import { Home } from '.';
 import React, { ReactElement } from 'react';
 
@@ -16,12 +16,25 @@ Given('a Home component', () => {
 });
 
 When('it is rendered', () => {
-  renderResult = withConfigFeatureFlagContext(component);
+  renderResult = renderWithCustomConfigFeatureFlagContext(
+    {
+      client: { about: { version: '34.34.34' } },
+      featureFlags: {
+        client: {
+          Home: {
+            showVersion: true,
+          },
+        },
+      },
+    },
+    component
+  );
 });
 
 Then('it should display text', () => {
   const { getByText } = renderResult;
   expect(getByText('Welcome to the Strimzi UI')).toBeInTheDocument();
+  expect(getByText('Version: 34.34.34')).toBeInTheDocument();
 });
 
 Fusion('Home.feature');

@@ -4,7 +4,7 @@
  */
 import { RenderResult } from '@testing-library/react';
 import React from 'react';
-import { withCustomConfigFeatureFlagContext } from 'utils/test';
+import { renderWithCustomConfigFeatureFlagContext } from 'utils/test';
 import { defaultClientConfig } from './ConfigFeatureFlag.assets';
 import { FeatureFlag } from './FeatureFlag.view';
 
@@ -22,7 +22,7 @@ describe('FeatureFlag component', () => {
   const renderForTestFFComponentWithFlag: (flag: string) => RenderResult = (
     flag
   ) =>
-    withCustomConfigFeatureFlagContext(
+    renderWithCustomConfigFeatureFlagContext(
       testConfigFeatureFlagState,
       <FeatureFlag flag={flag}>My Feature</FeatureFlag>
     );

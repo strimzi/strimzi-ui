@@ -4,7 +4,12 @@
  */
 
 import merge from 'lodash.merge';
-import { PublicConfig, ProgrammaticValue, Config, Literal } from './types';
+import {
+  PublicConfig,
+  ProgrammaticValue,
+  Config,
+  Literal,
+} from './config.types';
 
 /** helper function to get the value of an environment variable, or a defined fallback value */
 export const getEnvvarValue: (

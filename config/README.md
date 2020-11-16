@@ -7,7 +7,8 @@ This directory contains all configuration for both the client and server of the 
 - `featureflags.ts` - will contain all feature flags. These could be defined literally, or require a callback to resolve (like `runtime.ts` configuration values)
 - `index.ts` - acts as a barrel file for all types, merging them together
 - `configHelpers.ts` - utility code for reducing the configuration, used in `index.ts`
-- `types.ts` - types for the config module
+- `config.types.ts` - internal types for the config module
+- `types.ts` - all exported types for the config module
 
 ## Configuration sensitivity
 
