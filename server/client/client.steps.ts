@@ -16,9 +16,7 @@ And(
       ...world,
       configuration: merge(world.configuration, {
         client: {
-          configOverrides: {
-            publicDir: '/dir/that/does/not/exist',
-          },
+          publicDir: '/dir/that/does/not/exist',
         },
       }),
     };

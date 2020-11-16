@@ -4,6 +4,9 @@
  */
 import express from 'express';
 import { UIServerModule } from 'types';
+import bodyParser from 'body-parser';
+import { ApolloServer } from 'apollo-server-express';
+import { schema } from './data';
 
 const moduleName = 'mockapi';
 
@@ -22,8 +25,14 @@ export const MockApiModule: UIServerModule = {
       exit(418);
     });
 
-    // other implementation to follow
-    routerForModule.get('/*', (req, res) => res.sendStatus(200));
+    const server = new ApolloServer({
+      typeDefs: schema,
+      resolvers: {},
+      debug: true,
+      mockEntireSchema: true,
+    });
+
+    routerForModule.use(bodyParser.json(), server.getMiddleware({ path: '/' }));
 
     return exit({ mountPoint: '/api', routerForModule });
   },

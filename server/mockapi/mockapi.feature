@@ -7,7 +7,7 @@ Feature: mockapi module
     Scenario: Returns with the expected response for a mocked api call
     Given a 'mockapi_only' server configuration
     And I run an instance of the Strimzi-UI server
-    When I make a 'get' request to '/api/foo'
+    When I make a 'mockTopicsQuery' gql request to '/api'
     Then I get the expected mockapi response
 
     Scenario: Returns with the expected response for a call to the test endpoint

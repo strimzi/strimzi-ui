@@ -35,9 +35,7 @@ const configModuleConfig: () => serverConfig = () =>
 const clientModuleConfig: () => serverConfig = () =>
   merge(merge({}, defaultTestConfig()), {
     client: {
-      configOverrides: {
-        publicDir: resolve(__dirname, './__test_fixtures__/client'),
-      },
+      publicDir: resolve(__dirname, './__test_fixtures__/client'),
     },
     modules: { ...modules, client: true },
   });

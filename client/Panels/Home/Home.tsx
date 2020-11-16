@@ -4,10 +4,11 @@
  */
 import React, { FunctionComponent } from 'react';
 import image from 'Images/logo.png';
+import './style.scss';
 
 const Home: FunctionComponent = ({ children }) => {
   return (
-    <div>
+    <div className='home'>
       <img src={image} alt='Strimzi logo' />
       Welcome to the Strimzi UI
       {children}

@@ -11,3 +11,14 @@ This directory contains all client code for the Strimzi UI - ie code which is se
 - [Pages](./Pages/README.md) - metadata used to describe the pages shown in the UI
 - [Panels](./Panels/README.md) - section/page level components
 - `tsconfig.json` - Typescript config for this codebase
+- `jest.config.js` - Jest config for this codebase.
+
+## Configuration options
+
+The client codebase will include a significant number of configuration options, all of which [can be found here](../config/README.md). These values will be retrieved and made available via the [`ConfigFeatureFlag`](./Contexts/ConfigFeatureFlag/README.md) context at runtime, along with feature flag state.
+
+The below table details the top level items, and what they contain:
+
+| Configuration | Content                                                                     |
+| ------------- | --------------------------------------------------------------------------- |
+| about         | Key value pairs containing metadata about the UI - eg the version of the UI |

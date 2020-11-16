@@ -13,6 +13,7 @@ import {
   genericWorldType,
   worldGenerator,
 } from '../../test_common/jest_cucumber_support/commonTestTypes';
+import { requests } from './testGQLRequests';
 
 type supertestRequestType = request.SuperTest<request.Test>;
 
@@ -67,7 +68,7 @@ And(
   stepWhichUpdatesWorld((world) => {
     return {
       ...world,
-      server: request(returnExpress('test-server', () => world.configuration)),
+      server: request(returnExpress(() => world.configuration)),
     };
   })
 );
@@ -79,6 +80,20 @@ When(
     return {
       ...world,
       request: server[method as string](endpoint),
+    };
+  })
+);
+
+When(
+  /^I make a '(.+)' gql request to '(.+)'$/,
+  stepWhichUpdatesWorld((world, requestName, endpoint) => {
+    const { server } = world;
+
+    const query = requests[requestName as string] || {};
+
+    return {
+      ...world,
+      request: server.post(endpoint as string).send(query),
     };
   })
 );

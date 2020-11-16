@@ -12,6 +12,22 @@ Then(
     await request.then(
       (res) => {
         expect(res.status).toBe(200);
+
+        const { data } = res.body;
+
+        expect(data).not.toBeUndefined();
+
+        const { client, server, featureFlags } = data;
+
+        // confirm for all three config types the generated type names are present - shows the schema generation and resolvers are working
+        expect(client).not.toBeUndefined();
+        expect(client._generatedTypeName).toBe('client');
+
+        expect(server).not.toBeUndefined();
+        expect(server._generatedTypeName).toBe('server');
+
+        expect(featureFlags).not.toBeUndefined();
+        expect(featureFlags._generatedTypeName).toBe('featureFlags');
       },
       (err) => {
         throw err;

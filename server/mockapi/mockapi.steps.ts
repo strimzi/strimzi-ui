@@ -12,6 +12,23 @@ Then(
     await request.then(
       (res) => {
         expect(res.status).toBe(200);
+
+        const { data } = res.body;
+
+        expect(data).not.toBeUndefined();
+
+        const { topics } = data;
+
+        expect(topics).not.toBeUndefined();
+
+        expect(Array.isArray(topics)).toBe(true);
+        expect(topics.length).not.toBeLessThan(1);
+
+        const { name, partitions, replicas } = topics[0];
+
+        expect(name).not.toBeUndefined();
+        expect(partitions).not.toBeUndefined();
+        expect(replicas).not.toBeUndefined();
       },
       (err) => {
         throw err;

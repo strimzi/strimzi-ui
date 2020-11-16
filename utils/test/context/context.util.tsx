@@ -5,40 +5,30 @@
 import React, { Provider, ReactElement, ReactNode } from 'react';
 import { render, RenderResult } from '@testing-library/react';
 
-type ProviderEntry = {
-  value: unknown;
-  provider: Provider<unknown>;
+type TestProviderWithValue<T> = {
+  value: T;
+  provider: Provider<T>;
 };
 
-const contextWrapper = (
-  providers: Array<ProviderEntry>,
+const contextWrapper: <T>(
+  providers: Array<TestProviderWithValue<T>>,
   children: ReactNode
-) => {
-  const provider = providers.shift();
-  if (provider) {
-    if (providers.length == 0) {
-      return (
-        <provider.provider value={provider.value}>{children}</provider.provider>
-      );
-    } else {
-      return (
-        <provider.provider value={provider.value}>
-          {contextWrapper(providers, children)}
-        </provider.provider>
-      );
-    }
-  } else {
-    throw new Error(
-      'Provider array is empty. Please provide at least one provider'
-    );
-  }
-};
+) => JSX.Element = (providers = [], children = null) => (
+  <React.Fragment>
+    {providers.reduceRight(
+      (accJsx, { provider: ProviderToMount, value }) => (
+        <ProviderToMount value={value}>{accJsx}</ProviderToMount>
+      ),
+      children
+    )}
+  </React.Fragment>
+);
 
-const renderWithContextProviders = (
+const renderWithContextProviders: <T>(
   ui: ReactElement,
   options: Record<string, unknown>,
-  providers: Array<ProviderEntry>
-): RenderResult =>
+  providers: Array<TestProviderWithValue<T>>
+) => RenderResult = (ui, options, providers) =>
   render(ui, {
     wrapper: ({ children }) => {
       return contextWrapper(providers, children);

@@ -29,3 +29,4 @@ Where:
 ## Available contexts
 
 - [`Introspect`](./Introspect/README.md) - responsible for fetching, parsing and providing the UI with the supported capabilities of the backend GraphQL server
+- [`ConfigFeatureFlag`](./ConfigFeatureFlag/README.md) - responsible for fetching and providing the current configuration and feature flag state, retrieved from the UI Server [config module](../../server/config/README.md)

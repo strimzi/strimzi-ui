@@ -14,9 +14,8 @@ import {
 } from 'logging';
 
 export const returnExpress: (
-  serverName: string,
   getConfig: () => serverConfig
-) => express.Application = (serverName, getConfig) => {
+) => express.Application = (getConfig) => {
   const logger = generateLogger('core');
   const app = express();
 

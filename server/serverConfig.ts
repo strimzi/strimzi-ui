@@ -6,12 +6,11 @@
 import { existsSync, watch } from 'fs';
 import { resolve } from 'path';
 import merge from 'lodash.merge';
+import { server } from 'ui-config';
 
-import {
-  serverConfig,
-  supportedAuthenticationStrategyTypes,
-  loggerType,
-} from 'types';
+const { defaultServerConfig } = server.values;
+
+import { serverConfig, loggerType } from 'types';
 
 /** Out of the box when built by webpack, it replaces `require` with it's own version (`__webpack_require__`), which requires static paths. As we use require to load a config from an envvar, we need the node require function (`__non_webpack_require__`, as called by webpack). Thus, check if we are in a webpack built environment (I.e `__non_webpack_require__` is defined), and if so, use it, else use `require` (which will be the normal node require, used via ts-node etc) */
 /* eslint-disable no-undef */
@@ -21,34 +20,7 @@ const requireForConfigLoad =
     : require;
 /* eslint-enable no-undef */
 
-const defaultConfig: serverConfig = {
-  authentication: {
-    strategy: 'none' as supportedAuthenticationStrategyTypes,
-  },
-  client: {
-    configOverrides: {
-      publicDir: './dist/client',
-    },
-    transport: {},
-  },
-  featureFlags: {},
-  modules: {
-    api: true,
-    client: true,
-    config: true,
-    log: true,
-    mockapi: false,
-  },
-  proxy: {
-    hostname: 'strimzi.admin.hostname.com',
-    contextRoot: '/',
-    port: 9080,
-    transport: {},
-  },
-  logging: {},
-  hostname: '0.0.0.0',
-  port: 3000,
-};
+const defaultConfig = (defaultServerConfig as unknown) as serverConfig;
 
 export const getDefaultConfig: () => serverConfig = () =>
   merge({}, defaultConfig);
@@ -74,7 +46,6 @@ export const loadConfig: (
       requireForConfigLoad.resolve(pathToConfigFile)
     ];
     // this is a deliberate require so we can load json/js, and have it parsed/modules evaluated
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const loadedConfig = requireForConfigLoad(pathToConfigFile);
     // merge parsed with core/std config
     config = merge(config, loadedConfig);

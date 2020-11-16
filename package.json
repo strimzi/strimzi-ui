@@ -45,7 +45,9 @@
   "dependencies": {
     "@apollo/client": "^3.2.5",
     "@apollo/react-hooks": "^4.0.0",
+    "@walmartlabs/json-to-simple-graphql-schema": "^2.0.3",
     "apollo-link-http": "^1.5.17",
+    "apollo-server-express": "^2.18.2",
     "compression-webpack-plugin": "^4.0.0",
     "express": "^4.17.1",
     "express-static-gzip": "^2.1.0",
@@ -65,7 +67,6 @@
     "pino-pretty": "^4.3.0",
     "sass": "^1.29.0",
     "react-i18next": "^11.7.3",
-    "sass": "^1.26.10",
     "subscriptions-transport-ws": "^0.9.18",
     "terser-webpack-plugin": "^3.0.7",
     "typescript": "^4.0.3",

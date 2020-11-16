@@ -226,7 +226,7 @@ The above UI build is implemented in the [`build directory`](../utils/build). It
 
 ## UI build into Strimzi
 
-The UI build is used in a `dockerfile` to produce an image that can then be deployed as a part of Strimzi. This `dockerfile` performs the following steps:
+The UI build is used in a [`dockerfile`](../build/dockerfile) to produce an image that can then be deployed as a part of Strimzi. This `dockerfile` performs the following steps:
 
 - Install all dependencies
 - Run `npm run build`, which in turn runs a production build of the client and server
@@ -234,4 +234,4 @@ The UI build is used in a `dockerfile` to produce an image that can then be depl
 - Move the built UI directory `dist` and `node_modules` to the required location
 - Sets the entrypoint to a script/command which runs the UI Server: `node dist/server/main.js`
 
-Further details to be added once https://github.com/strimzi/proposals/pull/6 has been finalized.
+Further details/refinement to be added once https://github.com/strimzi/strimzi-ui/issues/62 has been finalized.

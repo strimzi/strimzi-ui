@@ -13,7 +13,7 @@ const config = {
   testMatch: ['**/*.(spec|steps).[jt]s?(x)'],
   coverageDirectory: '<rootDir>/../coverage/client',
   moduleNameMapper: {
-    ...pathsToModuleNameMapper(compilerOptions.paths),
+    ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
     ...jestModuleMapper,
   },
   testEnvironment: 'jsdom',
