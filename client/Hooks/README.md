@@ -34,4 +34,4 @@ Where:
 
 ## Implemented hooks
 
-Hooks to be added here on implementation, with summary of purpose/usage and a link to it's README.
+- [`useConfigFeatureFlag`](./useConfigFeatureFlag/README.md) - a hook providing consumer access to the `ConfigFeatureFlag` context, containing configuration and feature flag state

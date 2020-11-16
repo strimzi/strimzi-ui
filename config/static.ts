@@ -11,7 +11,9 @@ import { version as strimziUiVersion } from '../package.json';
  */
 
 const client: Config<Literal> = {
-  version: strimziUiVersion,
+  about: {
+    version: strimziUiVersion,
+  },
 };
 
 const server: Config<Literal> = {

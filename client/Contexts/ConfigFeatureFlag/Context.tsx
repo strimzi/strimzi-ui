@@ -2,24 +2,22 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-import React, { createContext, FunctionComponent, useContext } from 'react';
+import React, { createContext, FunctionComponent } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_CONFIG } from 'Queries/Config';
 import {
-  apolloQueryResponseType,
-  ConfigFeatureFlagType,
   defaultClientConfig,
   defaultConfigFeatureFlagValue,
 } from './ConfigFeatureFlag.assets';
 
+import {
+  apolloQueryResponseType,
+  ConfigFeatureFlagType,
+} from './ConfigFeatureFlag.types';
+/** ConfigFeatureFlag context - exported solely for use in test and the `useConfigFeatureFlag` hook. Please use the hook or the exported provider/consumer components to access values at runtime */
 const ConfigFeatureFlag = createContext(defaultConfigFeatureFlagValue);
-/** useConfigFeatureFlag - hook which returns the current value of the ConfigFeatureFlag context */
-const useConfigFeatureFlag: () => ConfigFeatureFlagType = () =>
-  useContext(ConfigFeatureFlag);
 /** ConfigFeatureFlagConsumer - consumer component of the ConfigFeatureFlag context */
 const ConfigFeatureFlagConsumer = ConfigFeatureFlag.Consumer;
-/** Test provider. Only to be used in tests */
-const _ConfigFeatureFlag_TestProvider = ConfigFeatureFlag.Provider;
 /** ConfigFeatureFlagProvider - component which sets up and provides a value to the ConfigFeatureFlag context. Should only be used in the Bootstrap `index.ts` entry point file */
 const ConfigFeatureFlagProvider: FunctionComponent = ({
   children,
@@ -55,6 +53,5 @@ const ConfigFeatureFlagProvider: FunctionComponent = ({
 export {
   ConfigFeatureFlagProvider,
   ConfigFeatureFlagConsumer,
-  useConfigFeatureFlag,
-  _ConfigFeatureFlag_TestProvider,
+  ConfigFeatureFlag,
 };

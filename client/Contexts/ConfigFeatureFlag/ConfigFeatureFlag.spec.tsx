@@ -3,7 +3,7 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 import { render, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { GET_CONFIG } from 'Queries/Config';
@@ -11,21 +11,24 @@ import { withApolloProviderReturning, apolloMockResponse } from 'utils/test';
 import {
   ConfigFeatureFlagProvider,
   ConfigFeatureFlagConsumer,
-  useConfigFeatureFlag,
 } from './Context';
-import {
-  ConfigFeatureFlagType,
-  defaultClientConfig,
-} from './ConfigFeatureFlag.assets';
+import { defaultClientConfig } from './ConfigFeatureFlag.assets';
+
+import { ConfigFeatureFlagType } from './ConfigFeatureFlag.types';
 
 describe('ConfigFeatureFlag', () => {
   const mockClientResponse = {
-    version: '1.2.3',
+    about: {
+      version: '1.2.3',
+    },
   };
   const mockFeatureFlagResponse = {
     client: {
       Home: {
         showVersion: true,
+      },
+      Pages: {
+        PlaceholderHome: true,
       },
     },
   };
@@ -339,44 +342,6 @@ describe('ConfigFeatureFlag', () => {
           getByText(JSON.stringify(expectedFeatureFlagsComplete))
         ).toBeInTheDocument();
       });
-    });
-  });
-
-  describe('`useConfigFeatureFlag` hook', () => {
-    const HookWrapper: FunctionComponent = () => {
-      const { triggerRefetch, ...others } = useConfigFeatureFlag();
-      return (
-        <p>
-          {JSON.stringify({
-            ...others,
-            triggerRefetch: typeof triggerRefetch === 'function',
-          })}
-        </p>
-      );
-    };
-
-    // functions are not stringified, so expect the HookWrapper to return true if it is present
-    const expectedHookValue = {
-      client: {},
-      featureFlags: {},
-      loading: true,
-      error: false,
-      isComplete: false,
-      rawResponse: {},
-      triggerRefetch: true,
-    };
-
-    // The functions/responses/behaviours of the hook are the same as the components, tested above. This test verifies the hook returns the expected state
-    it('returns the expected context state', () => {
-      const { getByText } = render(
-        withApolloProviderReturning(
-          noOpResponse,
-          <ConfigFeatureFlagProvider>
-            <HookWrapper />
-          </ConfigFeatureFlagProvider>
-        )
-      );
-      expect(getByText(JSON.stringify(expectedHookValue))).toBeInTheDocument();
     });
   });
 });

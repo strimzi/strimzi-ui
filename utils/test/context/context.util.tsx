@@ -5,11 +5,11 @@
 import React, { Provider, ReactElement, ReactNode } from 'react';
 import { render, RenderResult } from '@testing-library/react';
 import {
-  _ConfigFeatureFlag_TestProvider,
+  ConfigFeatureFlag,
   defaultClientConfig,
-  apolloQueryResponseType,
   defaultConfigFeatureFlagValue,
 } from 'Contexts';
+import { apolloQueryResponseType } from 'Contexts/types';
 
 type TestProviderWithValue<T> = {
   value: T;
@@ -49,7 +49,7 @@ const withConfigFeatureFlagContext: (
 ) => RenderResult = (ui, options = {}) =>
   renderWithContextProviders(ui, options, [
     {
-      provider: _ConfigFeatureFlag_TestProvider,
+      provider: ConfigFeatureFlag.Provider,
       value: defaultConfigFeatureFlagValue,
     },
   ]);
@@ -66,7 +66,7 @@ const withCustomConfigFeatureFlagContext: (
 ) =>
   renderWithContextProviders(ui, options, [
     {
-      provider: _ConfigFeatureFlag_TestProvider,
+      provider: ConfigFeatureFlag.Provider,
       value: { ...defaultConfigFeatureFlagValue, ...configFeatureFlagValue },
     },
   ]);

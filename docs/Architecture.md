@@ -370,9 +370,7 @@ Once all callbacks have been executed, the _server_ will reduce and own the curr
 
 ##### Client configuration
 
-As mentioned
-
-[Configuration options for the client can be found here.](../client/README.md#configuration-options)
+As mentioned above, the UI server will reduce the defined configuration and serve that configuration via the `/config` endpoint, as well as including a critical subset in the returned `index.html`. The exposure of all of these values for use in the client will be managed via the [`ConfigFeatureFlag` context](../client/Contexts/ConfigFeatureFlag/README.md). All full run down of [all configuration options for the client can be found here.](../client/README.md#configuration-options)
 
 ##### Server configuration
 
@@ -384,7 +382,24 @@ The UI server will primarily be configured at runtime via a provided JSON file. 
 
 ##### Feature flags
 
-Additional content to follow in a future PR/as a part of https://github.com/strimzi/strimzi-ui/issues/13 .
+Feature flags are used across the UI to enabled and disable capabilities as required. Features may be enabled or disabled based for a range of reasons. For example, a feature may be enabled or disabled base on if they are in still development, if a user has the rights to access them (or not), or if the backend can support the capability in question. All feature flag values resolve to a `true`/`false` value.
+
+For use in the client, the [`ConfigFeatureFlag` context](../client/Contexts/ConfigFeatureFlag/README.md) handles the retrieval of feature flag state from the server, which can then be accessed via either the context value provided, or via the `FeatureFlag` component. The server can access Feature flag state from the configuration directly.
+
+The convention for defining feature flags should be kept contextual. For example, all flags for a given area should be 'namespaced' as such. For example:
+
+```
+  client: {
+    Pages: {
+      Home: true
+    },
+    Home: {
+      showVersion: false
+    }
+  }
+```
+
+Here, given the structure, it is easy to see the differentiation between flags/capabilities for a page (`Home`), and flags for the showing of pages (`Pages`), and that these are only required on the `client` codebase. The current feature flag configuration is [defined here.](../config/featureflags.ts)
 
 ### Code Structure
 

@@ -13,5 +13,8 @@ export const featureFlags: Config<boolean> = {
     Home: {
       showVersion: true,
     },
+    Pages: {
+      PlaceholderHome: true,
+    },
   },
 };

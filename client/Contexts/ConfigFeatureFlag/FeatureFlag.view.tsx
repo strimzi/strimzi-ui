@@ -4,7 +4,7 @@
  */
 import React, { FunctionComponent } from 'react';
 import get from 'lodash.get';
-import { useConfigFeatureFlag } from './Context';
+import { useConfigFeatureFlag } from 'Hooks';
 
 type featureFlagPropsType = {
   /** the json path of the flag - eg `client.Home.showVersion` */

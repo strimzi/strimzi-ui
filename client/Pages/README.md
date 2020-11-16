@@ -57,7 +57,7 @@ Where:
 - `contentComponent` - binds a panel to each page `context` in the contexts array. This can ether be a module (meaning the panel will be included in the main bundle) or a function, which will then be integrated with React Suspense/Lazy to asynchronously load the panel when required
 - `contexts[X].path` - path/location of this page. Used as a unique identifier, two `contexts` should have the same path.
 - `contexts[X].name` - translation key which maps to the name for this page, which will be shown (as required) by the navigation
-- `contexts[X].feature_flag` - the feature flag to check for to enable or disable this page - more details to follow in/as a part of https://github.com/strimzi/strimzi-ui/issues/13
+- `contexts[X].feature_flag` - the feature flag to check for to enable or disable this page. Retrieved via the [`ConfigFeatureFlag` context](../Contexts/ConfigFeatureFlag/README.md)
 - `contexts[X].order` - numeric value to enable sorting if when processed there are peers to this page, and a specific ordering is desired
 - `contexts[X].Icon` - a page may wish to have an icon to identify it in top level navigation, or at sub levels when there are many peers. If required this should be a React component representing the Icon, else `undefined`
 - `contexts[X].pageType` - a description of the type ([as defined here](../Bootstrap/Navigation/README.md#page-types)) of page this is. The Navigation will then render (or not) supporting visual elements, such as the first or second level navigation, depending on this type
