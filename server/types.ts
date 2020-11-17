@@ -62,6 +62,10 @@ type proxyConfigType = {
   transport: sslCertificateType;
 };
 
+type sessionConfigType = {
+  name: string;
+};
+
 export type serverConfig = {
   /** authentication configuration */
   authentication: authenticationConfigType;
@@ -79,6 +83,7 @@ export type serverConfig = {
   hostname: string;
   /** The port number to use/accept traffic on */
   port: number;
+  session: sessionConfigType;
 };
 
 /** Re-export the pino Logger type */

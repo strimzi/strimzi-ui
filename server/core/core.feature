@@ -30,7 +30,7 @@ Feature: core module
 
     Scenario: When making a call to the strimzi-ui server, the expected session cookie is present
         Given a 'mockapi_only' server configuration
-        And a server name of 'server-name'
+        And a session identifier of 'server-name'
         And I run an instance of the Strimzi-UI server
         When I make a 'get' request to '/'
         Then the response sets a cookie named 'server-name'

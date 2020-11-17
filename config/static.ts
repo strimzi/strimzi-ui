@@ -36,6 +36,9 @@ const server: Config<Literal> = {
         port: 9080,
         transport: {},
       },
+      session: {
+        name: 'strimzi-ui',
+      },
       logging: {},
       hostname: '0.0.0.0',
       port: 3000,
