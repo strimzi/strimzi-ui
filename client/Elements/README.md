@@ -35,7 +35,7 @@ Where:
 - Heading.types.ts are all the types for this component
 - heading.feature is the feature definition to test this component
 - Heading.steps.ts are the steps for the feature file
-- HEading.assets.ts are the test assets for this component
+- Heading.assets.ts are the test assets for this component
 
 ## Components
 
