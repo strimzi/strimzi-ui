@@ -7,16 +7,9 @@ import { stepWithWorld } from 'test_common/commonServerSteps';
 
 Then(
   'I get the expected log response',
-  stepWithWorld(async (world) => {
+  stepWithWorld((world) => {
     const { request } = world;
-    await request.then(
-      (res) => {
-        expect(res.status).toBe(200);
-      },
-      (err) => {
-        throw err;
-      }
-    );
+    return request.expect(200);
   })
 );
 
