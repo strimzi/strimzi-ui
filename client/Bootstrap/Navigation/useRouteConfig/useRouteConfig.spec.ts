@@ -3,17 +3,14 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 import { useRouteConfig } from 'Bootstrap/Navigation';
-import {
-  PageConfig,
-  RouterConfig,
-} from 'Bootstrap/Navigation/useRouteConfig/useRouteConfig.types';
+import { PageConfig, RouterConfig, PageType } from 'Bootstrap/Navigation/types';
 import { generateSimplePage } from './useRouteConfig.assets';
 
 const READ = '';
 
-const HOME = 'home';
-const NORMAL = 'normal';
-const FULLSCREEN = 'fullscreen';
+const HOME = PageType.HOME;
+const NORMAL = PageType.NORMAL;
+const FULLSCREEN = PageType.FULLSCREEN;
 
 describe('useRouteConfig tests', () => {
   it('Given a single page config, transform into correct router data', () => {
