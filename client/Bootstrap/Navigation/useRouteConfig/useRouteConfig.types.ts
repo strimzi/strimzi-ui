@@ -97,6 +97,7 @@ export type RouterConfig = {
   links: Array<Link>;
   routes: Array<Route>;
   meta: Map<string, Meta> | Record<string, unknown>;
+  isComplete: boolean;
 };
 
 /** Type describing a relationship between a child nav and it's parent nav */
