@@ -15,16 +15,24 @@ For a given new Context `FeatureFlagContext`, the expected files are as follows:
 ```
 Contexts/
   index.ts
+  types.ts
   FeatureFlagContext/
     README.md
-    Context.ts
+    FeatureFlagContext.ts
+    FeatureFlagContext.assets.ts
+    FeatureFlagContext.spec.ts
+    FeatureFlagContext.types.ts
 ```
 
 Where:
 
 - index.ts acts as a barrel file, exporting all public elements of this context/the contexts contained in the Context directory
+- types.ts acts as a barrel file, exporting all the public types of each context
 - README.md is the readme for this Context, detailing design choices and usage
-- Context.ts is the implementation of this context
+- FeatureFlagContext.ts is the implementation of this context
+- FeatureFlagContext.spec.ts are the tests for this context
+- FeatureFlagContext.assets.ts are the test assets for this context
+- FeatureFlagContext.types.ts are the types for this context
 
 ## Available contexts
 

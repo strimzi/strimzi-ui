@@ -13,21 +13,31 @@ For a given Panel component `Topics`, the expected files are as follows:
 ```
 Panels/
   index.ts
+  types.ts
   Topics/
     index.ts
     README.md
     View.ts
     Model.ts
     Styling.scss
+    Topics.feature
+    Topics.steps.ts
+    Topics.assets.ts
+    Topics.types.ts
 ```
 
 Where:
 
 - index.ts acts as a barrel file, exporting the public API of this component/component bundle.
+- types.ts acts as a barrel file, exporting all the public types of each context
 - README.md is the readme for this component, detailing design choices and usage
 - View.ts is the view logic for this component
 - Model.ts (_optional_) is the model (business) logic for this component
 - Styling.scss (_optional_) is the styling for this component
+- Topics.feature is the test definition file for this page
+- Topics.steps.ts are the steps for the feature definition
+- Topics.assets.ts are the test assets for this page
+- Topics.types.ts are the types for this page
 
 ## Components
 

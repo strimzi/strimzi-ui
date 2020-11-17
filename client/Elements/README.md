@@ -13,19 +13,29 @@ For a given Element component `Heading`, the expected files are as follows:
 ```
 Elements/
   index.ts
+  types.ts
   Heading/
     index.ts
     README.md
     View.ts
     Styling.scss
+    Heading.types.ts
+    Heading.feature
+    Heading.steps.ts
+    Heading.assets.ts
 ```
 
 Where:
 
 - index.ts acts as a barrel file, exporting all public elements of this component/the components in the Elements directory
+- types.ts acts as a barrel file, exporting all the public types of each element
 - README.md is the readme for this component, detailing design choices and usage
 - View.ts is the view logic for this component
 - Styling.scss (_optional_) is the styling for this component
+- Heading.types.ts are all the types for this component
+- heading.feature is the feature definition to test this component
+- Heading.steps.ts are the steps for the feature file
+- Heading.assets.ts are the test assets for this component
 
 ## Components
 

@@ -19,6 +19,7 @@ For a given Bootstrap component `Navigation`, the expected files are as follows:
 ```
 Bootstrap/
   index.ts (*)
+  types.ts
   index.html
   Navigation/
     index.ts (**)
@@ -26,17 +27,20 @@ Bootstrap/
     View.ts
     Model.ts
     Styling.scss
+    Navigation.types.ts
 ```
 
 Where:
 
 - index.ts (\*) acts as the build (and thus client) entry point
+- types.ts acts as barrel file for types, exporting all public types for each bootstrap component
 - index.html is the HTML template file which is used to
 - index.ts (\*\*) acts as a barrel file, exporting all public elements of this component
 - README.md is the readme for this component, detailing design choices and usage
 - View.ts is the view logic for this component
 - Model.ts (_optional_) is the model (business) logic for this component
 - Styling.scss (_optional_) is the styling for this component
+- Navigation.types.ts contains all types for this component that can be used externally
 
 ## Components
 
