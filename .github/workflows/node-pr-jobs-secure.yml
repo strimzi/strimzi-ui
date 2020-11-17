@@ -47,13 +47,14 @@ jobs:
       - name: Test client code
         run: npm run test:jest:client -- --forceExit # force exit in case a test does not clean up after failure
       - name: Test server code
+        if: ${{ success() || failure() }}
         run: npm run test:jest:server -- --forceExit # force exit in case a test does not clean up after failure
       - name: Coverage report
         id: coverage
-        if: ${{ always() }}
+        if: ${{ success() || failure() }}
         uses: ./.github/actions/coverage-report
       - name: Comment on PR
-        if: ${{ always() }}
+        if: ${{ success() || failure() }}
         uses: ./.github/actions/commenter
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

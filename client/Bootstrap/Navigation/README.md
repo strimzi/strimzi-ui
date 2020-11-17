@@ -22,7 +22,7 @@ Additional properties to follow in a later PR.
 
 When a route is accessed, a component (as per the configuration provided via [props](#Properties)) will be rendered by the Navigation component. As a part of this rendering, a number of helper functions, as well as navigation state, will be passed to that rendered component via a `navigationState` property (as well as any other defined properties to pass as [as per that page's configuration](../../Pages/README.md#page-metadata-schema)). This allows the Navigation to own/manage navigation state and functionality, but still allow any rendered components the ability to access or make changes to the navigation they need. The snippet below details the content of the `navigationState` property:
 
-```
+```ts
 {
     state: {
         path: {
@@ -60,13 +60,13 @@ To follow in a later PR.
 
 As mentioned, this component takes in [configuration](../../Pages/README.md) which maps [`Panels`](../../Panels/README.md) to routes, along with other supporting metadata, such as a translatable page names, what backend services are required to show the page, and what authorization(s) a user may need to see it. This configuration is processed via the Navigation's model, and will result in an object which is then iterated on in the Navigation's view layers to generate the UI's routing/navigation. For example, given the following configuration:
 
-```
+```ts
 {
     Homepage: {
         contentComponent: HomePageComponent, // synchronous import - meaning it will be included in the core bundle returned to the user
         contexts: [
             {
-                path: '/homepage'
+                path: '/homepage',
                 name: 'HOME_TRANSLATION_KEY', // when translated will map to the string 'Home'
                 feature_flag: 'PAGE.HOME',
                 order: 0,
@@ -84,7 +84,7 @@ As mentioned, this component takes in [configuration](../../Pages/README.md) whi
         contentComponent: () => import('Panels/ConsumerGroups'), // async import - returned when accessed/needed for the first time
         contexts: [
             {
-                path: '/consumergroups'
+                path: '/consumergroups',
                 name: 'CONSUMER_GROUPS_TRANSLATION_KEY', // when translated will map to the string 'Consumer Groups'
                 feature_flag: 'PAGE.CONSUMER_GROUPS',
                 order: 2,
@@ -103,7 +103,7 @@ As mentioned, this component takes in [configuration](../../Pages/README.md) whi
                 }
             },
             {
-                path: '/topic/:name/consumergroups'
+                path: '/topics/:name/consumergroups',
                 name: 'CONSUMER_GROUPS_TRANSLATION_KEY', // when translated will map to the string 'Consumer Groups'
                 feature_flag: 'PAGE.TOPIC.CONSUMER_GROUPS',
                 order: 0,
@@ -128,7 +128,7 @@ As mentioned, this component takes in [configuration](../../Pages/README.md) whi
         contentComponent: () => import('Panels/Topics'), // async import
         contexts: [
             {
-                path: '/topics'
+                path: '/topics',
                 name: 'TOPICS_TRANSLATION_KEY', // when translated will map to the string 'Topic'
                 feature_flag: 'PAGE.TOPICS',
                 order: 1,
@@ -150,12 +150,12 @@ As mentioned, this component takes in [configuration](../../Pages/README.md) whi
         contentComponent: () => import('Panels/TopicsEdit'), // async import
         contexts: [
             {
-                path: '/topics/:name/edit'
+                path: '/topics/:name/edit',
                 name: 'TOPICS_EDIT_TRANSLATION_KEY', // when translated will map to the string 'Edit topic ${name}' - where name is the value from the path parameter :name
                 feature_flag: 'PAGE.TOPICS.EDIT',
                 order: 5,
                 icon: undefined,
-                pageType: NORMAL,
+                pageType: FULLSCREEN,
                 properties: {},
                 requiresMinimum: {
                     backendSupportFor: {
@@ -173,68 +173,68 @@ As mentioned, this component takes in [configuration](../../Pages/README.md) whi
 
 This configuration is iterated on in the model hook. This hook makes use of three other hooks to get the current state of backend capability ([defined by the result of GraphQL Schema introspection](../../../docs/Architecture.md#introspection)), a user's [authorization](../../../docs/Architecture.md#security) on backend resources, and [feature flag state/entablement](../../../docs/Architecture.md#configuration-and-feature-flagging). Based on these values, as well as knowledge of special use case pages for error cases etc, the configuration is reduced into a form for the view layer to render. This looks as follows, for the above configuration (assuming all flags are enabled, the user has all required authorization, but the backend cannot support Topic editing).
 
-```
+```ts
 {
     Links: [
         {
-            to: '/homepage'
+            to: '/homepage',
             key: 'link-Home',
             children: 'Home'
         },
         {
-            to: '/topics'
+            to: '/topics',
             key: 'link-Topics',
             children: 'Topics'
         },
         {
-            to: '/consumergroups'
+            to: '/consumergroups',
             key: 'link-ConsumerGroups.Cluster',
             children: 'Consumer Groups'
         }
     ],
     Routes: [{
-        path: '/homepage'
+        path: '/homepage',
         key: 'route-Home',
         componentForRoute: HomePageComponent
     },
     {
-        path: '/topics'
+        path: '/topics',
         key: 'route-Topics',
         componentForRoute: () => import('Panels/Topics')
     },
     {
-        path: '/consumergroups'
+        path: '/consumergroups',
         key: 'route-ConsumerGroups.Cluster',
         componentForRoute: () => import('Panels/ConsumerGroups')
     },
     {
-        path: '/topics/:name/consumergroups'
+        path: '/topics/:name/consumergroups',
         key: 'route-ConsumerGroups.Topic',
         componentForRoute: () => import('Panels/ConsumerGroups')
     },
     {
-        path: '/topics/:name/edit'
+        path: '/topics/:name/edit',
         key: 'route-Topics.Edit',
         componentForRoute: 404PageComponent
     },
     ],
     meta: {
         '/homepage': {
-            name: 'Home'
+            name: 'Home',
             pageType: HOME,
             order: 0,
             properties: {},
             isTopLevel: true,
-            icon: HomeIcon
+            icon: HomeIcon,
             leaves: []
         },
         '/topics': {
-            name: 'Topics'
+            name: 'Topics',
             pageType: NORMAL,
             order: 1,
             properties: {},
             isTopLevel: true,
-            icon: TopicIcon
+            icon: TopicIcon,
             leaves: [
                 {
                     path: '/topics/:name/consumergroups',
@@ -243,36 +243,36 @@ This configuration is iterated on in the model hook. This hook makes use of thre
             ]
         },
         '/consumergroups': {
-            name: 'Consumer Groups'
+            name: 'Consumer Groups',
             pageType: NORMAL,
             order: 2,
             properties: {
                 mode: 'Cluster'
             },
             isTopLevel: true,
-            icon: ConsumerGroupIcon
+            icon: ConsumerGroupIcon,
             leaves: []
         },
         '/topics/:name/consumergroups': {
-            name: 'Consumer Groups'
+            name: 'Consumer Groups',
             pageType: NORMAL,
             order: 0,
             properties: {
                 mode: 'Topic'
             },
             isTopLevel: false,
-            icon: undefined
+            icon: undefined,
             leaves: []
         },
         '/topics/:name/edit': {
-            name: 'Edit topic ${name}'
+            name: 'Edit topic ${name}',
             pageType: FULLSCREEN,
             order: 5,
             properties: {
                 message: 'The backend cannot support this capability. Contact your administrator.'
             },
             isTopLevel: false,
-            icon: undefined
+            icon: undefined,
             leaves: []
         },
     }
