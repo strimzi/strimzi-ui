@@ -6,8 +6,7 @@ import { useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 export const MESSAGE_BUFFER_MAX_SIZE = 100;
-// TODO: Replace with the regex from the LOGGING query param
-const defaultLoggingRegex = /.+/;
+
 // TODO: Replace with the web socket address from config
 const defaultWebSocketAddress = 'ws://localhost:3000/log';
 
@@ -40,6 +39,29 @@ export type LoggerType = {
   trace: (msg: string) => void;
 };
 
+/**
+ * Checks if the component should be logged by checking if the LOGGING
+ * query parameter regex metches the component name.
+ *
+ * @param componentName the component name to check
+ */
+const shouldLogComponent: (componentName: string) => boolean = (
+  componentName: string
+) => {
+  let shouldLogComponent = false;
+  // Retrieve the logging regex from the URL LOGGING query param
+  if (window.location.search) {
+    const params = new URLSearchParams(window.location.search);
+    const loggingParam = params.get('LOGGING');
+    if (loggingParam) {
+      const loggingRegex = new RegExp(loggingParam);
+      shouldLogComponent = loggingRegex.test(componentName);
+    }
+  }
+
+  return shouldLogComponent;
+};
+
 export const useLogger: (componentName: string) => LoggerType = (
   componentName: string
 ) => {
@@ -49,7 +71,7 @@ export const useLogger: (componentName: string) => LoggerType = (
 
   useEffect(() => {
     // Check if the component should be logged
-    if (defaultLoggingRegex.test(componentName)) {
+    if (shouldLogComponent(componentName)) {
       const loggerWebSocket = loggerWebSocketRef.current;
       const loggerMessageBuffer = loggerMessageBufferRef.current;
 
@@ -80,7 +102,7 @@ export const useLogger: (componentName: string) => LoggerType = (
 
   const log = (clientLevel: LogLevelType, msg: string) => {
     // Check if the component should be logged
-    if (defaultLoggingRegex.test(componentName)) {
+    if (shouldLogComponent(componentName)) {
       const loggerWebSocket = loggerWebSocketRef.current;
       const loggerMessageBuffer = loggerMessageBufferRef.current;
 

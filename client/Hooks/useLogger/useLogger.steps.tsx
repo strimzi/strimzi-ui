@@ -2,7 +2,15 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-import { And, Given, When, Then, Fusion, After } from 'jest-cucumber-fusion';
+import {
+  And,
+  Given,
+  When,
+  Then,
+  Fusion,
+  After,
+  Before,
+} from 'jest-cucumber-fusion';
 import { renderHook } from '@testing-library/react-hooks';
 import { Server } from 'mock-socket';
 
@@ -11,15 +19,21 @@ import { useLogger, LoggerType, MESSAGE_BUFFER_MAX_SIZE } from '.';
 let logger: LoggerType;
 let rerenderHook: (newProps?: unknown) => void;
 let mockWebSocketServer: Server;
+let originalWindowLocation: Location;
 let onConnectionPromise: Promise<void>;
 let onMessagePromise: Promise<string>;
 let sentMessagesCount = 0;
 let verifiedClient = true;
 
+Before(() => {
+  originalWindowLocation = window.location;
+});
+
 After(() => {
   sentMessagesCount = 0;
   mockWebSocketServer.close();
   verifiedClient = true;
+  window.location = originalWindowLocation;
 });
 
 Given('a logging WebSocket server', () => {
@@ -35,6 +49,16 @@ Given('a logging WebSocket server', () => {
       onConnectionResolve();
     })
   );
+});
+
+And(/^the LOGGING query param is set to '(.*)'$/, (loggingParamValue) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  delete window.location;
+  window.location = {
+    ...originalWindowLocation,
+    search: `?LOGGING=${loggingParamValue}`,
+  };
 });
 
 const useLoggerHookIsRendered = 'the useLogger hook is rendered';
