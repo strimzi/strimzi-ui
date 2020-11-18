@@ -3,8 +3,11 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 import React, { createContext, FunctionComponent } from 'react';
+import set from 'lodash.set';
+import merge from 'lodash.merge';
 import { useQuery } from '@apollo/client';
 import { GET_CONFIG } from 'Queries/Config';
+import { sanatiseUrlParams, getLocation } from 'Utils';
 import {
   defaultClientConfig,
   defaultConfigFeatureFlagValue,
@@ -50,9 +53,25 @@ const ConfigFeatureFlagProvider: FunctionComponent = ({
 
   const { client, featureFlags }: apolloQueryResponseType =
     data || defaultClientConfig;
+
+  // check to see/merge any feature flag state with any defined in browser
+  const sanatisedParams = sanatiseUrlParams(getLocation().search);
+  const featureFlagsFromUrl = sanatisedParams.ff
+    ? sanatisedParams.ff
+        .split(',')
+        .map((encodedKeyValuePair) => encodedKeyValuePair.split('='))
+        .reduce((acc, [ffKey, value]) => {
+          return set(acc, ffKey, value === 'true');
+        }, {})
+    : {};
+  const featureFlagsWithUrlFlags = merge(
+    merge({}, featureFlags),
+    featureFlagsFromUrl
+  );
+
   const value: ConfigFeatureFlagType = {
     client,
-    featureFlags,
+    featureFlags: featureFlagsWithUrlFlags,
     bootstrapConfig,
     loading,
     error: error ? true : false,

@@ -10,7 +10,7 @@ The value(s) returned by this context are categorised into three types:
 
 - `bootstrapConfig` - critical bootstrap configuration, retrieved/parsed from the returned `index.html`
 - `client` - all client configuration values, retrieved from the server at runtime
-- `featureFlags` - feature flag state for the UI (including server), retrieved from the server at runtime
+- `featureFlags` - feature flag state for the UI (including server), retrieved from the server at runtime, [merged with values set in the URL (if any)](#URL-values). URL values will take precedence.
 
 Due to the majority of configuration coming from an asynchronous call, the returned value also will contain:
 
@@ -21,6 +21,20 @@ Due to the majority of configuration coming from an asynchronous call, the retur
 - `rawResponse` - the raw response for the config request. Will contain either error data, or the completed response
 
 It will be the responsibility of any consumer of this context to handle the loading, error and success cases.
+
+### URL values
+
+If required, feature flag values can be specified at runtime as search parameters, to override any values defined/retrieved. The format is as follows:
+
+(?)ff=<JsonPathOfFlag>=<true | false>,<JsonPathOfFlag>=<true | false>,...
+
+I.e:
+
+```
+https://hostname/?ff=feature.flag.name1=true,feature.flag.name2=false
+```
+
+This would enable `feature.flag.name1` and disable `feature.flag.name2` from the client's point of view, even if the response from the server is different. The `ff` parameter is optional. When not present, the retrieved feature flag state from the server will be used.
 
 ## Usage
 

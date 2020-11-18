@@ -3,9 +3,19 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
+// we need to be able to control the response from one util function, while testing another. Thus create a custom mock to control the response from `getLocation`
+const getLocationMock = jest.fn();
+jest.mock('Utils', () => {
+  return {
+    ...(jest.requireActual('Utils') as Record<string, unknown>),
+    getLocation: getLocationMock,
+  };
+});
+
 import React from 'react';
 import { render, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import merge from 'lodash.merge';
 import { GET_CONFIG } from 'Queries/Config';
 import { withApolloProviderReturning, apolloMockResponse } from 'utils/test';
 import {
@@ -87,6 +97,10 @@ describe('ConfigFeatureFlag', () => {
   };
 
   describe('`ConfigFeatureFlagProvider` and `ConfigFeatureFlagConsumer` components', () => {
+    beforeEach(() => {
+      getLocationMock.mockReturnValue(new URL('http://random.com'));
+    });
+
     describe('initial state', () => {
       it('returns the expected client configuration values', () => {
         const expectedValues = defaultClientConfig.client;
@@ -170,7 +184,7 @@ describe('ConfigFeatureFlag', () => {
         );
       });
     });
-    describe('response handling logic', () => {
+    describe('response handling and context value reduction logic', () => {
       // define common expected states, namespaces so RTL getByText can identify them
       const namespaceValue: (
         ns: string
@@ -307,6 +321,50 @@ describe('ConfigFeatureFlag', () => {
           ).toBeInTheDocument();
           expect(getByText(JSON.stringify(expectedStatus))).toBeInTheDocument();
         });
+      });
+
+      it('merges feature flag state from the URL if present as expected', async () => {
+        const urlFeatureFlagState =
+          '?ff=random=input,client.Home.showVersion=false';
+        const expectedShapeForInput = {
+          random: false,
+          client: {
+            Home: {
+              showVersion: false,
+            },
+          },
+        };
+
+        const expectedIntialFeatureFlagsFromURLOnly = featureFlagsNs(
+          expectedShapeForInput
+        );
+        const expectedFeatureFlagsFromURLAndResponseFromServer = featureFlagsNs(
+          merge(merge({}, mockFeatureFlagResponse), expectedShapeForInput)
+        );
+        // set up the URL to contain our flags
+        getLocationMock.mockReturnValue(
+          new URL(`http://random.com/${urlFeatureFlagState}`)
+        );
+
+        const { getByText } = render(
+          withApolloProviderReturning(
+            successResponse,
+            <ConfigFeatureFlagProvider>
+              <ConfigFeatureFlagConsumer>
+                {testRenderFunc}
+              </ConfigFeatureFlagConsumer>
+            </ConfigFeatureFlagProvider>
+          )
+        );
+        expect(
+          getByText(JSON.stringify(expectedIntialFeatureFlagsFromURLOnly))
+        ).toBeInTheDocument();
+        await apolloMockResponse(); // tick for data
+        expect(
+          getByText(
+            JSON.stringify(expectedFeatureFlagsFromURLAndResponseFromServer)
+          )
+        ).toBeInTheDocument(); // confirm flags from response and URL present, with URL taking precedence if overlap
       });
 
       it('returns the default bootstrap config values if content is missing', () => {

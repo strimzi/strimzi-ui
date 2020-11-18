@@ -399,7 +399,7 @@ The convention for defining feature flags should be kept contextual. For example
   }
 ```
 
-Here, given the structure, it is easy to see the differentiation between flags/capabilities for a page (`Home`), and flags for the showing of pages (`Pages`), and that these are only required on the `client` codebase. The current feature flag configuration is [defined here.](../config/featureflags.ts)
+Here, given the structure, it is easy to see the differentiation between flags/capabilities for a page (`Home`), and flags for the showing of pages (`Pages`), and that these are only required on the `client` codebase. The current feature flag configuration is [defined here.](../config/featureflags.ts). Finally, as and when required, feature flags can be overriden in the client via URL, [as described here](../client/Contexts/ConfigFeatureFlag/README.md#URL-values).
 
 ### Code Structure
 
