@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import * as availableModules from './modules';
 import { serverConfig, UIServerModule } from 'types';
 import { authFunction } from 'placeholderFunctionsToReplace';
+import expressSession, { SessionOptions } from 'express-session';
 import {
   generateLogger,
   generateHttpLogger,
@@ -19,11 +20,23 @@ export const returnExpress: (
   const logger = generateLogger('core');
   const app = express();
 
+  const { session } = getConfig();
+
   // add helmet middleware
   app.use(helmet());
 
   // add pino-http middleware
   app.use(generateHttpLogger());
+
+  //Add session middleware
+  const sessionOpts: SessionOptions = {
+    secret: 'CHANGEME', //TODO replace with value from config https://github.com/strimzi/strimzi-ui/issues/111
+    name: session.name,
+    cookie: {
+      maxAge: 1000 * 3600 * 24 * 30, //30 days as a starting point //TODO replace with value from config https://github.com/strimzi/strimzi-ui/issues/111
+    },
+  };
+  app.use(expressSession(sessionOpts));
 
   // for each module, call the function to add it to the routing table
   const routingTable = Object.values(availableModules).reduce(

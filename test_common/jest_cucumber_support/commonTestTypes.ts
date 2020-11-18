@@ -29,13 +29,14 @@ export const worldGenerator: <T extends genericWorldType>(
 } = (world) => {
   let worldInstance = world;
 
+  //Force async so that callbacks will always be handled as promises in Jest
   return {
     resetWorld: () => {
       worldInstance = { ...world };
     },
-    stepWhichUpdatesWorld: (callback) => async (...others) =>
-      (worldInstance = await callback(worldInstance, ...others)),
-    stepWithWorld: (callback) => (...others) =>
-      callback(worldInstance, ...others),
+    stepWhichUpdatesWorld: (callback) => async (...stepArguments) =>
+      (worldInstance = await callback(worldInstance, ...stepArguments)),
+    stepWithWorld: (callback) => async (...stepArguments) =>
+      callback(worldInstance, ...stepArguments),
   };
 };
