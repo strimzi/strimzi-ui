@@ -63,6 +63,7 @@ type proxyConfigType = {
 };
 
 type sessionConfigType = {
+  /** Name used to create the session cookie */
   name: string;
 };
 
@@ -83,6 +84,7 @@ export type serverConfig = {
   hostname: string;
   /** The port number to use/accept traffic on */
   port: number;
+  /** Configuration for a creation/management of a session */
   session: sessionConfigType;
 };
 
