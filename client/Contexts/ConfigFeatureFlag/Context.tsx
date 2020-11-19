@@ -14,7 +14,7 @@ import {
 } from './ConfigFeatureFlag.assets';
 
 import {
-  apolloQueryResponseType,
+  ApolloQueryResponseType,
   ConfigFeatureFlagType,
 } from './ConfigFeatureFlag.types';
 /** ConfigFeatureFlag context - exported solely for use in test and the `useConfigFeatureFlag` hook. Please use the hook or the exported provider/consumer components to access values at runtime */
@@ -51,18 +51,18 @@ const ConfigFeatureFlagProvider: FunctionComponent = ({
     bootstrapConfig = defaultConfigFeatureFlagValue.bootstrapConfig;
   }
 
-  const { client, featureFlags }: apolloQueryResponseType =
+  const { client, featureFlags }: ApolloQueryResponseType =
     data || defaultClientConfig;
 
   // check to see/merge any feature flag state with any defined in browser
   const sanatisedParams = sanatiseUrlParams(getLocation().search);
   const featureFlagsFromUrl = sanatisedParams.ff
     ? sanatisedParams.ff
-        .split(',')
-        .map((encodedKeyValuePair) => encodedKeyValuePair.split('='))
-        .reduce((acc, [ffKey, value]) => {
-          return set(acc, ffKey, value === 'true');
-        }, {})
+      .split(',')
+      .map((encodedKeyValuePair) => encodedKeyValuePair.split('='))
+      .reduce((acc, [ffKey, value]) => {
+        return set(acc, ffKey, value === 'true');
+      }, {})
     : {};
   const featureFlagsWithUrlFlags = merge(
     merge({}, featureFlags),
@@ -75,7 +75,7 @@ const ConfigFeatureFlagProvider: FunctionComponent = ({
     bootstrapConfig,
     loading,
     error: error ? true : false,
-    isComplete: !(loading || error) && !loading && !error,
+    isComplete: !loading && !error,
     triggerRefetch: () => {
       refetch();
     },

@@ -21,22 +21,22 @@ const modules = {
 };
 
 const mockapiModuleConfig: () => serverConfigType = () =>
-  merge(merge({}, defaultTestConfig()), {
+  merge({}, defaultTestConfig(), {
     modules: { ...modules, mockapi: true },
   });
 
 const logModuleConfig: () => serverConfigType = () =>
-  merge(merge({}, defaultTestConfig()), {
+  merge({}, defaultTestConfig(), {
     modules: { ...modules, log: true },
   });
 
 const configModuleConfig: () => serverConfigType = () =>
-  merge(merge({}, defaultTestConfig()), {
+  merge({}, defaultTestConfig(), {
     modules: { ...modules, config: true },
   });
 
 const configModuleWithConfigOverrides: () => serverConfigType = () =>
-  merge(merge({}, configModuleConfig()), {
+  merge({}, configModuleConfig(), {
     client: {
       configOverrides: {
         version: '34.0.0',
@@ -53,7 +53,7 @@ const configModuleWithConfigOverrides: () => serverConfigType = () =>
   });
 
 const clientModuleConfig: () => serverConfigType = () =>
-  merge(merge({}, defaultTestConfig()), {
+  merge({}, defaultTestConfig(), {
     client: {
       publicDir: resolve(__dirname, './__test_fixtures__/client'),
     },
@@ -61,7 +61,7 @@ const clientModuleConfig: () => serverConfigType = () =>
   });
 
 const apiModuleConfig: () => serverConfigType = () =>
-  merge(merge({}, defaultTestConfig()), {
+  merge({}, defaultTestConfig(), {
     proxy: {
       hostname: 'test-backend',
       port: 3434,
@@ -70,7 +70,7 @@ const apiModuleConfig: () => serverConfigType = () =>
   });
 
 const apiModuleConfigWithCustomContextRoot: () => serverConfigType = () =>
-  merge(merge({}, defaultTestConfig()), {
+  merge({}, defaultTestConfig(), {
     proxy: {
       hostname: 'test-backend',
       port: 3434,
@@ -80,7 +80,7 @@ const apiModuleConfigWithCustomContextRoot: () => serverConfigType = () =>
   });
 
 const securedApiModuleConfig: () => serverConfigType = () =>
-  merge(merge(apiModuleConfig()), {
+  merge(apiModuleConfig(), {
     proxy: {
       transport: {
         cert: 'mock certificate',
@@ -90,25 +90,25 @@ const securedApiModuleConfig: () => serverConfigType = () =>
 
 export const getConfigForName: (name: string) => serverConfigType = (name) => {
   switch (name) {
-    default:
-    case 'default':
-    case 'production':
-      return defaultTestConfig();
-    case 'mockapi_only':
-      return mockapiModuleConfig();
-    case 'log_only':
-      return logModuleConfig();
-    case 'config_only':
-      return configModuleConfig();
-    case 'config_only_with_config_overrides':
-      return configModuleWithConfigOverrides();
-    case 'client_only':
-      return clientModuleConfig();
-    case 'api_only':
-      return apiModuleConfig();
-    case 'api_secured_only':
-      return securedApiModuleConfig();
-    case 'api_with_custom_context_root':
-      return apiModuleConfigWithCustomContextRoot();
+  default:
+  case 'default':
+  case 'production':
+    return defaultTestConfig();
+  case 'mockapi_only':
+    return mockapiModuleConfig();
+  case 'log_only':
+    return logModuleConfig();
+  case 'config_only':
+    return configModuleConfig();
+  case 'config_only_with_config_overrides':
+    return configModuleWithConfigOverrides();
+  case 'client_only':
+    return clientModuleConfig();
+  case 'api_only':
+    return apiModuleConfig();
+  case 'api_secured_only':
+    return securedApiModuleConfig();
+  case 'api_with_custom_context_root':
+    return apiModuleConfigWithCustomContextRoot();
   }
 };

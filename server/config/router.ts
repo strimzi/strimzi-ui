@@ -7,7 +7,7 @@ import { UIServerModule } from 'types';
 
 import bodyParser from 'body-parser';
 import { ApolloServer } from 'apollo-server-express';
-import { returnSchemaAndResolversGivenConfig } from './controller';
+import { apolloConfig } from './controller';
 
 const moduleName = 'config';
 
@@ -18,7 +18,7 @@ export const ConfigModule: UIServerModule = {
     const routerForModule = express.Router();
 
     const server = new ApolloServer({
-      ...returnSchemaAndResolversGivenConfig(config),
+      ...apolloConfig(config),
     });
 
     routerForModule.use(

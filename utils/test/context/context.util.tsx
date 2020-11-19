@@ -9,7 +9,7 @@ import {
   defaultClientConfig,
   defaultConfigFeatureFlagValue,
 } from 'Contexts';
-import { apolloQueryResponseType } from 'Contexts/types';
+import { ApolloQueryResponseType } from 'Contexts/types';
 
 type TestProviderWithValue<T> = {
   value: T;
@@ -56,7 +56,7 @@ const renderWithConfigFeatureFlagContext: (
 
 /** renderWithCustomConfigFeatureFlagContext renders the given `ui` JSX with a ConfigFeatureFlag provider provided via `configFeatureFlagValue`. */
 const renderWithCustomConfigFeatureFlagContext: (
-  configFeatureFlagValue: apolloQueryResponseType,
+  configFeatureFlagValue: ApolloQueryResponseType,
   ui: ReactElement,
   options?: Record<string, unknown>
 ) => RenderResult = (

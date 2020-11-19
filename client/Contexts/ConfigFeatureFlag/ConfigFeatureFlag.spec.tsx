@@ -13,10 +13,9 @@ jest.mock('Utils', () => {
 });
 
 import React from 'react';
-import { render, act } from '@testing-library/react';
+import { render, RenderResult, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import merge from 'lodash.merge';
-import { GET_CONFIG } from 'Queries/Config';
 import { withApolloProviderReturning, apolloMockResponse } from 'utils/test';
 import {
   ConfigFeatureFlagProvider,
@@ -25,65 +24,17 @@ import {
 import {
   defaultClientConfig,
   defaultConfigFeatureFlagValue,
+  mockData,
+  mockRequests,
 } from './ConfigFeatureFlag.assets';
 
 import { ConfigFeatureFlagType } from './ConfigFeatureFlag.types';
 import { Literal } from 'ui-config/types';
+import { MockedResponse } from '@apollo/client/testing';
 
 describe('ConfigFeatureFlag', () => {
-  const mockClientResponse = {
-    about: {
-      version: '1.2.3',
-    },
-  };
-  const mockFeatureFlagResponse = {
-    client: {
-      Home: {
-        showVersion: true,
-      },
-      Pages: {
-        PlaceholderHome: true,
-      },
-    },
-  };
-
-  const request = {
-    query: GET_CONFIG,
-    variables: {},
-    context: {
-      purpose: 'config',
-    },
-  };
-
-  const mockError = new Error('Example error case');
-
-  const errorResponse = [
-    {
-      request,
-      error: mockError,
-    },
-  ];
-
-  const successResponse = [
-    {
-      request,
-      result: {
-        data: {
-          client: mockClientResponse,
-          featureFlags: mockFeatureFlagResponse,
-        },
-      },
-    },
-  ];
-
-  const noOpResponse = [
-    {
-      request,
-      result: {
-        data: {},
-      },
-    },
-  ];
+  const { noOpRequest, successRequest, errorRequest } = mockRequests;
+  const { mockClientResponse, mockFeatureFlagResponse, mockError } = mockData;
 
   const addContainerWithBootstrapMeta: (
     config?: Record<string, Literal>
@@ -96,42 +47,45 @@ describe('ConfigFeatureFlag', () => {
     return { container: document.body.appendChild(metaElement) };
   };
 
+  const renderProviderConsumerSeededWith: (
+    responses: Array<MockedResponse<Record<string, unknown>>>,
+    renderFn: (value: ConfigFeatureFlagType) => JSX.Element,
+    renderOptions?: Record<string, unknown>
+  ) => RenderResult = (responses, renderFn, renderOptions = {}) =>
+    render(
+      withApolloProviderReturning(
+        responses,
+        <ConfigFeatureFlagProvider>
+          <ConfigFeatureFlagConsumer>{renderFn}</ConfigFeatureFlagConsumer>
+        </ConfigFeatureFlagProvider>
+      ),
+      renderOptions
+    );
+
   describe('`ConfigFeatureFlagProvider` and `ConfigFeatureFlagConsumer` components', () => {
     beforeEach(() => {
       getLocationMock.mockReturnValue(new URL('http://random.com'));
     });
 
     describe('initial state', () => {
-      it('returns the expected client configuration values', () => {
+      it('returns the default client configuration values', () => {
         const expectedValues = defaultClientConfig.client;
-        const { getByText } = render(
-          withApolloProviderReturning(
-            noOpResponse,
-            <ConfigFeatureFlagProvider>
-              <ConfigFeatureFlagConsumer>
-                {({ client }) => {
-                  return <p>{JSON.stringify(client)}</p>;
-                }}
-              </ConfigFeatureFlagConsumer>
-            </ConfigFeatureFlagProvider>
-          )
+        const { getByText } = renderProviderConsumerSeededWith(
+          [noOpRequest],
+          ({ client }) => {
+            return <p>{JSON.stringify(client)}</p>;
+          }
         );
         expect(getByText(JSON.stringify(expectedValues))).toBeInTheDocument();
       });
 
-      it('returns the expected featureFlags configuration values', () => {
+      it('returns the default featureFlags configuration values', () => {
         const expectedValues = defaultClientConfig.featureFlags;
-        const { getByText } = render(
-          withApolloProviderReturning(
-            noOpResponse,
-            <ConfigFeatureFlagProvider>
-              <ConfigFeatureFlagConsumer>
-                {({ featureFlags }) => {
-                  return <p>{JSON.stringify(featureFlags)}</p>;
-                }}
-              </ConfigFeatureFlagConsumer>
-            </ConfigFeatureFlagProvider>
-          )
+        const { getByText } = renderProviderConsumerSeededWith(
+          [noOpRequest],
+          ({ featureFlags }) => {
+            return <p>{JSON.stringify(featureFlags)}</p>;
+          }
         );
         expect(getByText(JSON.stringify(expectedValues))).toBeInTheDocument();
       });
@@ -139,17 +93,11 @@ describe('ConfigFeatureFlag', () => {
       it('returns the expected default bootstrap configuration values', () => {
         const bootstrapConfigValues =
           defaultConfigFeatureFlagValue.bootstrapConfig;
-        const { getByText } = render(
-          withApolloProviderReturning(
-            noOpResponse,
-            <ConfigFeatureFlagProvider>
-              <ConfigFeatureFlagConsumer>
-                {({ bootstrapConfig }) => {
-                  return <p>{JSON.stringify(bootstrapConfig)}</p>;
-                }}
-              </ConfigFeatureFlagConsumer>
-            </ConfigFeatureFlagProvider>
-          ),
+        const { getByText } = renderProviderConsumerSeededWith(
+          [noOpRequest],
+          ({ bootstrapConfig }) => {
+            return <p>{JSON.stringify(bootstrapConfig)}</p>;
+          },
           addContainerWithBootstrapMeta(bootstrapConfigValues)
         );
         expect(
@@ -157,62 +105,55 @@ describe('ConfigFeatureFlag', () => {
         ).toBeInTheDocument();
       });
 
-      it('returns the expected state values on mount', () => {
-        // check the documented externals are provided to consumers
-        render(
-          withApolloProviderReturning(
-            noOpResponse,
-            <ConfigFeatureFlagProvider>
-              <ConfigFeatureFlagConsumer>
-                {({
-                  loading,
-                  error,
-                  isComplete,
-                  triggerRefetch,
-                  rawResponse,
-                }) => {
-                  expect(loading).toBe(true);
-                  expect(error).toBe(false);
-                  expect(isComplete).toBe(false);
-                  expect(rawResponse).toEqual({});
-                  expect(triggerRefetch).toEqual(expect.any(Function));
-                  return <p>{JSON.stringify(isComplete)}</p>;
-                }}
-              </ConfigFeatureFlagConsumer>
-            </ConfigFeatureFlagProvider>
-          )
+      it('returns the default state values on mount', () => {
+        // check the documented external states/functions are provided to consumers
+        renderProviderConsumerSeededWith(
+          [noOpRequest],
+          ({ loading, error, isComplete, triggerRefetch, rawResponse }) => {
+            expect(loading).toBe(true);
+            expect(error).toBe(false);
+            expect(isComplete).toBe(false);
+            expect(rawResponse).toEqual({});
+            expect(triggerRefetch).toEqual(expect.any(Function));
+            return <p>{JSON.stringify(isComplete)}</p>;
+          }
         );
       });
     });
+
     describe('response handling and context value reduction logic', () => {
       // define common expected states, namespaces so RTL getByText can identify them
-      const namespaceValue: (
+      const stringifyForRender: (
         ns: string
       ) => (value: unknown) => Record<string, typeof value> = (ns) => (
         value
       ) => ({ [ns]: value });
-      const clientNs = namespaceValue('client');
-      const featureFlagsNs = namespaceValue('featureFlags');
-      const bootstrapConfigNs = namespaceValue('bootStrap');
-      const statusNs = namespaceValue('status');
-      const functionNs = namespaceValue('functions');
+      const clientWhenRendered = stringifyForRender('client');
+      const featureFlagsWhenRendered = stringifyForRender('featureFlags');
+      const bootstrapConfigWhenRendered = stringifyForRender('bootStrap');
+      const statusWhenRendered = stringifyForRender('status');
+      const functionWhenRendered = stringifyForRender('functions');
 
-      const emptyClientResponse = clientNs(defaultClientConfig.client);
-      const emptyFeatureFlagResponse = featureFlagsNs(
+      const emptyClientResponse = clientWhenRendered(
+        defaultClientConfig.client
+      );
+      const emptyFeatureFlagResponse = featureFlagsWhenRendered(
         defaultClientConfig.featureFlags
       );
 
-      const returnClientResponse = clientNs(mockClientResponse);
-      const returnFeatureFlagResponse = featureFlagsNs(mockFeatureFlagResponse);
+      const returnClientResponse = clientWhenRendered(mockClientResponse);
+      const returnFeatureFlagResponse = featureFlagsWhenRendered(
+        mockFeatureFlagResponse
+      );
 
-      const initialLoadingStatus = statusNs({
+      const initialLoadingStatus = statusWhenRendered({
         loading: true,
         error: false,
         isComplete: false,
         rawResponse: {},
       });
 
-      const errorStatus = statusNs({
+      const errorStatus = statusWhenRendered({
         loading: false,
         error: true,
         isComplete: false,
@@ -223,7 +164,7 @@ describe('ConfigFeatureFlag', () => {
         },
       });
 
-      const successStatus = statusNs({
+      const successStatus = statusWhenRendered({
         loading: false,
         error: false,
         isComplete: true,
@@ -233,11 +174,13 @@ describe('ConfigFeatureFlag', () => {
         },
       });
 
-      const defaultBootstrapConfig = bootstrapConfigNs(
+      const defaultBootstrapConfig = bootstrapConfigWhenRendered(
         defaultConfigFeatureFlagValue.bootstrapConfig
       );
       const bootstrapConfigValue = {};
-      const withBootstrapConfig = bootstrapConfigNs(bootstrapConfigValue);
+      const withBootstrapConfig = bootstrapConfigWhenRendered(
+        bootstrapConfigValue
+      );
 
       const testRenderFunc: (value: ConfigFeatureFlagType) => JSX.Element = ({
         client,
@@ -250,17 +193,17 @@ describe('ConfigFeatureFlag', () => {
         triggerRefetch,
       }) => (
         <React.Fragment>
-          <p>{JSON.stringify(clientNs(client))}</p>
-          <p>{JSON.stringify(featureFlagsNs(featureFlags))}</p>
-          <p>{JSON.stringify(bootstrapConfigNs(bootstrapConfig))}</p>
+          <p>{JSON.stringify(clientWhenRendered(client))}</p>
+          <p>{JSON.stringify(featureFlagsWhenRendered(featureFlags))}</p>
+          <p>{JSON.stringify(bootstrapConfigWhenRendered(bootstrapConfig))}</p>
           <p>
             {JSON.stringify(
-              statusNs({ loading, error, isComplete, rawResponse })
+              statusWhenRendered({ loading, error, isComplete, rawResponse })
             )}
           </p>
           <p>
             {JSON.stringify(
-              functionNs({
+              functionWhenRendered({
                 triggerRefetch: typeof triggerRefetch === 'function',
               })
             )}
@@ -268,22 +211,16 @@ describe('ConfigFeatureFlag', () => {
         </React.Fragment>
       );
 
-      it('returns the expected values when in loading state', () => {
+      it('returns the expected values when in loading state', async () => {
         const expectedClient = emptyClientResponse;
         const expectedFeatureFlags = emptyFeatureFlagResponse;
         const expectedBootstrapConfig = defaultBootstrapConfig;
         const expectedStatus = initialLoadingStatus;
-        const { getByText } = render(
-          withApolloProviderReturning(
-            noOpResponse,
-            <ConfigFeatureFlagProvider>
-              <ConfigFeatureFlagConsumer>
-                {testRenderFunc}
-              </ConfigFeatureFlagConsumer>
-            </ConfigFeatureFlagProvider>
-          )
+        const { getByText } = renderProviderConsumerSeededWith(
+          [noOpRequest],
+          testRenderFunc
         );
-        act(() => {
+        await waitFor(() => {
           expect(getByText(JSON.stringify(expectedClient))).toBeInTheDocument();
           expect(
             getByText(JSON.stringify(expectedFeatureFlags))
@@ -295,23 +232,19 @@ describe('ConfigFeatureFlag', () => {
         });
       });
 
-      it('returns the expected bootstrap config values', () => {
+      it('returns the expected bootstrap config values', async () => {
         const expectedClient = emptyClientResponse;
         const expectedFeatureFlags = emptyFeatureFlagResponse;
         const expectedBootstrapConfig = bootstrapConfigValue;
         const expectedStatus = initialLoadingStatus;
-        const { getByText } = render(
-          withApolloProviderReturning(
-            noOpResponse,
-            <ConfigFeatureFlagProvider>
-              <ConfigFeatureFlagConsumer>
-                {testRenderFunc}
-              </ConfigFeatureFlagConsumer>
-            </ConfigFeatureFlagProvider>
-          ),
+
+        const { getByText } = renderProviderConsumerSeededWith(
+          [noOpRequest],
+          testRenderFunc,
           addContainerWithBootstrapMeta(expectedBootstrapConfig)
         );
-        act(() => {
+
+        await waitFor(() => {
           expect(getByText(JSON.stringify(expectedClient))).toBeInTheDocument();
           expect(
             getByText(JSON.stringify(expectedFeatureFlags))
@@ -335,27 +268,22 @@ describe('ConfigFeatureFlag', () => {
           },
         };
 
-        const expectedIntialFeatureFlagsFromURLOnly = featureFlagsNs(
+        const expectedIntialFeatureFlagsFromURLOnly = featureFlagsWhenRendered(
           expectedShapeForInput
         );
-        const expectedFeatureFlagsFromURLAndResponseFromServer = featureFlagsNs(
-          merge(merge({}, mockFeatureFlagResponse), expectedShapeForInput)
+        const expectedFeatureFlagsFromURLAndResponseFromServer = featureFlagsWhenRendered(
+          merge({}, mockFeatureFlagResponse, expectedShapeForInput)
         );
         // set up the URL to contain our flags
         getLocationMock.mockReturnValue(
           new URL(`http://random.com/${urlFeatureFlagState}`)
         );
 
-        const { getByText } = render(
-          withApolloProviderReturning(
-            successResponse,
-            <ConfigFeatureFlagProvider>
-              <ConfigFeatureFlagConsumer>
-                {testRenderFunc}
-              </ConfigFeatureFlagConsumer>
-            </ConfigFeatureFlagProvider>
-          )
+        const { getByText } = renderProviderConsumerSeededWith(
+          [successRequest],
+          testRenderFunc
         );
+
         expect(
           getByText(JSON.stringify(expectedIntialFeatureFlagsFromURLOnly))
         ).toBeInTheDocument();
@@ -367,22 +295,16 @@ describe('ConfigFeatureFlag', () => {
         ).toBeInTheDocument(); // confirm flags from response and URL present, with URL taking precedence if overlap
       });
 
-      it('returns the default bootstrap config values if content is missing', () => {
+      it('returns the default bootstrap config values if content is missing', async () => {
         const expectedClient = emptyClientResponse;
         const expectedFeatureFlags = emptyFeatureFlagResponse;
         const expectedStatus = initialLoadingStatus;
-        const { getByText } = render(
-          withApolloProviderReturning(
-            noOpResponse,
-            <ConfigFeatureFlagProvider>
-              <ConfigFeatureFlagConsumer>
-                {testRenderFunc}
-              </ConfigFeatureFlagConsumer>
-            </ConfigFeatureFlagProvider>
-          ),
+        const { getByText } = renderProviderConsumerSeededWith(
+          [noOpRequest],
+          testRenderFunc,
           addContainerWithBootstrapMeta() // no content provided
         );
-        act(() => {
+        await waitFor(() => {
           expect(getByText(JSON.stringify(expectedClient))).toBeInTheDocument();
           expect(
             getByText(JSON.stringify(expectedFeatureFlags))
@@ -400,15 +322,9 @@ describe('ConfigFeatureFlag', () => {
         const expectedBootstrapConfig = defaultBootstrapConfig;
         const expectedStatusLoading = initialLoadingStatus;
         const expectedStatusLoaded = successStatus;
-        const { getByText } = render(
-          withApolloProviderReturning(
-            successResponse,
-            <ConfigFeatureFlagProvider>
-              <ConfigFeatureFlagConsumer>
-                {testRenderFunc}
-              </ConfigFeatureFlagConsumer>
-            </ConfigFeatureFlagProvider>
-          )
+        const { getByText } = renderProviderConsumerSeededWith(
+          [successRequest],
+          testRenderFunc
         );
         expect(
           getByText(JSON.stringify(expectedStatusLoading))
@@ -432,15 +348,9 @@ describe('ConfigFeatureFlag', () => {
         const expectedBootstrapConfig = defaultBootstrapConfig;
         const expectedStatusLoading = initialLoadingStatus;
         const expectedStatusError = errorStatus;
-        const { getByText } = render(
-          withApolloProviderReturning(
-            errorResponse,
-            <ConfigFeatureFlagProvider>
-              <ConfigFeatureFlagConsumer>
-                {testRenderFunc}
-              </ConfigFeatureFlagConsumer>
-            </ConfigFeatureFlagProvider>
-          )
+        const { getByText } = renderProviderConsumerSeededWith(
+          [errorRequest],
+          testRenderFunc
         );
         expect(
           getByText(JSON.stringify(expectedStatusLoading))
@@ -464,29 +374,24 @@ describe('ConfigFeatureFlag', () => {
         const expectedStatusError = errorStatus;
 
         const expectedClientComplete = returnClientResponse;
-        const expectedFeatureFlagsComplete = featureFlagsNs(
+        const expectedFeatureFlagsComplete = featureFlagsWhenRendered(
           mockFeatureFlagResponse
         );
         const expectedStatusComplete = successStatus;
 
-        const { getByText } = render(
-          withApolloProviderReturning(
-            [...errorResponse, ...successResponse],
-            <ConfigFeatureFlagProvider>
-              <ConfigFeatureFlagConsumer>
-                {(values) => {
-                  const { triggerRefetch } = values;
-                  return (
-                    <React.Fragment>
-                      {testRenderFunc(values)}
-                      <button onClick={triggerRefetch}>Refetch</button>
-                    </React.Fragment>
-                  );
-                }}
-              </ConfigFeatureFlagConsumer>
-            </ConfigFeatureFlagProvider>
-          )
+        const { getByText } = renderProviderConsumerSeededWith(
+          [errorRequest, successRequest],
+          (values) => {
+            const { triggerRefetch } = values;
+            return (
+              <React.Fragment>
+                {testRenderFunc(values)}
+                <button onClick={triggerRefetch}>Refetch</button>
+              </React.Fragment>
+            );
+          }
         );
+
         // 1st tick - error state
         await apolloMockResponse();
         expect(

@@ -4,7 +4,7 @@
  */
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
-import { getFiles, renderIndexHtmlWithBootstrapConfig } from './controller';
+import { getFiles, renderTemplate } from './controller';
 import { UIServerModule } from 'types';
 
 const moduleName = 'client';
@@ -34,10 +34,7 @@ export const ClientModule: UIServerModule = {
 
     // return index.html, with configuration templated in
     hasIndexFile &&
-      routerForModule.get(
-        '/index.html',
-        renderIndexHtmlWithBootstrapConfig(indexFile)
-      );
+      routerForModule.get('/index.html', renderTemplate(indexFile));
 
     // host all files from the client dir
     routerForModule.get(

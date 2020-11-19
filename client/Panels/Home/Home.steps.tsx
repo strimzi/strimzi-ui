@@ -4,12 +4,25 @@
  */
 import { Given, When, Then, Fusion } from 'jest-cucumber-fusion';
 import { RenderResult } from '@testing-library/react';
+import merge from 'lodash.merge';
 import { renderWithCustomConfigFeatureFlagContext } from 'utils/test';
 import { Home } from '.';
 import React, { ReactElement } from 'react';
 
 let renderResult: RenderResult;
 let component: ReactElement;
+let showVersionSet: boolean;
+
+const coreConfigFromContext = {
+  client: { about: { version: '34.34.34' } },
+  featureFlags: {
+    client: {
+      Home: {
+        showVersion: true,
+      },
+    },
+  },
+};
 
 Given('a Home component', () => {
   component = <Home />;
@@ -17,24 +30,35 @@ Given('a Home component', () => {
 
 When('it is rendered', () => {
   renderResult = renderWithCustomConfigFeatureFlagContext(
-    {
-      client: { about: { version: '34.34.34' } },
+    coreConfigFromContext,
+    component
+  );
+  showVersionSet = true;
+});
+
+When('it is rendered with no version', () => {
+  renderResult = renderWithCustomConfigFeatureFlagContext(
+    merge({}, coreConfigFromContext, {
       featureFlags: {
         client: {
           Home: {
-            showVersion: true,
+            showVersion: false,
           },
         },
       },
-    },
+    }),
     component
   );
+  showVersionSet = false;
 });
 
-Then('it should display text', () => {
-  const { getByText } = renderResult;
+Then('it should display the expected text', () => {
+  const { getByText, queryByText } = renderResult;
   expect(getByText('Welcome to the Strimzi UI')).toBeInTheDocument();
-  expect(getByText('Version: 34.34.34')).toBeInTheDocument();
+  const versionString = `Version: ${coreConfigFromContext.client.about.version}`;
+  showVersionSet
+    ? expect(getByText(versionString)).toBeInTheDocument()
+    : expect(queryByText(versionString)).not.toBeInTheDocument();
 });
 
 Fusion('Home.feature');

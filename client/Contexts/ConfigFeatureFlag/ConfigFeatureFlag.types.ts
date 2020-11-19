@@ -10,7 +10,7 @@ import {
 } from 'ui-config/types';
 
 /** the response (`data`) value from the graphql config query (client/Queries/Config/index.ts) */
-export type apolloQueryResponseType = {
+export type ApolloQueryResponseType = {
   /** all client values returned */
   client: exposedClientType;
   /** all feature flag values returned */

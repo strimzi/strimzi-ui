@@ -18,3 +18,6 @@ const { getByText } = render(withApolloProviderReturning(myResponseForTestCase, 
         expect(getByText('Foo'));
         ....
 ```
+
+- `generateMockResponseForGQLRequest` - for use in tests/storybook to simulate the response from an Apollo call. Encapsulates the structure expected by the Apollo MockProvider
+- `generateMockDataResponseForGQLRequest` and `generateMockErrorResponseForGQLRequest` - uses `generateMockResponseForGQLRequest` to return responses to provide to the Apollo MockProvider for success/failure conditions when making a request in tests/storybook scenarios

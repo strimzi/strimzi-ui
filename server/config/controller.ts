@@ -14,18 +14,17 @@ type configSchemaResolverType = {
   resolvers: IResolvers;
 };
 
-export const returnSchemaAndResolversGivenConfig: (
+export const apolloConfig: (
   config: serverConfigType
 ) => configSchemaResolverType = (config) => {
-  const { featureFlags: featureFlagOverrides } = config;
-  const { configOverrides } = config.client;
+  const {
+    featureFlags: featureFlagOverrides,
+    client: { configOverrides },
+  } = config;
 
   const configToHost = {
-    featureFlags: merge(
-      merge({}, featureFlags.publicValues),
-      featureFlagOverrides
-    ),
-    client: merge(merge({}, client.publicValues), configOverrides),
+    featureFlags: merge({}, featureFlags.publicValues, featureFlagOverrides),
+    client: merge({}, client.publicValues, configOverrides),
     server: server.publicValues,
   };
 
