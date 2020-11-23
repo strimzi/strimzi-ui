@@ -149,6 +149,7 @@ const withImageModuleLoader = returnModuleRuleWithConfig(
 // exported helper function - returns common configuration, merged via object spread. Provided options take precedence
 const returnBasicConfigMergedWith = (customConfigurationForBuildMode = {}) =>
   merge(
+    {},
     {
       entry: `${BOOTSTRAP_DIR}/index.tsx`,
       target: 'web', // build for browsers (Webpack default)

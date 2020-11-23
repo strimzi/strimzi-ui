@@ -7,7 +7,7 @@ import set from 'lodash.set';
 import merge from 'lodash.merge';
 import { useQuery } from '@apollo/client';
 import { GET_CONFIG } from 'Queries/Config';
-import { sanatiseUrlParams, getLocation } from 'Utils';
+import { sanitiseUrlParams, getLocation } from 'Utils';
 import {
   defaultClientConfig,
   defaultConfigFeatureFlagValue,
@@ -55,9 +55,9 @@ const ConfigFeatureFlagProvider: FunctionComponent = ({
     data || defaultClientConfig;
 
   // check to see/merge any feature flag state with any defined in browser
-  const sanatisedParams = sanatiseUrlParams(getLocation().search);
-  const featureFlagsFromUrl = sanatisedParams.ff
-    ? sanatisedParams.ff
+  const sanitisedParams = sanitiseUrlParams(getLocation().search);
+  const featureFlagsFromUrl = sanitisedParams.ff
+    ? sanitisedParams.ff
       .split(',')
       .map((encodedKeyValuePair) => encodedKeyValuePair.split('='))
       .reduce((acc, [ffKey, value]) => {

@@ -4,5 +4,5 @@ This directory contains client utility code. It also is responsible for importin
 
 Currently provided utilities are provided by utility type follows:
 
-- [`sanatise`](./sanatise/README.md) - set of helper functions to sanatise user input
+- [`sanitise`](./sanitise/README.md) - set of helper functions to sanitise user input
 - [`window`](./window/README.md) - functions for interacting with the `Window` global object

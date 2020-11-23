@@ -2,10 +2,10 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-import { sanatiseUrlParams } from './sanatise';
+import { sanitiseUrlParams } from './sanitise';
 
-describe('sanatise function tests', () => {
-  describe(`sanatiseUrlParams`, () => {
+describe('sanitise function tests', () => {
+  describe(`sanitiseUrlParams`, () => {
     [
       {
         input: '',
@@ -35,7 +35,7 @@ describe('sanatise function tests', () => {
       it(`returns the expected response (${JSON.stringify(
         output
       )}) for given parameters '${input}'`, () => {
-        expect(sanatiseUrlParams(input)).toEqual(output);
+        expect(sanitiseUrlParams(input)).toEqual(output);
       })
     );
   });
