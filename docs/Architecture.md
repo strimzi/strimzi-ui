@@ -113,17 +113,17 @@ The Strimzi UI makes use of both HTTP and WebSockets. This section details what 
 
 #### HTTP
 
-Currently, HTTP is only used to retrieve static assets from the UI server.
+Currently, HTTP is used to retrieve static assets from the UI server, as well as serve [GraphQL](https://graphql.org/) queries. In a following PR, all GraphQL requests (including queries) will be made via a Websocket, [as per the UI proposal](https://github.com/strimzi/proposals/blob/master/011-strimzi-ui.md#session-management-and-authentication).
 
 #### WebSockets
-
-[GraphQL](https://graphql.org/)
-
-All messages with GraphQL are done over a WebSocket, even standard queries. WebSockets are required by GraphQL to do subscriptions. Subscriptions allow the client to listen for data changes from the server so that it can stay updated in real-time. All other queries are bundled into the same websocket so a clean network traffic log can be kept. The WebSocket will be held with the UI server, which will then proxy any websocket messages to the GraphQL admin server. This proxy allows for custom Apollo errors to be injected into the websocket so that the client can handle additional errors such as session expiration. The proxy is also responsible for injecting an authorization header for the client so that a connection can be established to the admin server. For full details of the WebSocket flow, [view our proposal](https://github.com/strimzi/proposals/blob/master/011-strimzi-ui.md#session-management-and-authentication).
 
 [Logging](#client-side-logging)
 
 Client logs are sent to the UI server over a persistent websocket so that the logs of both components can co-exist.
+
+##### Future work
+
+In due course, all [GraphQL](https://graphql.org/) requests will be done over a WebSocket, even standard queries. WebSockets are required by GraphQL to do subscriptions. Subscriptions allow the client to listen for data changes from the server so that it can stay updated in real-time. All other queries are bundled into the same websocket so a clean network traffic log can be kept. The WebSocket will be held with the UI server, which will then proxy any websocket messages to the GraphQL admin server. This proxy allows for custom Apollo errors to be injected into the websocket so that the client can handle additional errors such as session expiration. The proxy is also responsible for injecting an authorization header for the client so that a connection can be established to the admin server. For full details of the WebSocket flow, [view our proposal](https://github.com/strimzi/proposals/blob/master/011-strimzi-ui.md#session-management-and-authentication).
 
 ### Strimzi integration
 
