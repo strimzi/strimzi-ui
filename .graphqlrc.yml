@@ -1,0 +1,12 @@
+schema: https://raw.githubusercontent.com/rkpattnaik780/enmasse/14c4e82a0c13370d5e14a74669982e1a1105a0ba/console/console-init/ui/mock-console-server/schema.graphql
+
+extensions:
+  codegen:
+    generates:
+      ./generated/entityModelConstants.ts:
+        plugins:
+          - typescript
+          - typescript-react-apollo
+    config:
+      skipTypeNameForRoot: true
+      skipTypename: true

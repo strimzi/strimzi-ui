@@ -32,7 +32,8 @@
     "lint:format": "prettier --config ./linting/prettier.config.js --write",
     "cy:open": "cypress open --config-file e2e/cypress.json",
     "cy:closed": "cypress run --config-file e2e/cypress.json",
-    "addDevCerts": "./utils/tooling/generateCerts.sh"
+    "addDevCerts": "./utils/tooling/generateCerts.sh",
+    "graphql:codegen": "graphql codegen"
   },
   "sideEffects": false,
   "repository": {
@@ -135,6 +136,10 @@
     "webpack-bundle-analyzer": "^3.8.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0",
-    "webpack-node-externals": "^2.5.2"
+    "webpack-node-externals": "^2.5.2",
+    "graphql-cli": "4.1.0",
+    "@graphql-cli/codegen": "1.17.14",
+    "@graphql-codegen/typescript": "1.17.11",
+    "@graphql-codegen/typescript-react-apollo": "2.1.1"
   }
 }
