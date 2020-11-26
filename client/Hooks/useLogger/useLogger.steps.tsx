@@ -14,16 +14,26 @@ import {
 import { renderHook } from '@testing-library/react-hooks';
 import { Server } from 'mock-socket';
 
+import React, { useRef } from 'react';
+jest.mock('react', () => {
+  const originReact = jest.requireActual('react');
+  const useRef = jest.fn();
+  return {
+    ...originReact,
+    useRef,
+  };
+});
+
 import { useLogger, LoggerType, MESSAGE_BUFFER_MAX_SIZE } from '.';
+import { LoggingProvider } from 'Contexts';
 
 let logger: LoggerType;
-let rerenderHook: (newProps?: unknown) => void;
+let rerenderHook: (newProps?: { children: unknown }) => void;
 let mockWebSocketServer: Server;
 let originalWindowLocation: Location;
 let onConnectionPromise: Promise<void>;
 let onMessagePromise: Promise<string>;
 let sentMessagesCount = 0;
-let verifiedClient = true;
 
 Before(() => {
   originalWindowLocation = window.location;
@@ -31,15 +41,24 @@ Before(() => {
 
 After(() => {
   sentMessagesCount = 0;
-  mockWebSocketServer.close();
-  verifiedClient = true;
+  if (mockWebSocketServer) {
+    mockWebSocketServer.close();
+  }
   window.location = originalWindowLocation;
 });
 
-Given('a logging WebSocket server', () => {
-  mockWebSocketServer = new Server('ws://localhost:3000/log', {
-    verifyClient: () => verifiedClient,
-  });
+Given(/^a(?: (secure))* logging WebSocket server$/, (isSecure) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  delete window.location;
+  window.location = {
+    ...originalWindowLocation,
+    protocol: isSecure ? 'https:' : 'http:',
+    host: 'mytestserver:3000',
+  };
+  mockWebSocketServer = new Server(
+    `${isSecure ? 'wss' : 'ws'}://mytestserver:3000/log`
+  );
 
   onConnectionPromise = new Promise((onConnectionResolve) =>
     mockWebSocketServer.on('connection', (socket) => {
@@ -52,19 +71,20 @@ Given('a logging WebSocket server', () => {
 });
 
 And(/^the LOGGING query param is set to '(.*)'$/, (loggingParamValue) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  delete window.location;
-  window.location = {
-    ...originalWindowLocation,
-    search: `?LOGGING=${loggingParamValue}`,
-  };
+  window.location.search = `?LOGGING=${loggingParamValue}`;
 });
 
 const useLoggerHookIsRendered = 'the useLogger hook is rendered';
 const useLoggerHookIsRenderedFn = () => {
+  const initialRef = { current: { websocket: null, messageBuffer: [] } };
+  (useRef as jest.Mock).mockReturnValue(initialRef);
+  const wrapper = ({ children }) => (
+    <LoggingProvider>{children}</LoggingProvider>
+  );
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const renderedHook = renderHook(() => useLogger('TestComponent'));
+  const renderedHook = renderHook(() => useLogger('TestComponent'), {
+    wrapper,
+  });
   logger = renderedHook.result.current;
   expect(logger).not.toBeNull();
   expect(logger).not.toBeUndefined();
@@ -77,14 +97,6 @@ And(useLoggerHookIsRendered, useLoggerHookIsRenderedFn);
 
 And('the useLogger hook is re-rendered', () => {
   rerenderHook();
-});
-
-When('the useLogger hook is rendered with an empty componentName', () => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const renderedHook = renderHook(() => useLogger(''));
-  logger = renderedHook.result.current;
-  expect(logger).not.toBeNull();
-  expect(logger).not.toBeUndefined();
 });
 
 And(

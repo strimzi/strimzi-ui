@@ -4,6 +4,8 @@ This hook is responsible for storing and sending client log messages to the WebS
 
 Logging and the websocket connection are enabled when the `LOGGING` query parameter exists in the URL. The value of the `LOGGING` query parameter is a regex that is used to determine which components and code are logged. For example, a URL like `https://localhost:3000?LOGGING=.*` will enable logging for all components, and a URL like `https://localhost:3000?LOGGING=Home|MyDiv` will enable logging for just the `Home` and `MyDiv` components.
 
+To use this hook, the (`LoggingProvider`)[../../Contexts/Logging] context provider component must be rendered by an ancestor component. The `Logging` context stores the websocket client and the messages buffer used by this hook.
+
 Usage of the hook must follow the (react hooks rules)[https://reactjs.org/docs/hooks-rules.html], but the logger callback returned by the hook can be used anywhere. For example:
 
 ```
@@ -24,7 +26,7 @@ const MyDiv = (props) => {
 
 ## API
 
-### `userLogger(componentName: string)`
+### `useLogger(componentName: string)`
 
 The useLogger hook takes the name of the component, which appears in the server-side logs as `componentName`, and returns the `LoggerType` object containing the logging callbacks. The hook makes the connection to the the WebSocket listener on the server `/log` endpoint.
 

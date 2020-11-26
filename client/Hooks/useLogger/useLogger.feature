@@ -76,3 +76,12 @@ Feature: useLogger hook
     And 1 info-level message is logged
     And the WebSocket server rejects the useLogger connection
     Then the useLogger hook is disconnnected from the WebSocket server
+
+  Scenario: Basic useLogger secured connection and logging
+    Given a secure logging WebSocket server
+    And the LOGGING query param is set to '.*'
+    When the useLogger hook is rendered
+    And 1 trace-level message is logged
+    Then the useLogger hook is connnected to the WebSocket server
+    And 1 trace-level logging message is received by the WebSocket server
+
