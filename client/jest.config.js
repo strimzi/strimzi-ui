@@ -28,6 +28,7 @@ const config = {
     '!**/mock/**/*',
     // Wrapper around graphql - not something we need/wish to test
     '!Bootstrap/GraphQLClient/**',
+    '!Bootstrap/bootstrap.tsx'
   ],
 };
 

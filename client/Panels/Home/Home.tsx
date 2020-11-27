@@ -25,3 +25,5 @@ const Home: FunctionComponent = ({ children }) => {
 };
 
 export { Home };
+
+export default Home;

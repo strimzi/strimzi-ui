@@ -6,6 +6,7 @@ const path = require('path');
 const webpack = require('webpack');
 const merge = require('lodash.merge');
 const { PRODUCTION, DEVELOPMENT } = require('../utils/tooling/constants.js');
+const { dependencies, federatedModuleName } = require('../package.json');
 
 // constants
 const UI_TITLE = 'Strimzi UI';
@@ -57,6 +58,29 @@ const withWebpackBundleAnalyzerPlugin = returnPluginWithConfig(
 );
 
 const withTsconfigPathsPlugin = returnPluginWithConfig(TsconfigPathsPlugin, {});
+
+const withModuleFederationPlugin = new webpack.container.ModuleFederationPlugin(
+  {
+    name: federatedModuleName,
+    filename: 'remoteEntry.js',
+    exposes: {
+      './Home': './client/Panels/Home/Home',
+    },
+    shared: {
+      ...dependencies,
+      react: {
+        eager: true,
+        singleton: true,
+        requiredVersion: dependencies.react,
+      },
+      'react-dom': {
+        eager: true,
+        singleton: true,
+        requiredVersion: dependencies['react-dom'],
+      },
+    },
+  }
+);
 
 const withNormalModuleReplacementPlugin = () =>
   new webpack.NormalModuleReplacementPlugin(/.carbon./, (resource) => {
@@ -139,7 +163,7 @@ const withImageModuleLoader = returnModuleRuleWithConfig(
     {
       loader: 'file-loader',
       options: {
-        publicPath: '/images/',
+        //publicPath: '/images/',
         outputPath: 'images/',
       },
     },
@@ -181,6 +205,7 @@ module.exports = {
     withMiniCssExtractPlugin,
     withWebpackBundleAnalyzerPlugin,
     withTsconfigPathsPlugin,
+    withModuleFederationPlugin,
   },
   moduleLoaders: {
     withStylingModuleLoader,
