@@ -1,5 +1,6 @@
 {
   "name": "strimzi-ui",
+  "federatedModuleName": "strimziUi",
   "private": true,
   "version": "0.0.1",
   "description": "Strimzi UI provides a way for managing Strimzi and Kafka clusters (+ other components) deployed by it using a graphical user interface.",
@@ -64,7 +65,8 @@
     "pino-http": "^5.3.0",
     "pino-pretty": "^4.3.0",
     "react-i18next": "^11.7.3",
-    "react": "^16.13.1",
+    "react": "16.14.0",
+    "react-dom": "16.14.0",
     "subscriptions-transport-ws": "^0.9.18"
   },
   "devDependencies": {
