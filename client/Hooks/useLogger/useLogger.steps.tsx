@@ -25,7 +25,7 @@ jest.mock('react', () => {
 });
 
 import { useLogger, LoggerType, MESSAGE_BUFFER_MAX_SIZE } from '.';
-import { LoggingProvider } from 'Contexts';
+import { LoggingProvider, loggerMessage } from 'Contexts';
 
 let logger: LoggerType;
 let rerenderHook: (newProps?: { children: unknown }) => void;
@@ -134,7 +134,9 @@ const loggingMessagesAreReceivedFn = async (messagesCount, logLevel) => {
 
   const receivedMessageEvent = await onMessagePromise;
   expect(receivedMessageEvent).not.toBeNull();
-  const parsedLoggingMessages = JSON.parse(receivedMessageEvent);
+  const parsedLoggingMessages: loggerMessage[] = JSON.parse(
+    receivedMessageEvent
+  );
   expect(parsedLoggingMessages.length).toBe(expectedLoggingMessagesCount);
 
   let startingIndex = 1;

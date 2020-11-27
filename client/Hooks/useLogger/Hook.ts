@@ -5,12 +5,12 @@
 import { useEffect, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-import { LogLevelType, LoggingContext } from 'Contexts';
+import { LogLevel, LoggingContext } from 'Contexts';
 
 export const MESSAGE_BUFFER_MAX_SIZE = 100;
 
 export type LoggerType = {
-  log: (clientLevel: LogLevelType, msg: string) => void;
+  log: (clientLevel: LogLevel, msg: string) => void;
   fatal: (msg: string) => void;
   error: (msg: string) => void;
   warn: (msg: string) => void;
@@ -28,9 +28,7 @@ const clientID = uuidv4();
  *
  * @param componentName the component name to check
  */
-const shouldLogComponent: (componentName: string) => boolean = (
-  componentName: string
-) => {
+const shouldLogComponent = (componentName: string): boolean => {
   let shouldLogComponent = false;
   // Retrieve the logging regex from the URL LOGGING query param
   if (window.location.search) {
@@ -45,15 +43,13 @@ const shouldLogComponent: (componentName: string) => boolean = (
   return shouldLogComponent;
 };
 
-const getWebSocketAddress: () => string = () => {
+const getWebSocketAddress = (): string => {
   return `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${
     window.location.host
   }/log`;
 };
 
-export const useLogger: (componentName: string) => LoggerType = (
-  componentName: string
-) => {
+export const useLogger = (componentName: string): LoggerType => {
   // Get the logging state from the Logging context
   const loggingRef = useContext(LoggingContext);
 
@@ -68,7 +64,8 @@ export const useLogger: (componentName: string) => LoggerType = (
         websocket.onopen = () => {
           if (messageBuffer.length > 0) {
             // WebSocket is now open, send anything in the message buffer and clear it
-            websocket.send(JSON.stringify(messageBuffer));
+            const serializedMessageBuffer = JSON.stringify(messageBuffer);
+            websocket.send(serializedMessageBuffer);
             messageBuffer.length = 0;
           }
         };
@@ -86,7 +83,7 @@ export const useLogger: (componentName: string) => LoggerType = (
     }
   });
 
-  const log = (clientLevel: LogLevelType, msg: string) => {
+  const log = (clientLevel: LogLevel, msg: string) => {
     // Check if the component should be logged
     if (shouldLogComponent(componentName) && loggingRef) {
       const { websocket, messageBuffer } = loggingRef.current;
@@ -102,7 +99,8 @@ export const useLogger: (componentName: string) => LoggerType = (
 
       if (websocket && websocket.readyState === WebSocket.OPEN) {
         // WebSocket is in OPEN state, send any buffered messages and the new message
-        websocket.send(JSON.stringify(messageBuffer));
+        const serializedMessageBuffer = JSON.stringify(messageBuffer);
+        websocket.send(serializedMessageBuffer);
         // Clear the message buffer
         messageBuffer.length = 0;
       } else {
@@ -117,16 +115,16 @@ export const useLogger: (componentName: string) => LoggerType = (
     }
   };
 
-  const genLog = (clientLevel: LogLevelType) => (msg: string) =>
+  const genLog = (clientLevel: LogLevel) => (msg: string) =>
     log(clientLevel, msg);
 
   return {
     log,
-    fatal: genLog('fatal'),
-    error: genLog('error'),
-    warn: genLog('warn'),
-    info: genLog('info'),
-    debug: genLog('debug'),
-    trace: genLog('trace'),
+    fatal: genLog(LogLevel.fatal),
+    error: genLog(LogLevel.error),
+    warn: genLog(LogLevel.warn),
+    info: genLog(LogLevel.info),
+    debug: genLog(LogLevel.debug),
+    trace: genLog(LogLevel.trace),
   };
 };

@@ -20,7 +20,7 @@ ReactDOM.render(
         <FeatureFlag flag={'client.Pages.PlaceholderHome'}>
           <Home />
         </FeatureFlag>
-      </LoggingProvider>,
+      </LoggingProvider>
     </ConfigFeatureFlagProvider>
   </ApolloProvider>,
   document.getElementById('root')

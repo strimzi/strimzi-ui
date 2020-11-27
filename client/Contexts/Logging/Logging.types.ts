@@ -10,15 +10,18 @@ export type LoggingStateType = {
 export interface loggerMessage {
   clientTime: number;
   clientID: string;
-  clientLevel: LogLevelType;
+  clientLevel: LogLevel;
   componentName: string;
   msg: string;
 }
 
-export type LogLevelType =
-  | 'fatal'
-  | 'error'
-  | 'warn'
-  | 'info'
-  | 'debug'
-  | 'trace';
+export enum LogLevel {
+  fatal = 'fatal',
+  error = 'error',
+  warn = 'warn',
+  info = 'info',
+  debug = 'debug',
+  trace = 'trace',
+}
+
+export type LogLevelType = keyof typeof LogLevel;
