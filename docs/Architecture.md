@@ -113,17 +113,17 @@ The Strimzi UI makes use of both HTTP and WebSockets. This section details what 
 
 #### HTTP
 
-Currently, HTTP is only used to retrieve static assets from the UI server.
+Currently, HTTP is used to retrieve static assets from the UI server, as well as serve [GraphQL](https://graphql.org/) queries. In a following PR, all GraphQL requests (including queries) will be made via a Websocket, [as per the UI proposal](https://github.com/strimzi/proposals/blob/master/011-strimzi-ui.md#session-management-and-authentication).
 
 #### WebSockets
-
-[GraphQL](https://graphql.org/)
-
-All messages with GraphQL are done over a WebSocket, even standard queries. WebSockets are required by GraphQL to do subscriptions. Subscriptions allow the client to listen for data changes from the server so that it can stay updated in real-time. All other queries are bundled into the same websocket so a clean network traffic log can be kept. The WebSocket will be held with the UI server, which will then proxy any websocket messages to the GraphQL admin server. This proxy allows for custom Apollo errors to be injected into the websocket so that the client can handle additional errors such as session expiration. The proxy is also responsible for injecting an authorization header for the client so that a connection can be established to the admin server. For full details of the WebSocket flow, [view our proposal](https://github.com/strimzi/proposals/blob/master/011-strimzi-ui.md#session-management-and-authentication).
 
 [Logging](#client-side-logging)
 
 Client logs are sent to the UI server over a persistent websocket so that the logs of both components can co-exist.
+
+##### Future work
+
+In due course, all [GraphQL](https://graphql.org/) requests will be done over a WebSocket, even standard queries. WebSockets are required by GraphQL to do subscriptions. Subscriptions allow the client to listen for data changes from the server so that it can stay updated in real-time. All other queries are bundled into the same websocket so a clean network traffic log can be kept. The WebSocket will be held with the UI server, which will then proxy any websocket messages to the GraphQL admin server. This proxy allows for custom Apollo errors to be injected into the websocket so that the client can handle additional errors such as session expiration. The proxy is also responsible for injecting an authorization header for the client so that a connection can be established to the admin server. For full details of the WebSocket flow, [view our proposal](https://github.com/strimzi/proposals/blob/master/011-strimzi-ui.md#session-management-and-authentication).
 
 ### Strimzi integration
 
@@ -370,9 +370,7 @@ Once all callbacks have been executed, the _server_ will reduce and own the curr
 
 ##### Client configuration
 
-As mentioned
-
-[Configuration options for the client can be found here.](../client/README.md#configuration-options)
+As mentioned above, the UI server will reduce the defined configuration and serve that configuration via the `/config` endpoint, as well as including a critical subset in the returned `index.html`. The exposure of all of these values for use in the client will be managed via the [`ConfigFeatureFlag` context](../client/Contexts/ConfigFeatureFlag/README.md). All full run down of [all configuration options for the client can be found here.](../client/README.md#configuration-options)
 
 ##### Server configuration
 
@@ -384,7 +382,24 @@ The UI server will primarily be configured at runtime via a provided JSON file. 
 
 ##### Feature flags
 
-Additional content to follow in a future PR/as a part of https://github.com/strimzi/strimzi-ui/issues/13 .
+Feature flags are used across the UI to enabled and disable capabilities as required. Features may be enabled or disabled based for a range of reasons. For example, a feature may be enabled or disabled base on if they are in still development, if a user has the rights to access them (or not), or if the backend can support the capability in question. All feature flag values resolve to a `true`/`false` value.
+
+For use in the client, the [`ConfigFeatureFlag` context](../client/Contexts/ConfigFeatureFlag/README.md) handles the retrieval of feature flag state from the server, which can then be accessed via either the context value provided, or via the `FeatureFlag` component. The server can access Feature flag state from the configuration directly.
+
+The convention for defining feature flags should be kept contextual. For example, all flags for a given area should be 'namespaced' as such. For example:
+
+```
+  client: {
+    Pages: {
+      Home: true
+    },
+    Home: {
+      showVersion: false
+    }
+  }
+```
+
+Here, given the structure, it is easy to see the differentiation between flags/capabilities for a page (`Home`), and flags for the showing of pages (`Pages`), and that these are only required on the `client` codebase. The current feature flag configuration is [defined here.](../config/featureflags.ts). Finally, as and when required, feature flags can be overriden in the client via URL, [as described here](../client/Contexts/ConfigFeatureFlag/README.md#URL-values).
 
 ### Code Structure
 

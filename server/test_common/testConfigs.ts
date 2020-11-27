@@ -3,13 +3,13 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 import { resolve } from 'path';
-import { serverConfig } from 'types';
+import { serverConfigType } from 'types';
 import { getDefaultConfig } from 'serverConfig';
 import merge from 'lodash.merge';
 
-const defaultConfig: () => serverConfig = () => getDefaultConfig();
+const defaultConfig: () => serverConfigType = () => getDefaultConfig();
 
-const defaultTestConfig: () => serverConfig = () =>
+const defaultTestConfig: () => serverConfigType = () =>
   merge(defaultConfig(), { logging: false });
 
 const modules = {
@@ -20,28 +20,48 @@ const modules = {
   mockapi: false,
 };
 
-const mockapiModuleConfig: () => serverConfig = () =>
-  merge(merge({}, defaultTestConfig()), {
+const mockapiModuleConfig: () => serverConfigType = () =>
+  merge({}, defaultTestConfig(), {
     modules: { ...modules, mockapi: true },
   });
-const logModuleConfig: () => serverConfig = () =>
-  merge(merge({}, defaultTestConfig()), {
+
+const logModuleConfig: () => serverConfigType = () =>
+  merge({}, defaultTestConfig(), {
     modules: { ...modules, log: true },
   });
-const configModuleConfig: () => serverConfig = () =>
-  merge(merge({}, defaultTestConfig()), {
+
+const configModuleConfig: () => serverConfigType = () =>
+  merge({}, defaultTestConfig(), {
     modules: { ...modules, config: true },
   });
-const clientModuleConfig: () => serverConfig = () =>
-  merge(merge({}, defaultTestConfig()), {
+
+const configModuleWithConfigOverrides: () => serverConfigType = () =>
+  merge({}, configModuleConfig(), {
+    client: {
+      configOverrides: {
+        version: '34.0.0',
+      },
+    },
+    featureFlags: {
+      client: {
+        Home: {
+          showVersion: false,
+        },
+      },
+      testFlag: true,
+    },
+  });
+
+const clientModuleConfig: () => serverConfigType = () =>
+  merge({}, defaultTestConfig(), {
     client: {
       publicDir: resolve(__dirname, './__test_fixtures__/client'),
     },
     modules: { ...modules, client: true },
   });
 
-const apiModuleConfig: () => serverConfig = () =>
-  merge(merge({}, defaultTestConfig()), {
+const apiModuleConfig: () => serverConfigType = () =>
+  merge({}, defaultTestConfig(), {
     proxy: {
       hostname: 'test-backend',
       port: 3434,
@@ -49,8 +69,8 @@ const apiModuleConfig: () => serverConfig = () =>
     modules: { ...modules, api: true },
   });
 
-const apiModuleConfigWithCustomContextRoot: () => serverConfig = () =>
-  merge(merge({}, defaultTestConfig()), {
+const apiModuleConfigWithCustomContextRoot: () => serverConfigType = () =>
+  merge({}, defaultTestConfig(), {
     proxy: {
       hostname: 'test-backend',
       port: 3434,
@@ -59,8 +79,8 @@ const apiModuleConfigWithCustomContextRoot: () => serverConfig = () =>
     modules: { ...modules, api: true },
   });
 
-const securedApiModuleConfig: () => serverConfig = () =>
-  merge(merge(apiModuleConfig()), {
+const securedApiModuleConfig: () => serverConfigType = () =>
+  merge(apiModuleConfig(), {
     proxy: {
       transport: {
         cert: 'mock certificate',
@@ -68,25 +88,27 @@ const securedApiModuleConfig: () => serverConfig = () =>
     },
   });
 
-export const getConfigForName: (name: string) => serverConfig = (name) => {
+export const getConfigForName: (name: string) => serverConfigType = (name) => {
   switch (name) {
-    default:
-    case 'default':
-    case 'production':
-      return defaultTestConfig();
-    case 'mockapi_only':
-      return mockapiModuleConfig();
-    case 'log_only':
-      return logModuleConfig();
-    case 'config_only':
-      return configModuleConfig();
-    case 'client_only':
-      return clientModuleConfig();
-    case 'api_only':
-      return apiModuleConfig();
-    case 'api_secured_only':
-      return securedApiModuleConfig();
-    case 'api_with_custom_context_root':
-      return apiModuleConfigWithCustomContextRoot();
+  default:
+  case 'default':
+  case 'production':
+    return defaultTestConfig();
+  case 'mockapi_only':
+    return mockapiModuleConfig();
+  case 'log_only':
+    return logModuleConfig();
+  case 'config_only':
+    return configModuleConfig();
+  case 'config_only_with_config_overrides':
+    return configModuleWithConfigOverrides();
+  case 'client_only':
+    return clientModuleConfig();
+  case 'api_only':
+    return apiModuleConfig();
+  case 'api_secured_only':
+    return securedApiModuleConfig();
+  case 'api_with_custom_context_root':
+    return apiModuleConfigWithCustomContextRoot();
   }
 };

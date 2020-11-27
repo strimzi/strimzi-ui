@@ -2,11 +2,11 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-import { Then, Fusion } from "jest-cucumber-fusion";
-import { stepWithWorld } from "test_common/commonServerSteps";
+import { Then, Fusion } from 'jest-cucumber-fusion';
+import { stepWithWorld } from 'test_common/commonServerSteps';
 
 Then(
-  "I get the expected mockapi response",
+  'I get the expected mockapi response',
   stepWithWorld((world) => {
     const { request } = world;
     return request.expect(200).expect((res) => {
@@ -31,11 +31,11 @@ Then(
 );
 
 Then(
-  "I get the expected mockapi test endpoint response",
+  'I get the expected mockapi test endpoint response',
   stepWithWorld((world) => {
     const { request } = world;
     return request.expect(418);
   })
 );
 
-Fusion("mockapi.feature");
+Fusion('mockapi.feature');

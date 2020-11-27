@@ -10,6 +10,8 @@ This directory contains all client code for the Strimzi UI - ie code which is se
 - [Images](./Images/README.md) - images used across the UI
 - [Pages](./Pages/README.md) - metadata used to describe the pages shown in the UI
 - [Panels](./Panels/README.md) - section/page level components
+- [Queries](./Queries/README.md) - GraphQL request definitions (Queries, Mutations etc)
+- [Utils](./Utils/README.md) - common utility code used across the client UI
 - `tsconfig.json` - Typescript config for this codebase
 - `jest.config.js` - Jest config for this codebase.
 

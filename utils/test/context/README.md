@@ -18,3 +18,9 @@ render = (children) =>
 This can be defined in a test file so that tests can still use a `render`
 function in the same way they usually would with rtl but these renders will be
 wrapped in the providers defined in the above function.
+
+## Available functions
+
+- `renderWithContextProviders` - described above
+- `renderWithConfigFeatureFlagContext` - uses `renderWithContextProviders` to render given JSX with a default `ConfigFeatureFlag` context provided
+- `renderWithCustomConfigFeatureFlagContext` - same as `renderWithConfigFeatureFlagContext`, but allows a specific value for the `ConfigFeatureFlag` context to be provided

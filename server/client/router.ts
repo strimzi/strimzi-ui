@@ -4,7 +4,7 @@
  */
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
-import { getFiles } from './controller';
+import { getFiles, renderTemplate } from './controller';
 import { UIServerModule } from 'types';
 
 const moduleName = 'client';
@@ -21,6 +21,7 @@ export const ClientModule: UIServerModule = {
       protectedFiles,
       builtClientDir,
       hasIndexFile,
+      indexFile,
     } = getFiles(publicDir);
 
     logger.debug(
@@ -30,6 +31,10 @@ export const ClientModule: UIServerModule = {
 
     // add the auth middleware to all non public files
     protectedFiles.forEach((file) => routerForModule.get(`${file}`, authFn));
+
+    // return index.html, with configuration templated in
+    hasIndexFile &&
+      routerForModule.get('/index.html', renderTemplate(indexFile));
 
     // host all files from the client dir
     routerForModule.get(

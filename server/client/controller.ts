@@ -4,18 +4,20 @@
  */
 
 import { resolve, sep } from 'path';
-import { existsSync, readdirSync } from 'fs';
+import { existsSync, readdirSync, readFileSync } from 'fs';
+import { serverConfigType } from 'types';
+import { render } from 'mustache';
 
 // function to recursively get all files from a directory
 const getFilesInDirectory: (directory: string) => Array<string> = (directory) =>
   existsSync(directory)
     ? readdirSync(directory, { withFileTypes: true }).reduce((acc, fileObj) => {
-        return fileObj.isFile()
-          ? acc.concat([`${directory}${sep}${fileObj.name}`])
-          : acc.concat(
-              getFilesInDirectory(`${directory}${sep}${fileObj.name}`)
-            );
-      }, [] as string[])
+      return fileObj.isFile()
+        ? acc.concat([`${directory}${sep}${fileObj.name}`])
+        : acc.concat(
+          getFilesInDirectory(`${directory}${sep}${fileObj.name}`)
+        );
+    }, [] as string[])
     : [];
 
 // mark a subset of files as public - this means any user can access them. These entries will be used in a regex - if the test passes, it will be considered public
@@ -34,6 +36,7 @@ export const getFiles: (
 ) => {
   totalNumberOfFiles: number;
   hasIndexFile: boolean;
+  indexFile: string;
   protectedFiles: Array<string>;
   builtClientDir: string;
 } = (publicDirectory) => {
@@ -55,10 +58,38 @@ export const getFiles: (
     [] as string[]
   );
 
+  const hasIndexFile = allFilesInClientDirectory.includes('/index.html');
+  const indexFile = hasIndexFile
+    ? readFileSync(resolve(`${builtClientDir}${sep}index.html`), {
+      encoding: 'utf-8',
+    })
+    : '';
+
   return {
     totalNumberOfFiles: allFilesInClientDirectory.length,
-    hasIndexFile: allFilesInClientDirectory.includes('/index.html'),
+    hasIndexFile,
+    indexFile,
     protectedFiles: protectedFiles,
     builtClientDir,
   };
+};
+
+export const renderTemplate: (indexTemplate: string) => (req, res) => void = (
+  indexTemplate
+) => (req, res) => {
+  const { entry, debug } = res.locals.strimziuicontext.logger;
+  const { exit } = entry('renderTemplate');
+  const { authentication } = res.locals.strimziuicontext
+    .config as serverConfigType;
+  const bootstrapConfigs = {
+    authType: authentication.strategy,
+  };
+  debug(`Templating bootstrap config containing`, bootstrapConfigs);
+  res.send(
+    exit(
+      render(indexTemplate, {
+        bootstrapConfigs: encodeURIComponent(JSON.stringify(bootstrapConfigs)),
+      })
+    )
+  );
 };

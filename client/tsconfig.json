@@ -6,7 +6,8 @@
     "outDir": "../js/client",
     "baseUrl": ".",
     "paths": {
-      "utils/*": ["../utils/*"]
+      "utils/*": ["../utils/*"],
+      "ui-config/*": ["../config/*"]
     }
   }
 }

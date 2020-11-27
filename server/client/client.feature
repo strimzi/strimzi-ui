@@ -37,3 +37,12 @@ Feature: client module
     | /someroute            | 302           |
     | /protected.html       | 511           |
     | /                     | 200           |
+
+
+    Scenario: Critical configuration is templated into index.html so the client can bootstrap
+    Given a 'client_only' server configuration
+    And There are files to serve
+    And Authentication is required
+    And I run an instance of the Strimzi-UI server
+    When I make a 'get' request to '/index.html'
+    Then the file is returned as with the expected configuration included

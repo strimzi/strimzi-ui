@@ -44,4 +44,27 @@ Then(
   })
 );
 
+Then(
+  'the file is returned as with the expected configuration included',
+  stepWithWorld(async (world) => {
+    const { request, configuration } = world;
+    const configuredAuthType = configuration.authentication.strategy;
+
+    await request.then(
+      (res) => {
+        const { status, text } = res;
+        // pull required configuration from the world, and create the expected shape from them
+        const expectedConfig = encodeURIComponent(
+          JSON.stringify({ authType: configuredAuthType })
+        );
+        expect(status).toBe(200);
+        expect(text.includes(expectedConfig)).toBe(true);
+      },
+      (err) => {
+        throw err;
+      }
+    );
+  })
+);
+
 Fusion('client.feature');

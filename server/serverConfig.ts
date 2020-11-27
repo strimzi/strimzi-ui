@@ -6,11 +6,11 @@
 import { existsSync, watch } from 'fs';
 import { resolve } from 'path';
 import merge from 'lodash.merge';
-import { server } from 'ui-config';
+import { server } from 'ui-config/index';
 
-const { defaultServerConfig } = server.values;
+const { defaultConfig, serverConfigPath, serverName } = server.values;
 
-import { serverConfig, loggerType } from 'types';
+import { serverConfigType, loggerType } from 'types';
 
 /** Out of the box when built by webpack, it replaces `require` with it's own version (`__webpack_require__`), which requires static paths. As we use require to load a config from an envvar, we need the node require function (`__non_webpack_require__`, as called by webpack). Thus, check if we are in a webpack built environment (I.e `__non_webpack_require__` is defined), and if so, use it, else use `require` (which will be the normal node require, used via ts-node etc) */
 /* eslint-disable no-undef */
@@ -20,24 +20,21 @@ const requireForConfigLoad =
     : require;
 /* eslint-enable no-undef */
 
-const defaultConfig = (defaultServerConfig as unknown) as serverConfig;
+const defaultServerConfig = (defaultConfig as unknown) as serverConfigType;
 
-export const getDefaultConfig: () => serverConfig = () =>
-  merge({}, defaultConfig);
+export const getDefaultConfig: () => serverConfigType = () =>
+  merge({}, defaultServerConfig);
 
-const pathToConfigFile = process.env.configPath
-  ? resolve(process.env.configPath)
-  : resolve('./server.config.json'); // default file config
+const pathToConfigFile = resolve(serverConfigPath as string);
 
 const configFileExists = existsSync(pathToConfigFile);
-export const getServerName: () => string = () =>
-  process.env.serverName || 'Strimzi-ui server';
+export const getServerName: () => string = () => serverName as string;
 
 export const loadConfig: (
-  callback: (config: serverConfig) => void,
+  callback: (config: serverConfigType) => void,
   logger: loggerType
 ) => void = (callback, logger) => {
-  let config = merge({}, defaultConfig);
+  let config = merge({}, defaultServerConfig);
 
   if (configFileExists) {
     logger.info(`Using config file '${pathToConfigFile}'`);
@@ -58,7 +55,7 @@ export const loadConfig: (
 };
 
 export const watchConfig: (
-  callbackOnConfigChange: (newConfig: serverConfig) => void,
+  callbackOnConfigChange: (newConfig: serverConfigType) => void,
   logger: loggerType
 ) => void = (callbackOnConfigChange, logger) =>
   configFileExists &&

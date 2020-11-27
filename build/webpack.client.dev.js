@@ -43,7 +43,11 @@ const devSpecificConfig = {
     ],
   },
   plugins: [
-    withHTMLPlugin(),
+    withHTMLPlugin({
+      bootstrapConfigInsert: encodeURIComponent(
+        JSON.stringify({ authType: 'none' })
+      ), // template in bootstrap config required, which would normally be provided by the client server module
+    }),
     withNormalModuleReplacementPlugin(),
     withMiniCssExtractPlugin({
       hmr: true, // enable hmr as well as standard config

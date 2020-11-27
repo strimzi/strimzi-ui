@@ -4,16 +4,24 @@
  */
 
 import merge from 'lodash.merge';
-import { PublicConfig, ProgrammaticValue, Config, Literal } from './types';
+import {
+  PublicConfig,
+  ProgrammaticValue,
+  Config,
+  Literal,
+} from './config.types';
 
 /** helper function to get the value of an environment variable, or a defined fallback value */
 export const getEnvvarValue: (
   name: string,
-  fallback?: Literal
-) => () => Literal = (name, fallback = `No value for ENVVAR ${name}`) => () =>
+  fallback?: string
+) => () => string = (name, fallback = `No value for ENVVAR ${name}`) => () =>
   process.env[name] || fallback;
 
-/** helper used to process a `configurationDeclaration` or `featureFlagDeclaration` (D) to a `configurationType` with values being of type (T) for use across the codebase */
+/** helper used to process sets of `configurationDeclaration` or `featureFlagDeclaration` (D) to a `configurationType` with values being of type (T) for use across the codebase.
+ * @param config - an array of `D` config decelerations. Important! If the same key is present in any `config`s provided in this array, the latter value will take precedence/be returned in the output
+ * @returns a configuration object ready to use in across the UI
+ */
 export const processConfig = <T extends Literal>(
   config: Config<T>[]
 ): PublicConfig<T> => {
@@ -34,7 +42,8 @@ export const processConfig = <T extends Literal>(
         valueType === 'boolean' ||
         valueType === 'number';
       const isConfigurationValue =
-        !isLiteralValue && (value as ProgrammaticValue<T>).configValue;
+        !isLiteralValue &&
+        (value as ProgrammaticValue<T>).configValue !== undefined;
 
       let publicValue, privateValue;
 

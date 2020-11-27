@@ -5,7 +5,7 @@
 import express from 'express';
 import helmet from 'helmet';
 import * as availableModules from './modules';
-import { serverConfig, UIServerModule } from 'types';
+import { serverConfigType, UIServerModule } from 'types';
 import { authFunction } from 'placeholderFunctionsToReplace';
 import expressSession, { SessionOptions } from 'express-session';
 import {
@@ -15,7 +15,7 @@ import {
 } from 'logging';
 
 export const returnExpress: (
-  getConfig: () => serverConfig
+  getConfig: () => serverConfigType
 ) => express.Application = (getConfig) => {
   const logger = generateLogger('core');
   const app = express();

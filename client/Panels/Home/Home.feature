@@ -5,4 +5,9 @@ Feature: Home component
   Scenario: Basic rendering
     Given a Home component
     When it is rendered
-    Then it should display text
+    Then it should display the expected text
+
+  Scenario: Basic rendering without version
+    Given a Home component
+    When it is rendered with no version
+    Then it should display the expected text

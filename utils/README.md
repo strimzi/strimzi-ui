@@ -8,7 +8,7 @@ This directory contains common helper code or configuration for a variety of pur
 
 Configuration used for development purposes. See the [README](./dev_config/README.md) for further details.
 
-### Tooling
+### tooling
 
 - `constants.js` - file containing development/build time constants.
 - `aliasHelper.js` - logic used to generate code aliases.

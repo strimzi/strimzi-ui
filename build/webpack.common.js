@@ -37,6 +37,7 @@ const withHTMLPlugin = returnPluginWithConfig(HtmlPlugin, {
   filename: 'index.html', // name of output file
   template: `${BOOTSTRAP_DIR}/index.html`, // source template
   title: UI_TITLE, // HTML title
+  bootstrapConfigInsert: '{{bootstrapConfigs}}', // config insert for client bootstrap data
   favicon: `${IMAGES_DIR}/favicon.ico`, // favicon for this page
   inject: true,
 });
@@ -148,6 +149,7 @@ const withImageModuleLoader = returnModuleRuleWithConfig(
 // exported helper function - returns common configuration, merged via object spread. Provided options take precedence
 const returnBasicConfigMergedWith = (customConfigurationForBuildMode = {}) =>
   merge(
+    {},
     {
       entry: `${BOOTSTRAP_DIR}/index.tsx`,
       target: 'web', // build for browsers (Webpack default)

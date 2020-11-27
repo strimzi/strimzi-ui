@@ -11,3 +11,5 @@ import { renderWithContextProviders } from 'utils/test';
 ## Provided utilities
 
 - [Context](./context/README.md) - utilities for writing tests for components that use contexts.
+- [i18n](./i18n/README.md) - i18n test helpers
+- [withApollo](./withApollo/README.md) - Apollo client helper utilities

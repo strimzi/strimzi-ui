@@ -3,16 +3,21 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import { Config, Literal } from './types';
+import { Config, Literal } from './config.types';
+import { version as strimziUiVersion } from '../package.json';
 
 /**
  * static configuration - literal values for the client and server that can be defined at develop time
  */
 
-const client: Config<Literal> = {};
+const client: Config<Literal> = {
+  about: {
+    version: strimziUiVersion,
+  },
+};
 
 const server: Config<Literal> = {
-  defaultServerConfig: {
+  defaultConfig: {
     configValue: {
       authentication: {
         strategy: 'none',

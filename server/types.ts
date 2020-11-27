@@ -5,6 +5,7 @@
 import express from 'express';
 import { SecureVersion } from 'tls';
 import { Logger, LoggerOptions } from 'pino';
+import { exposedClientType, exposedFeatureFlagsType } from 'ui-config/types';
 
 export type supportedAuthenticationStrategyTypes = 'none' | 'scram' | 'oauth';
 
@@ -28,15 +29,12 @@ type sslCertificateType = {
 
 type clientConfigType = {
   /** Overrides to send to the client */
-  configOverrides: Record<string, unknown>;
+  configOverrides: exposedClientType;
   /** SSL transport configuration */
   transport: sslCertificateType;
   /** location of public files to server to the client */
   publicDir: string;
 };
-
-/** feature flag configuration overrides */
-type featureFlagsConfigType = Record<string, unknown>;
 
 type moduleConfigType = {
   /** is the api module enabled (or not) */
@@ -67,13 +65,13 @@ type sessionConfigType = {
   name: string;
 };
 
-export type serverConfig = {
+export type serverConfigType = {
   /** authentication configuration */
   authentication: authenticationConfigType;
   /** client (browser) facing configuration */
   client: clientConfigType;
   /** feature flag configuration overrides (for both client and server) */
-  featureFlags: featureFlagsConfigType;
+  featureFlags: exposedFeatureFlagsType;
   /** logging configuration */
   logging: LoggerOptions;
   /** module configuration */
@@ -105,7 +103,7 @@ export type entryExitLoggerType = Logger & {
 
 export type strimziUIContextType = {
   /** configuration passed to the server */
-  config: serverConfig;
+  config: serverConfigType;
   /** the unique id for this request */
   requestID: string;
   /** a pre-configured logger object to use for the life of this request */
@@ -117,7 +115,7 @@ interface addModule {
   (
     mountLogger: entryExitLoggerType,
     authFunction: expressMiddleware,
-    configAtServerStart: serverConfig
+    configAtServerStart: serverConfigType
   ): {
     /** the root/mounting point for requests made to this module */
     mountPoint: string;

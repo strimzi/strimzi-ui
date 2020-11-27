@@ -7,17 +7,19 @@ import { UIServerModule } from 'types';
 
 import bodyParser from 'body-parser';
 import { ApolloServer } from 'apollo-server-express';
-import { resolvers, schema } from './controller';
+import { apolloConfig } from './controller';
 
 const moduleName = 'config';
 
 export const ConfigModule: UIServerModule = {
   moduleName,
-  addModule: (logger, authFn) => {
+  addModule: (logger, authFn, config) => {
     const { exit } = logger.entry('addModule');
     const routerForModule = express.Router();
 
-    const server = new ApolloServer({ typeDefs: schema, resolvers });
+    const server = new ApolloServer({
+      ...apolloConfig(config),
+    });
 
     routerForModule.use(
       authFn,
