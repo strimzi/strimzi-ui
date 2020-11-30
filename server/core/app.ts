@@ -75,8 +75,21 @@ export const returnExpress: (
     next();
   });
 
-  Object.entries(routingTable).forEach(
-    ([moduleName, { mountPoint, routerForModule }]) =>
+  Object.entries(routingTable)
+    .map(([moduleName, { mountPoint, routerForModule }]) => ({
+      moduleName,
+      mountPoint,
+      routerForModule,
+    }))
+    .sort(({ mountPoint: mountPointA }, { mountPoint: mountPointB }) => {
+      // Sort mountpoints in reverse order, so that the shortest mountpoints are added last
+      // and do not route traffic meant for other endpoints
+      return mountPointA < mountPointB ? 1 : mountPointA > mountPointB ? -1 : 0;
+    })
+    .forEach(({ moduleName, mountPoint, routerForModule }) => {
+      logger.debug(
+        `Setting up app.use('${mountPoint}') for module '${moduleName}'`
+      );
       app.use(`${mountPoint}`, (req, res, next) => {
         // add logger for this module
         res.locals.strimziuicontext = {
@@ -91,8 +104,8 @@ export const returnExpress: (
           moduleName
         );
         isEnabled ? routerForModule(req, res, next) : next(); // if enabled, call the router for the module so it can handle the request. Else, call the next module
-      })
-  );
+      });
+    });
 
   return app;
 };
