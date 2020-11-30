@@ -56,16 +56,24 @@ const generateLogger: (
     requestID,
   });
 
-  const entryExitLogger = logger;
-  entryExitLogger.entry = (fnName, ...params) => {
-    logger.trace({ fnName, params }, 'entry');
-    return {
-      exit: (returns) => {
-        logger.trace({ fnName, returns }, 'exit');
-        return returns; // return params so you can do `return exit(.....)`
-      },
-    };
+  const entryExitLogger = {
+    ...logger,
+    entry: (fnName, ...params) => {
+      logger.trace({ fnName, params }, 'entry');
+      return {
+        exit: (returns) => {
+          logger.trace({ fnName, returns }, 'exit');
+          return returns; // return params so you can do `return exit(.....)`
+        },
+      };
+    },
   };
+
+  // Wrap the logging functions (trace(), debug(), info(), warn(), error(), and fatal()) in functions
+  // so that the entryExitLogger can be destructured. e.g: const {info} = res.locals.strimziuicontext.logger
+  Object.keys(logger.levels.values).forEach((level) => {
+    entryExitLogger[level] = (msg, ...args) => logger[level](msg, ...args);
+  });
 
   return entryExitLogger as entryExitLoggerType;
 };
