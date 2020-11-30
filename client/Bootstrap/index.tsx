@@ -9,7 +9,7 @@ import { ApolloProvider } from '@apollo/client';
 
 import { apolloClient } from 'Bootstrap/GraphQLClient';
 import { ConfigFeatureFlagProvider, FeatureFlag } from 'Contexts';
-import { Home } from 'Panels/Home';
+import { Home } from 'Panels';
 import { LoggingProvider } from 'Contexts';
 
 init(); //Bootstrap i18next support

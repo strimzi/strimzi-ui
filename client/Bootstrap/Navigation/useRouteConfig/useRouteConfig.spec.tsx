@@ -8,7 +8,7 @@ import { PageConfig, RouterConfig, PageType } from './useRouteConfig.types';
 import { generateSimplePage } from './useRouteConfig.assets';
 import { translate } from 'utils/test';
 import { useConfigFeatureFlag } from 'Hooks';
-import { Error404 } from 'Panels/Error404';
+import { Error404 } from 'Panels';
 
 const READ = '';
 

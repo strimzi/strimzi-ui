@@ -6,7 +6,7 @@ import { RouterConfig, PageConfig, Page, Leaf } from './useRouteConfig.types';
 import { useTranslation } from 'react-i18next';
 import mergeWith from 'lodash.mergewith';
 import { useConfigFeatureFlag } from 'Hooks';
-import { Error404 } from 'Panels/Error404';
+import { Error404 } from 'Panels';
 import get from 'lodash.get';
 
 const isTopLevelNav = (path) => path.split('/').length === 2;
