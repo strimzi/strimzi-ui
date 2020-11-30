@@ -10,14 +10,17 @@ import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from 'Bootstrap/GraphQLClient';
 import { ConfigFeatureFlagProvider, FeatureFlag } from 'Contexts';
 import { Home } from 'Panels/Home';
+import { LoggingProvider } from 'Contexts';
 
 init(); //Bootstrap i18next support
 ReactDOM.render(
   <ApolloProvider client={apolloClient}>
     <ConfigFeatureFlagProvider>
-      <FeatureFlag flag={'client.Pages.PlaceholderHome'}>
-        <Home />
-      </FeatureFlag>
+      <LoggingProvider>
+        <FeatureFlag flag={'client.Pages.PlaceholderHome'}>
+          <Home />
+        </FeatureFlag>
+      </LoggingProvider>
     </ConfigFeatureFlagProvider>
   </ApolloProvider>,
   document.getElementById('root')

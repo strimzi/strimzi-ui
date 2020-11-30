@@ -2,13 +2,14 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-
 import http from 'http';
 import https from 'https';
+import WebSocket from 'ws';
 
 import { loadConfig, watchConfig } from 'serverConfig';
 import { returnExpress } from 'core';
 import { generateLogger, updateRootLoggerOptions } from 'logging';
+import { strimziUIResponseType } from 'types';
 
 let logger = generateLogger('main');
 const errorHandler: (err: Error, ...others: unknown[]) => void = (
@@ -40,7 +41,7 @@ loadConfig((loadedInitialConfig) => {
     logger = generateLogger('main');
   }, logger); // load config and update config value
 
-  const expressAppForServer = returnExpress(() => config);
+  const expressApp = returnExpress(() => config);
 
   const { cert, key, ciphers, minTLS } = config.client.transport;
   let server;
@@ -55,10 +56,10 @@ loadConfig((loadedInitialConfig) => {
       ciphers,
       minVersion: minTLS || 'TLSv1.2',
     };
-    server = https.createServer(httpsConfig, expressAppForServer);
+    server = https.createServer(httpsConfig, expressApp);
   } else {
     logger.info('Strimzi ui server will serve via HTTP');
-    server = http.createServer(expressAppForServer);
+    server = http.createServer(expressApp);
   }
 
   const instance = server.listen(config.port, config.hostname, () =>
@@ -68,6 +69,26 @@ loadConfig((loadedInitialConfig) => {
       }:${config.port}`
     )
   );
+
+  const wss = new WebSocket.Server({ noServer: true });
+  instance.on('upgrade', (req, socket, head) => {
+    const { upgrade, connection } = req.headers;
+    logger.trace(
+      { headers: { upgrade, connection } },
+      `Upgrade request received for ${req.url}`
+    );
+
+    if (upgrade === 'websocket') {
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        const res = new http.ServerResponse(req) as strimziUIResponseType;
+        // add/mark the request as a websocket request
+        req.isWs = true;
+        res.ws = ws;
+        // call the express app as usual
+        expressApp(req, res);
+      });
+    }
+  });
 
   const shutdown = (server) => () =>
     server.close(() => {

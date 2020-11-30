@@ -4,3 +4,4 @@
  */
 export * from './ConfigFeatureFlag';
 export * from './Introspect/ExpectationTypes';
+export * from './Logging';

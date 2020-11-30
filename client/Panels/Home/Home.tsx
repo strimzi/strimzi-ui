@@ -6,13 +6,16 @@ import React, { FunctionComponent } from 'react';
 import get from 'lodash.get';
 import image from 'Images/logo.png';
 import './style.scss';
-import { useConfigFeatureFlag } from 'Hooks';
+import { useConfigFeatureFlag, useLogger } from 'Hooks';
 
 const Home: FunctionComponent = ({ children }) => {
   const { client, featureFlags, isComplete } = useConfigFeatureFlag();
   const version = get(client, 'about.version', '');
   // use the feature flag from context - could also use the `FeatureFlag` component - this just shows alternative usage
   const showVersion = get(featureFlags, 'client.Home.showVersion', false);
+
+  const { debug } = useLogger('Home');
+  debug(`Client version to display: ${version}`);
 
   return (
     <div className='home'>

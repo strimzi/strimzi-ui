@@ -35,3 +35,4 @@ Where:
 ## Implemented hooks
 
 - [`useConfigFeatureFlag`](./useConfigFeatureFlag/README.md) - a hook providing consumer access to the `ConfigFeatureFlag` context, containing configuration and feature flag state
+- [`useLogger`](./useLogger/README.md) - sends client log messages to the WebSocket listener on the server `/log` endpoint.

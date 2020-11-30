@@ -10,7 +10,7 @@ import merge from 'lodash.merge';
 const defaultConfig: () => serverConfigType = () => getDefaultConfig();
 
 const defaultTestConfig: () => serverConfigType = () =>
-  merge(defaultConfig(), { logging: false });
+  merge(defaultConfig(), { logging: {} });
 
 const modules = {
   api: false,
