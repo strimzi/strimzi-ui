@@ -77,14 +77,14 @@ export const getFiles: (
 export const renderTemplate: (indexTemplate: string) => (req, res) => void = (
   indexTemplate
 ) => (req, res) => {
-  const { logger } = res.locals.strimziuicontext;
-  const { exit } = logger.entry('renderTemplate');
+  const { entry, debug } = res.locals.strimziuicontext.logger;
+  const { exit } = entry('renderTemplate');
   const { authentication } = res.locals.strimziuicontext
     .config as serverConfigType;
   const bootstrapConfigs = {
     authType: authentication.strategy,
   };
-  logger.debug('Templating bootstrap config containing %o', bootstrapConfigs);
+  debug('Templating bootstrap config containing %o', bootstrapConfigs);
   res.send(
     exit(
       render(indexTemplate, {
