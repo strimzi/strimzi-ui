@@ -5,7 +5,12 @@
 import { Given, When, Then, Fusion } from 'jest-cucumber-fusion';
 import { RenderResult } from '@testing-library/react';
 import merge from 'lodash.merge';
-import { renderWithCustomConfigFeatureFlagContext } from 'utils/test';
+import {
+  renderWithCustomConfigFeatureFlagContext,
+  withApolloProviderReturning,
+  apolloMockResponse,
+} from 'utils/test';
+import { mockGetTopicsRequests } from 'Models';
 import { Home } from '.';
 import React, { ReactElement } from 'react';
 
@@ -31,7 +36,10 @@ Given('a Home component', () => {
 When('it is rendered', () => {
   renderResult = renderWithCustomConfigFeatureFlagContext(
     coreConfigFromContext,
-    component
+    withApolloProviderReturning(
+      [mockGetTopicsRequests.successRequest],
+      component
+    )
   );
   showVersionSet = true;
 });
@@ -47,18 +55,28 @@ When('it is rendered with no version', () => {
         },
       },
     }),
-    component
+    withApolloProviderReturning(
+      [mockGetTopicsRequests.successRequest],
+      component
+    )
   );
   showVersionSet = false;
 });
 
-Then('it should display the expected text', () => {
+Then('it should display the expected text', async () => {
   const { getByText, queryByText } = renderResult;
   expect(getByText('Welcome to the Strimzi UI')).toBeInTheDocument();
   const versionString = `Version: ${coreConfigFromContext.client.about.version}`;
   showVersionSet
     ? expect(getByText(versionString)).toBeInTheDocument()
     : expect(queryByText(versionString)).not.toBeInTheDocument();
+
+  const loadingTopicsString = 'Loading...';
+  expect(getByText(loadingTopicsString)).toBeInTheDocument();
+
+  await apolloMockResponse();
+  expect(queryByText(loadingTopicsString)).not.toBeInTheDocument();
+  expect(getByText('Number of topics: 3')).toBeInTheDocument();
 });
 
 Fusion('Home.feature');

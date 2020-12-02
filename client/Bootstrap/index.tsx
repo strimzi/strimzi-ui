@@ -8,9 +8,12 @@ import { init } from 'i18n';
 import { ApolloProvider } from '@apollo/client';
 
 import { apolloClient } from 'Bootstrap/GraphQLClient';
-import { ConfigFeatureFlagProvider, FeatureFlag } from 'Contexts';
+import {
+  ConfigFeatureFlagProvider,
+  FeatureFlag,
+  LoggingProvider,
+} from 'Contexts';
 import { Home } from 'Panels/Home';
-import { LoggingProvider } from 'Contexts';
 
 init(); //Bootstrap i18next support
 ReactDOM.render(
