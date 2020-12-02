@@ -6,7 +6,7 @@ const path = require('path');
 const webpack = require('webpack');
 const merge = require('lodash.merge');
 const { PRODUCTION, DEVELOPMENT } = require('../utils/tooling/constants.js');
-const { dependencies, federatedModuleName} = require("../package.json");
+const { dependencies, federatedModuleName } = require('../package.json');
 
 // constants
 const UI_TITLE = 'Strimzi UI';
@@ -58,26 +58,28 @@ const withWebpackBundleAnalyzerPlugin = returnPluginWithConfig(
 
 const withTsconfigPathsPlugin = returnPluginWithConfig(TsconfigPathsPlugin, {});
 
-const withModuleFederationPlugin = new webpack.container.ModuleFederationPlugin({
-  name: federatedModuleName,
-  filename: 'remoteEntry.js',
-  exposes: {
-    "./Home": "./client/Panels/Home"
-  },
-  shared: {
-    ...dependencies,
-    react: {
-      eager: true,
-      singleton: true,
-      requiredVersion: dependencies.react
+const withModuleFederationPlugin = new webpack.container.ModuleFederationPlugin(
+  {
+    name: federatedModuleName,
+    filename: 'remoteEntry.js',
+    exposes: {
+      './Home': './client/Panels/Home/Home',
     },
-    'react-dom': {
-      eager: true,
-      singleton: true,
-      requiredVersion: dependencies['react-dom']
-    }
+    shared: {
+      ...dependencies,
+      react: {
+        eager: true,
+        singleton: true,
+        requiredVersion: dependencies.react,
+      },
+      'react-dom': {
+        eager: true,
+        singleton: true,
+        requiredVersion: dependencies['react-dom'],
+      },
+    },
   }
-});
+);
 
 const withNormalModuleReplacementPlugin = () =>
   new webpack.NormalModuleReplacementPlugin(/.carbon./, (resource) => {
@@ -201,7 +203,7 @@ module.exports = {
     withMiniCssExtractPlugin,
     withWebpackBundleAnalyzerPlugin,
     withTsconfigPathsPlugin,
-    withModuleFederationPlugin
+    withModuleFederationPlugin,
   },
   moduleLoaders: {
     withStylingModuleLoader,
