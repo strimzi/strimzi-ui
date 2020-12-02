@@ -63,7 +63,7 @@ const withModuleFederationPlugin = new webpack.container.ModuleFederationPlugin(
     name: federatedModuleName,
     filename: 'remoteEntry.js',
     exposes: {
-      './Home': './client/Panels/Home/Home',
+      './Home': './client/Panels/Home',
     },
     shared: {
       ...dependencies,
@@ -82,7 +82,7 @@ const withModuleFederationPlugin = new webpack.container.ModuleFederationPlugin(
 );
 
 const withNormalModuleReplacementPlugin = () =>
-  new webpack.NormalModuleReplacementPlugin(/.carbon./, (resource) => {
+  new webpack.NormalModuleReplacementPlugin(/\.carbon/, (resource) => {
     const viewLayer = (process.env.VL || 'carbon').toLowerCase();
     resource.request = resource.request.replace('carbon', viewLayer);
   });

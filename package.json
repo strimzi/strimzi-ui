@@ -7,6 +7,7 @@
   "scripts": {
     "clean": "rm -rf dist/ && rm -rf js/ && rm -rf .out/ && rm -rf generated/ && rm -rf coverage/",
     "start": "npm-run-all --parallel --race start:client start:server start:mockadminserver",
+    "start:pf": "VL=patternfly npm-run-all --parallel --race start:client start:server start:mockadminserver",
     "start:builtserver": "configPath=utils/dev_config/server.e2e.config.js node dist/server/main.js",
     "start:client": "webpack serve --config build/webpack.client.dev.js",
     "start:server": "configPath=utils/dev_config/server.dev.config.js npm run server",
@@ -14,6 +15,7 @@
     "start:e2eserver": "npm-run-all --parallel start:builtserver start:mockadminserver",
     "server": "npx nodemon --exec 'ts-node -r tsconfig-paths/register --project server/tsconfig.json' server/main.ts",
     "build": "webpack --config build/webpack.client.prod.js && webpack --config build/webpack.server.prod.js",
+    "build:pf": "VL=patternfly webpack --config build/webpack.client.prod.js && webpack --config build/webpack.server.prod.js",
     "dockerbuild": "docker build -t strimzi-ui:latest -f ./build/dockerfile .",
     "pretest": "npm-run-all --parallel licence:check && prettier --config ./linting/prettier.config.js --check .",
     "storybook": "start-storybook --port 6006",
@@ -46,8 +48,9 @@
   "dependencies": {
     "@apollo/client": "^3.2.5",
     "@apollo/react-hooks": "^4.0.0",
-    "@walmartlabs/json-to-simple-graphql-schema": "^2.0.3",
+    "@patternfly/react-core": "^4.79.2",
     "@types/express-session": "^1.17.2",
+    "@walmartlabs/json-to-simple-graphql-schema": "^2.0.3",
     "apollo-link-http": "^1.5.17",
     "apollo-server-express": "^2.18.2",
     "express": "^4.17.1",
@@ -64,8 +67,8 @@
     "pino-filter": "^1.0.0",
     "pino-http": "^5.3.0",
     "pino-pretty": "^4.3.0",
-    "react-i18next": "^11.7.3",
     "react": "16.14.0",
+    "react-i18next": "^11.7.3",
     "react-dom": "16.14.0",
     "subscriptions-transport-ws": "^0.9.18"
   },

@@ -4,7 +4,7 @@
  */
 import { Given, When, Then, Fusion } from 'jest-cucumber-fusion';
 import { render, RenderResult } from '@testing-library/react';
-import { Home } from '.';
+import { Home } from './Home.carbon';
 import React, { ReactElement } from 'react';
 
 let renderResult: RenderResult;

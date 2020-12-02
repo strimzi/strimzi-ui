@@ -15,6 +15,7 @@ const config = {
   moduleNameMapper: {
     ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
     ...jestModuleMapper,
+    "\\.(css|less)$": "<rootDir>/../node_modules/@patternfly/react-styles/__mocks__/styleMock.js"
   },
   testEnvironment: 'jsdom',
   collectCoverageFrom: [
