@@ -6,6 +6,8 @@
 This repository contains the Strimzi UI and its implementation.
 Strimzi UI provides a way for managing Strimzi and Kafka clusters (+ other components) deployed by it using a graphical user interface.
 
+This UI is currently not in a state where it can be used. Is it still early on in it's development but we hope to have something usable very soon! If you're interested in what we're working on, please [view our project board](https://github.com/orgs/strimzi/projects/2). If you're interested in contributing, please [view our contribution guidelines]('./docs/Condribution.md).
+
 ## Getting started
 
 This UI uses `npm` to provide dependency management. If you wish to develop the UI, you will need:
