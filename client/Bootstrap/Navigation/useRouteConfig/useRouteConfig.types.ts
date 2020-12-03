@@ -18,7 +18,7 @@ type PageProperties = {
   mode?: string;
 };
 
-type PageConfigContext = {
+export type PageConfigContext = {
   /** URL path for a page */
   path: string;
   /** Display name of a page */
@@ -98,13 +98,4 @@ export type RouterConfig = {
   routes: Array<Route>;
   meta: Map<string, Meta> | Record<string, unknown>;
   isComplete: boolean;
-};
-
-/** Type describing a relationship between a child nav and it's parent nav */
-export type Leaf = {
-  parent: string;
-  child: {
-    path: string;
-    name: string;
-  };
 };

@@ -459,6 +459,14 @@ describe('useRouteConfig tests - feature flags enabled', () => {
       links: [],
       routes: [],
       meta: {
+        '/topics': {
+          leaves: [
+            {
+              name: translate('Consumer Groups'),
+              path: '/topics/:name/consumergroups',
+            },
+          ],
+        },
         '/topics/:name/consumergroups': {
           name: translate('Consumer Groups'),
           pageType: PageType.NORMAL,
