@@ -5,11 +5,16 @@
 import { QueryResult } from '@apollo/client';
 
 /** the shape of the object returned by the useTopics hook */
-export type useTopicsType = {
-  useGetTopics: () => QueryResult<topicsType>;
+export type useTopicsModelType = {
+  useGetTopics: (filter?: string) => useGetTopicsResultType;
 };
 
 /** the shape of the `data` returned by the useGetTopics hook */
+export type useGetTopicsResultType = QueryResult<
+  topicsType,
+  { filter?: string }
+>;
+
 export type topicsType = {
   topics: topicType[];
 };

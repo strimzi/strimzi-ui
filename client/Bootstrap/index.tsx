@@ -13,7 +13,7 @@ import {
   FeatureFlag,
   LoggingProvider,
 } from 'Contexts';
-import { Home } from 'Panels/Home';
+import { Home, Topics } from 'Panels';
 
 init(); //Bootstrap i18next support
 ReactDOM.render(
@@ -21,7 +21,9 @@ ReactDOM.render(
     <ConfigFeatureFlagProvider>
       <LoggingProvider>
         <FeatureFlag flag={'client.Pages.PlaceholderHome'}>
-          <Home />
+          <Home>
+            <Topics />
+          </Home>
         </FeatureFlag>
       </LoggingProvider>
     </ConfigFeatureFlagProvider>

@@ -4,7 +4,7 @@ A `Panel` component represents a top level element of a UI - the primary/signifi
 
 ## Test approach
 
-Bootstrap should be tested in a behavioural manor. See [Behavioural Driven Development](../../docs/Test.md#style-of-test).
+Bootstrap should be tested in a behavioural manner. See [Behavioural Driven Development](../../docs/Test.md#style-of-test).
 
 ## Expected files
 

@@ -5,8 +5,8 @@
 import gql from 'graphql-tag';
 
 export const GET_TOPICS = gql`
-  query {
-    topics {
+  query Topics($filter: String) {
+    topics(filter: $filter) {
       name
       partitions
       replicas

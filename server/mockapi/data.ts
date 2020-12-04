@@ -5,4 +5,4 @@
 
 // placeholder GQL schema for a topic/topic list - ideally to come from file
 export const schema =
-  'type Topic {name: String partitions: Int replicas: Int } type Query { topic(name: String): Topic topics: [Topic] } ';
+  'type Topic {name: String partitions: Int replicas: Int } type Query { topic(name: String): Topic topics(filter: String): [Topic] } ';

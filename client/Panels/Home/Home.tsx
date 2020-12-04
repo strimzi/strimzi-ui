@@ -7,7 +7,6 @@ import get from 'lodash.get';
 import image from 'Images/logo.png';
 import './style.scss';
 import { useConfigFeatureFlag, useLogger } from 'Hooks';
-import { useTopics } from 'Models';
 
 const Home: FunctionComponent = ({ children }) => {
   const { client, featureFlags, isComplete } = useConfigFeatureFlag();
@@ -18,19 +17,11 @@ const Home: FunctionComponent = ({ children }) => {
   const { debug } = useLogger('Home');
   debug(`Client version to display: ${version}`);
 
-  const { useGetTopics } = useTopics();
-  const { data, loading } = useGetTopics();
-
   return (
     <div className='home'>
       <img src={image} alt='Strimzi logo' />
       <p>Welcome to the Strimzi UI</p>
       {showVersion && isComplete && <p>{`Version: ${version}`}</p>}
-      {loading || !data ? (
-        <p>Loading...</p>
-      ) : (
-        <p>{`Number of topics: ${data.topics.length}`}</p>
-      )}
       {children}
     </div>
   );

@@ -5,12 +5,7 @@
 import { Given, When, Then, Fusion } from 'jest-cucumber-fusion';
 import { RenderResult } from '@testing-library/react';
 import merge from 'lodash.merge';
-import {
-  renderWithCustomConfigFeatureFlagContext,
-  withApolloProviderReturning,
-  apolloMockResponse,
-} from 'utils/test';
-import { mockGetTopicsRequests } from 'Models';
+import { renderWithCustomConfigFeatureFlagContext } from 'utils/test';
 import { Home } from '.';
 import React, { ReactElement } from 'react';
 
@@ -36,10 +31,7 @@ Given('a Home component', () => {
 When('it is rendered', () => {
   renderResult = renderWithCustomConfigFeatureFlagContext(
     coreConfigFromContext,
-    withApolloProviderReturning(
-      [mockGetTopicsRequests.successRequest],
-      component
-    )
+    component
   );
   showVersionSet = true;
 });
@@ -55,10 +47,7 @@ When('it is rendered with no version', () => {
         },
       },
     }),
-    withApolloProviderReturning(
-      [mockGetTopicsRequests.successRequest],
-      component
-    )
+    component
   );
   showVersionSet = false;
 });
@@ -70,13 +59,6 @@ Then('it should display the expected text', async () => {
   showVersionSet
     ? expect(getByText(versionString)).toBeInTheDocument()
     : expect(queryByText(versionString)).not.toBeInTheDocument();
-
-  const loadingTopicsString = 'Loading...';
-  expect(getByText(loadingTopicsString)).toBeInTheDocument();
-
-  await apolloMockResponse();
-  expect(queryByText(loadingTopicsString)).not.toBeInTheDocument();
-  expect(getByText('Number of topics: 3')).toBeInTheDocument();
 });
 
 Fusion('Home.feature');
