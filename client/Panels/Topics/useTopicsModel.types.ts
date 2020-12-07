@@ -2,18 +2,19 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-import { QueryResult } from '@apollo/client';
+import { ApolloError } from '@apollo/client';
+import { ChangeEvent } from 'react';
 
-/** the shape of the object returned by the useTopics hook */
+/** the shape of the object returned by the useTopicsModel hook */
 export type useTopicsModelType = {
-  useGetTopics: (filter?: string) => useGetTopicsResultType;
+  model: {
+    filter: string | undefined;
+    topics: topicType[];
+    error: ApolloError | undefined;
+    loading: boolean;
+  };
+  updateTopicsFilter: (evt: ChangeEvent<HTMLInputElement>) => void;
 };
-
-/** the shape of the `data` returned by the useGetTopics hook */
-export type useGetTopicsResultType = QueryResult<
-  topicsType,
-  { filter?: string }
->;
 
 export type topicsType = {
   topics: topicType[];

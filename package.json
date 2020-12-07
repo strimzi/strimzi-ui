@@ -45,8 +45,8 @@
   "dependencies": {
     "@apollo/client": "^3.2.5",
     "@apollo/react-hooks": "^4.0.0",
-    "@walmartlabs/json-to-simple-graphql-schema": "^2.0.3",
     "@types/express-session": "^1.17.2",
+    "@walmartlabs/json-to-simple-graphql-schema": "^2.0.3",
     "apollo-link-http": "^1.5.17",
     "apollo-server-express": "^2.18.2",
     "compression-webpack-plugin": "^4.0.0",
@@ -60,6 +60,7 @@
     "http-proxy": "^1.18.1",
     "i18next": "^19.8.3",
     "i18next-browser-languagedetector": "^6.0.1",
+    "lodash.debounce": "^4.0.8",
     "lodash.get": "^4.4.2",
     "lodash.keyby": "^4.6.0",
     "lodash.merge": "^4.6.2",

@@ -11,66 +11,35 @@ import {
   mockGetTopicsResponses,
 } from './useTopicsModel.assets';
 
-describe('`useTopics` hook', () => {
-  describe('`useGetTopics` hook', () => {
-    beforeEach(() => {
-      jest.useFakeTimers();
+describe('`useTopicsModel` hook', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('returns the expected query content', async () => {
+    const { result, rerender } = renderHook(useTopicsModel, {
+      wrapper: ({ children }) =>
+        withApolloProviderReturning(
+          [mockGetTopicsRequests.successRequest],
+          <React.Fragment>{children}</React.Fragment>
+        ),
     });
 
-    afterEach(() => {
-      jest.useRealTimers();
+    expect(result.current.model.loading).toBe(true);
+    expect(result.current.model.topics).toEqual([]);
+
+    await act(async () => {
+      jest.runAllTimers();
     });
+    rerender();
 
-    it('returns the expected content', async () => {
-      const { result, rerender } = renderHook(
-        () => useTopicsModel().useGetTopics(),
-        {
-          wrapper: ({ children }) =>
-            withApolloProviderReturning(
-              [mockGetTopicsRequests.successRequest],
-              <React.Fragment>{children}</React.Fragment>
-            ),
-        }
-      );
-
-      expect(result.current.loading).toBe(true);
-      expect(result.current.data).toBeUndefined();
-      await act(async () => {
-        jest.runAllTimers();
-      });
-      rerender();
-
-      expect(result.current.loading).toBe(false);
-      expect(result.current.data).toEqual(
-        mockGetTopicsResponses.successResponse
-      );
-    });
-
-    it('returns the expected content when filtering topics', async () => {
-      const { result, rerender } = renderHook(
-        () => useTopicsModel().useGetTopics('testtopic1'),
-        {
-          wrapper: ({ children }) =>
-            withApolloProviderReturning(
-              [mockGetTopicsRequests.successFilteredRequest],
-              <React.Fragment>{children}</React.Fragment>
-            ),
-        }
-      );
-
-      expect(result.current.loading).toBe(true);
-      expect(result.current.data).toBeUndefined();
-
-      await act(async () => {
-        jest.runAllTimers();
-      });
-
-      rerender();
-
-      expect(result.current.loading).toBe(false);
-      expect(result.current.data).toEqual(
-        mockGetTopicsResponses.successFilteredResponse
-      );
-    });
+    expect(result.current.model.topics).toEqual(
+      mockGetTopicsResponses.successResponse
+    );
+    expect(result.current.model.loading).toBe(false);
   });
 });
