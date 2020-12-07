@@ -364,19 +364,6 @@ describe('useRouteConfig tests - feature flags enabled', () => {
     const ConsumerGroupsPage = generateSimplePage('Consumer Groups');
 
     const input: PageConfig = {
-      Topics: {
-        contentComponent: TopicsPage,
-        contexts: [
-          {
-            path: '/topics',
-            name: 'Topics',
-            feature_flag: 'PAGE.TOPICS',
-            order: 1,
-            icon: 'myicon.svg',
-            pageType: PageType.NORMAL,
-          },
-        ],
-      },
       ConsumerGroups: {
         contentComponent: ConsumerGroupsPage,
         contexts: [
@@ -390,6 +377,19 @@ describe('useRouteConfig tests - feature flags enabled', () => {
             properties: {
               mode: 'Topic',
             },
+          },
+        ],
+      },
+      Topics: {
+        contentComponent: TopicsPage,
+        contexts: [
+          {
+            path: '/topics',
+            name: 'Topics',
+            feature_flag: 'PAGE.TOPICS',
+            order: 1,
+            icon: 'myicon.svg',
+            pageType: PageType.NORMAL,
           },
         ],
       },
@@ -459,14 +459,6 @@ describe('useRouteConfig tests - feature flags enabled', () => {
       links: [],
       routes: [],
       meta: {
-        '/topics': {
-          leaves: [
-            {
-              name: translate('Consumer Groups'),
-              path: '/topics/:name/consumergroups',
-            },
-          ],
-        },
         '/topics/:name/consumergroups': {
           name: translate('Consumer Groups'),
           pageType: PageType.NORMAL,
