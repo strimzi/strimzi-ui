@@ -9,21 +9,50 @@ import {
 } from 'test_common/commonServerSteps';
 
 import { AuthenticationStrategy, getStrategy } from './strategyFactory';
-import { authenticationStrategies, proxyConfigType } from 'types';
+import { authenticationStrategies } from 'types';
+import {
+  AuthOptions,
+  NoAuth,
+  OAuthOptions,
+  ScramOptions,
+} from 'security/types';
+
+jest.mock('passport-openidconnect');
+jest.mock('passport-local');
 
 When(
   /^a strategy factory is asked for type '(.+)'$/,
   stepWhichUpdatesWorld((world, type) => {
     const context = world.context;
-    const config: proxyConfigType = {
-      authentication: {
-        type: type as authenticationStrategies,
-      },
-      hostname: '',
-      port: 0,
-      contextRoot: '',
-      transport: {},
-    };
+    const config: AuthOptions = ((type: authenticationStrategies) => {
+      switch (type) {
+        case authenticationStrategies.SCRAM:
+          return {
+            type: authenticationStrategies.SCRAM,
+            endpoint: '',
+          } as ScramOptions;
+        case authenticationStrategies.OAUTH:
+          return {
+            type: authenticationStrategies.OAUTH,
+            options: {
+              issuer: '',
+              authorizationURL: '',
+              tokenURL: '',
+              userInfoURL: '',
+              logoutURL: '',
+              clientID: '',
+              clientSecret: '',
+              callbackURL: '',
+            },
+          } as OAuthOptions;
+        case authenticationStrategies.NONE:
+        default:
+          return {
+            type: authenticationStrategies.NONE,
+          } as NoAuth;
+      }
+    })(type as authenticationStrategies);
+
     context.strategy = getStrategy(config);
     return {
       ...world,

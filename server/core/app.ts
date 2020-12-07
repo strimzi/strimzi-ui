@@ -17,7 +17,7 @@ import { bootstrapAuthentication } from 'security';
 
 export const returnExpress: (
   getConfig: () => serverConfigType
-) => express.Application = (getConfig) => {
+) => Promise<express.Application> = async (getConfig) => {
   const logger = generateLogger('core');
   const app = express();
 
@@ -40,7 +40,7 @@ export const returnExpress: (
   app.use(expressSession(sessionOpts));
   app.use(bodyParser.json());
 
-  const authentication = bootstrapAuthentication(app, proxyConfig);
+  const authentication = await bootstrapAuthentication(app, proxyConfig);
 
   // for each module, call the function to add it to the routing table
   const routingTable = Object.values(availableModules).reduce(

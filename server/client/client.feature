@@ -5,13 +5,12 @@ Feature: client module
     Behaviours and capabilities provided by the client module
 
     Scenario Outline: With auth '<Auth>' - If no <Asset> asset can be served, the client module returns 404
-        Given a 'client_only' server configuration
+        Given a server with a 'client' configuration
         And There are no files to serve
         And '<Auth>' authentication is required
         And I run an instance of the Strimzi-UI server
         When I make a 'get' request to '<Asset>'
         Then I get the expected status code '<StatusCode>' response
-
         Examples:
             | Asset               | Auth  | StatusCode |
             | /index.html         | scram | 404        |
@@ -34,27 +33,28 @@ Feature: client module
             | /                   | none  | 404        |
 
     Scenario Outline: With auth '<Auth>' - if assets can be served, the client module returns the appropriate <StatusCode> return code for a request of <Asset>
-        Given a 'client_only' server configuration
+        Given a server with a 'client' configuration
+        And a 'security' module
         And There are files to serve
         And '<Auth>' authentication is required
         And I run an instance of the Strimzi-UI server
         When I make a 'get' request to '<Asset>'
         Then I get the expected status code '<StatusCode>' response
-        # if the route (not file) is not matched, we render index.html as the repsonse (200)
+        # if the route (not file) is not matched, we render index.html as the response (200)
         Examples:
             | Asset               | Auth  | StatusCode |
-            | /index.html         | scram | 511        |
+            | /index.html         | scram | 302        |
             | /images/picture.svg | scram | 200        |
-            | /doesnotexist.html  | scram | 511        |
-            | /someroute          | scram | 511        |
-            | /protected.html     | scram | 511        |
-            | /                   | scram | 511        |
-            | /index.html         | oauth | 511        |
+            | /doesnotexist.html  | scram | 302        |
+            | /someroute          | scram | 302        |
+            | /protected.html     | scram | 302        |
+            | /                   | scram | 302        |
+            | /index.html         | oauth | 302        |
             | /images/picture.svg | oauth | 200        |
-            | /doesnotexist.html  | oauth | 511        |
-            | /someroute          | oauth | 511        |
-            | /protected.html     | oauth | 511        |
-            | /                   | oauth | 511        |
+            | /doesnotexist.html  | oauth | 302        |
+            | /someroute          | oauth | 302        |
+            | /protected.html     | oauth | 302        |
+            | /                   | oauth | 302        |
             | /index.html         | none  | 200        |
             | /images/picture.svg | none  | 200        |
             | /doesnotexist.html  | none  | 200        |
@@ -62,25 +62,9 @@ Feature: client module
             | /protected.html     | none  | 200        |
             | /                   | none  | 200        |
 
-        Examples:
-            | Asset               | StatusCode |
-            | /index.html         | 404        |
-            | /images/picture.svg | 404        |
-            | /doesnotexist.html  | 404        |
-            | /someroute          | 404        |
-            | /protected.html     | 404        |
-            | /                   | 404        |
-
-    Scenario Outline: With auth '<Auth>' - Critical configuration is templated into index.html so the client can bootstrap
-        Given a 'client_only' server configuration
+    Scenario: Critical configuration is templated into index.html so the client can bootstrap
+        Given a server with a 'client' configuration
         And There are files to serve
-        And '<Auth>' authentication is required
-        And I am authenticated
         And I run an instance of the Strimzi-UI server
         When I make a 'get' request to '/index.html'
         Then the file is returned as with the expected configuration included
-        Examples:
-            | Auth  |
-            | scram |
-            | oauth |
-            | none  |

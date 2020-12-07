@@ -22,12 +22,15 @@ const proxyDefaults = {
 
 When(
   /^I bootstrap passport with authentication type '(\w+)'$/,
-  stepWhichUpdatesWorld((world, authType) => {
+  stepWhichUpdatesWorld(async (world, authType) => {
     try {
-      const auth = bootstrapPassport(world.context.app as express.Application, {
-        authentication: { type: authType as authenticationStrategies },
-        ...proxyDefaults,
-      });
+      const auth = await bootstrapPassport(
+        world.context.app as express.Application,
+        {
+          authentication: { type: authType as authenticationStrategies },
+          ...proxyDefaults,
+        }
+      );
       world.context.auth = auth;
     } catch (e) {
       world.context.error = e;

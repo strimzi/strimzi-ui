@@ -4,6 +4,13 @@
  */
 export const scram = {
   login: '/login',
+};
+
+export const oauth = {
+  callback: '/callback',
+};
+
+export const common = {
   logout: '/logout',
 };
 

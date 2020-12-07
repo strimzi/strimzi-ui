@@ -12,11 +12,20 @@ import { Authentication } from 'security';
 export enum authenticationStrategies {
   NONE = 'none',
   SCRAM = 'scram',
+  OAUTH = 'oauth',
 }
 
 export interface authenticationConfig {
   /** What authentication strategy to use to authenticate users */
   type: authenticationStrategies;
+}
+
+export interface OAuthConfig extends authenticationConfig {
+  type: authenticationStrategies.OAUTH;
+  discoveryURL: string;
+  clientID: string;
+  clientSecret: string;
+  callbackURL: string;
 }
 
 type sslCertificateType = {

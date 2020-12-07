@@ -8,5 +8,6 @@
       "ui-config/*": ["../config/*"]
     }
   },
-  "include": ["."]
+  "include": ["."],
+  "typeRoots": ["./typing", "../node_modules/@types"]
 }

@@ -31,7 +31,6 @@ export const ClientModule: UIServerModule = {
 
     // add the auth middleware to all non public files
     protectedFiles.forEach((file) => routerForModule.get(`${file}`, checkAuth));
-    routerForModule.get('/', checkAuth);
 
     // Direct request for index, serve it (behind auth check)
     hasIndexFile &&

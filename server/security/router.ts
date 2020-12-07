@@ -4,7 +4,7 @@
  */
 import express from 'express';
 import { authenticationStrategies, UIServerModule } from '../types';
-import { apiRoot, scram } from './routeConfig';
+import { apiRoot, scram, oauth, common } from './routeConfig';
 
 const moduleName = 'security';
 
@@ -25,9 +25,19 @@ export const SecurityModule: UIServerModule = {
           scram.login,
           (_req, res) => res.send('This will later be the login page') //https://github.com/strimzi/strimzi-ui/issues/110
         );
-        routerForModule.post(scram.logout, auth.logout, (_req, res) =>
+        routerForModule.post(common.logout, auth.logout, (_req, res) =>
           res.send(200)
         );
+        break;
+      }
+      case authenticationStrategies.OAUTH: {
+        logger.info('Mouting OAUTH security routes');
+        routerForModule.get(oauth.callback, auth.authenticate, (req, res) => {
+          const url = req.session.originalURL;
+          req.session.originalURL = '/';
+          return res.redirect(url || '/');
+        });
+        routerForModule.get(common.logout, auth.logout);
         break;
       }
       case authenticationStrategies.NONE: {

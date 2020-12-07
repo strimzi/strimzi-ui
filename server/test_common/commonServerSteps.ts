@@ -49,8 +49,6 @@ const { resetWorld, stepWhichUpdatesWorld, stepWithWorld } = worldGenerator(
 
 beforeEach(() => {
   resetWorld();
-  jest.resetAllMocks();
-  mocked(authFunction).mockReturnValue((_req, _res, next) => next());
 });
 
 const withModule: [RegExp, CallBack] = [
@@ -95,9 +93,29 @@ Given(
 And(
   /^'(\S+)' authentication is required$/,
   stepWhichUpdatesWorld((world, auth) => {
+    let authentication = {
+      type: auth as authenticationStrategies,
+    };
+
+    if ((auth as authenticationStrategies) === authenticationStrategies.OAUTH) {
+      const authServer = 'http://oauth-server.com';
+      const oauthOptions = {
+        clientID: 'client',
+        clientSecret: 'secret',
+        callbackURL: 'http://callback.com',
+        discoveryURL: authServer,
+      };
+      authentication = { ...authentication, ...oauthOptions };
+      nock(authServer).get('/').reply(200, {
+        authorization_endpoint: authServer,
+        issuer: authServer,
+        token_endpoint: authServer,
+        end_session_endpoint: authServer,
+      });
+    }
     const configuration = merge(world.configuration, {
       proxy: {
-        authentication: { type: auth as authenticationStrategies },
+        authentication,
       },
     });
     return {
@@ -109,8 +127,8 @@ And(
 
 And(
   'I run an instance of the Strimzi-UI server',
-  stepWhichUpdatesWorld((world) => {
-    const app = returnExpress(() => world.configuration);
+  stepWhichUpdatesWorld(async (world) => {
+    const app = await returnExpress(() => world.configuration);
     return {
       ...world,
       app,
@@ -118,10 +136,6 @@ And(
     };
   })
 );
-
-And('I am authenticated', () => {
-  mocked(authFunction).mockReturnValue((_req, _res, next) => next());
-});
 
 And(
   'all requests use the same session',

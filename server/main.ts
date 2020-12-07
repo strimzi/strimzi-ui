@@ -21,7 +21,7 @@ const errorHandler: (err: Error, ...others: unknown[]) => void = (
 
 logger.info('Strimzi ui server initialising');
 
-loadConfig((loadedInitialConfig) => {
+loadConfig(async (loadedInitialConfig) => {
   let config = loadedInitialConfig;
 
   logger.info(
@@ -41,7 +41,7 @@ loadConfig((loadedInitialConfig) => {
     logger = generateLogger('main');
   }, logger); // load config and update config value
 
-  const expressApp = returnExpress(() => config);
+  const expressApp = await returnExpress(() => config);
 
   const { cert, key, ciphers, minTLS } = config.client.transport;
   let server;

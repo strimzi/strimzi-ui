@@ -9,5 +9,6 @@ Feature: Strategy Factory
     Examples:
       | type    | expected |
       | scram   | scram    |
+      | oauth   | oauth    |
       | none    | none     |
       | unknown | none     |
