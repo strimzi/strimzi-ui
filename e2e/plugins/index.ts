@@ -12,4 +12,4 @@ module.exports = (on: (evt: string, callback: () => void) => void) => {
   const cucumberPreProcessor = cucumber.default;
 
   on('file:preprocessor', cucumberPreProcessor(options));
-};
+  };
