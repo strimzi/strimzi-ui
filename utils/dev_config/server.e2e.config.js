@@ -16,6 +16,12 @@ module.exports = {
       ...serverCertificates,
     },
   },
+  logging: {
+    level: 'debug',
+    prettyPrint: {
+      translateTime: true,
+    },
+  },
   proxy: {
     ...mockadminServer,
     transport: {

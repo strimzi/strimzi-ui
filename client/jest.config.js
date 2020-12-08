@@ -20,6 +20,7 @@ const config = {
   collectCoverageFrom: [
     '**/*.{js,ts,jsx,tsx}',
     '!**/index.{js,ts,jsx,tsx}',
+    '!Bootstrap/App.tsx',
     '!**/*.steps.*',
     '!**/*.d.ts',
     '!**/*types.ts',
@@ -28,6 +29,8 @@ const config = {
     '!**/mock/**/*',
     // Wrapper around graphql - not something we need/wish to test
     '!Bootstrap/GraphQLClient/**',
+    // Pages are just configuration, no need for coverage
+    '!**/Pages/*',
   ],
 };
 

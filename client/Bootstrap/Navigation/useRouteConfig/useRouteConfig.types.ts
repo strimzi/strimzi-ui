@@ -14,6 +14,33 @@ export enum PageType {
   FULLSCREEN,
 }
 
+export type NavigationState = {
+  state: {
+    path: Map<string, string> | Record<string, unknown>;
+    query: Record<string, string>;
+  };
+  goBack: () => void;
+  hasRoute: (path: string) => boolean;
+  renderLinkTo: (
+    path: string,
+    pathParams: Record<string, string>,
+    queryParams: Record<string, string>
+  ) => JSX.Element;
+  goTo: (
+    path: string,
+    pathParams: Record<string, string>,
+    queryParams: Record<string, string>
+  ) => void;
+};
+
+export type PageComponentProperties = {
+  navigationState: NavigationState;
+};
+
+type Component =
+  | FunctionComponent<PageComponentProperties>
+  | (() => FunctionComponent<PageComponentProperties>);
+
 type PageProperties = {
   mode?: string;
 };
@@ -43,7 +70,7 @@ type PageConfigContext = {
 };
 
 /** Describing a react router Link */
-type Link = {
+export type NavLink = {
   /** Path that the link directs to */
   to: string;
   /** Identifying key */
@@ -53,13 +80,13 @@ type Link = {
 };
 
 /** Describing a react router route */
-type Route = {
+export type NavRoute = {
   /** Path that the route resolves */
   path: string;
   /** Identifying key */
   key: string;
   /** Component to be rendered when this route is resovled */
-  componentForRoute: FunctionComponent | (() => FunctionComponent);
+  componentForRoute: Component;
 };
 
 /** Page metadata */
@@ -77,10 +104,7 @@ type Meta = {
   /** Icon to be rendered next to display name */
   icon: string;
   /** Pages that can be navigated to through this page */
-  leaves: Array<{
-    path: string;
-    name: string;
-  }>;
+  leaves: Array<NavLink>;
 };
 
 /** Type of input to useRouteConfig */
@@ -88,14 +112,14 @@ export type PageConfig = Record<string, Page>;
 
 /** Type of a page which is part of a page config */
 export type Page = {
-  contentComponent: FunctionComponent | (() => FunctionComponent);
+  contentComponent: Component;
   contexts: Array<PageConfigContext>;
 };
 
 /** Type of output from useRouteConfig */
 export type RouterConfig = {
-  links: Array<Link>;
-  routes: Array<Route>;
+  links: Array<NavLink>;
+  routes: Array<NavRoute>;
   meta: Map<string, Meta> | Record<string, unknown>;
 };
 
