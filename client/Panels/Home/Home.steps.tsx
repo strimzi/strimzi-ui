@@ -52,7 +52,7 @@ When('it is rendered with no version', () => {
   showVersionSet = false;
 });
 
-Then('it should display the expected text', () => {
+Then('it should display the expected text', async () => {
   const { getByText, queryByText } = renderResult;
   expect(getByText('Welcome to the Strimzi UI')).toBeInTheDocument();
   const versionString = `Version: ${coreConfigFromContext.client.about.version}`;
