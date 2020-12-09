@@ -5,7 +5,7 @@
 
 // client production specific plugins and webpack configuration
 const TerserPlugin = require('terser-webpack-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const CSSMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const { BannerPlugin } = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -69,7 +69,7 @@ const prodSpecificConfig = {
           },
         },
       }),
-      new OptimizeCSSAssetsPlugin({}),
+      new CSSMinimizerWebpackPlugin({}),
     ],
     splitChunks: {
       chunks: 'all',
@@ -93,7 +93,7 @@ const prodSpecificConfig = {
     // gzip compress all built js output
     new CompressionPlugin({
       test: /\\*\.js$/, // apply only on js files
-      filename: '[path].gz[query]', // output file name
+      filename: '[path][base].gz[query]', // output file name
       algorithm: 'gzip', // compress via gzip
       threshold: 0, // applies to all files
       minRatio: 0.8, // keep compressed file if smaller by this %
