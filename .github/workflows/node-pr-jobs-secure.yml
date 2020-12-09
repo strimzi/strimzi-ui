@@ -18,10 +18,10 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Upload Master Bundle Report for client and server
-        run: |
-          echo "CLIENT_MASTER_REPORT=$(cat generated/bundle-analyser/client-report.json)" >> $GITHUB_ENV 
-          echo "SERVER_MASTER_REPORT=$(cat generated/bundle-analyser/server-report.json)" >> $GITHUB_ENV 
+      # - name: Upload Master Bundle Report for client and server - REMOVED DUE TO https://github.com/strimzi/strimzi-ui/issues/147
+      #   run: |
+      #     echo "CLIENT_MASTER_REPORT=$(cat generated/bundle-analyser/client-report.json)" >> $GITHUB_ENV 
+      #     echo "SERVER_MASTER_REPORT=$(cat generated/bundle-analyser/server-report.json)" >> $GITHUB_ENV 
       - name: Checkout PR Branch
         uses: actions/checkout@v2
         with:
@@ -38,12 +38,12 @@ jobs:
           npm run addDevCerts
       - name: Build
         run: npm run build
-      - name: Calculate bundle size
-        id: bundle
-        uses: ./.github/actions/bundle
-        with:
-          CLIENT_MASTER_REPORT: ${{ env.CLIENT_MASTER_REPORT }}
-          SERVER_MASTER_REPORT: ${{ env.SERVER_MASTER_REPORT }}
+      # - name: Calculate bundle size - REMOVED DUE TO https://github.com/strimzi/strimzi-ui/issues/147
+      #   id: bundle
+      #   uses: ./.github/actions/bundle
+      #   with:
+      #     CLIENT_MASTER_REPORT: ${{ env.CLIENT_MASTER_REPORT }}
+      #     SERVER_MASTER_REPORT: ${{ env.SERVER_MASTER_REPORT }}
       - name: Test client code
         run: npm run test:jest:client -- --forceExit # force exit in case a test does not clean up after failure
       - name: Test server code
