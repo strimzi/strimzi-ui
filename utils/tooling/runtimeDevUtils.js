@@ -17,6 +17,9 @@ const devEnvValues = {
     hostname: process.env.MA_HOSTNAME || 'localhost',
     port: process.env.MA_PORT || 9080,
     contextRoot: process.env.MA_CONTEXT_ROOT || '/api',
+    authentication: {
+      type: 'none',
+    },
   },
   // (development instance) server hostname and port
   devServer: {

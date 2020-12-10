@@ -9,9 +9,6 @@ const {
 const { mockadminServer } = devEnvValues;
 
 module.exports = {
-  authentication: {
-    strategy: 'none',
-  },
   client: {
     transport: {
       ...mockAdminCertificates,
@@ -31,6 +28,9 @@ module.exports = {
   },
   proxy: {
     transport: {},
+    authentication: {
+      type: 'none',
+    },
   },
   ...mockadminServer,
 };

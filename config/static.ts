@@ -19,9 +19,6 @@ const client: Config<Literal> = {
 const server: Config<Literal> = {
   defaultConfig: {
     configValue: {
-      authentication: {
-        strategy: 'none',
-      },
       client: {
         configOverrides: {},
         transport: {},
@@ -40,6 +37,9 @@ const server: Config<Literal> = {
         contextRoot: '/',
         port: 9080,
         transport: {},
+        authentication: {
+          type: 'none',
+        },
       },
       session: {
         name: 'strimzi-ui',

@@ -16,7 +16,7 @@ const moduleName = 'api';
 
 export const ApiModule: UIServerModule = {
   moduleName,
-  addModule: (logger, authFn, serverConfig) => {
+  addModule: (logger, { checkAuth }, serverConfig) => {
     const { proxy } = serverConfig;
     const { exit } = logger.entry('addModule', proxy);
     const { hostname, port, contextRoot, transport } = proxy;
@@ -40,7 +40,9 @@ export const ApiModule: UIServerModule = {
     backendProxy.on('proxyReq', proxyStartHandler);
     backendProxy.on('proxyRes', proxyCompleteHandler);
     // proxy all requests post auth check
-    routerForModule.all('*', authFn, (req, res) => backendProxy.web(req, res));
+    routerForModule.all('*', checkAuth, (req, res) =>
+      backendProxy.web(req, res)
+    );
 
     return exit({ mountPoint: '/api', routerForModule });
   },

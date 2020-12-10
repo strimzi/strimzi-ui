@@ -2,13 +2,13 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-
+import { RequestHandler } from 'express';
 import { createProxyServer } from 'http-proxy';
 
 // without setting up a second server (with secure and insecure modes), the best way to simulate the proxying of calls is mocking them/verifying the api usage
 type mockProxyServerType = {
-  on: (event: string, handler: expressMiddleware) => void;
-  web: jest.Mock<expressMiddleware>;
+  on: (event: string, handler: RequestHandler) => void;
+  web: jest.Mock<RequestHandler>;
 };
 
 const placeholderProxyEvent = jest.fn();
@@ -55,7 +55,6 @@ import {
   stepWhichUpdatesWorld,
   stepWithWorld,
 } from 'test_common/commonServerSteps';
-import { expressMiddleware } from 'types';
 
 Before(() => {
   createProxyServer.mockReturnValue(createMockServerFn(false));

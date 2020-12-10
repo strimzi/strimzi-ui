@@ -11,6 +11,9 @@ interface withWorldInterface<T extends genericWorldType> {
   (callback: (world: T, ...others: Array<unknown>) => T): (
     ...others: Array<unknown>
   ) => void;
+  (callback: (world: T, ...others: Array<unknown>) => Promise<T>): (
+    ...others: Array<unknown>
+  ) => void;
   (callback: (world: T, ...others: Array<unknown>) => void): (
     ...others: Array<unknown>
   ) => void;
