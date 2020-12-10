@@ -5,9 +5,11 @@
 
 import { ApolloClient, HttpLink, split, InMemoryCache } from '@apollo/client';
 
-const apiLink = new HttpLink({ uri: '/api', fetch });
+declare const __API_BASE_PATH__: string;
 
-const configLink = new HttpLink({ uri: '/config', fetch });
+const apiLink = new HttpLink({ uri: `${__API_BASE_PATH__}/api`, fetch });
+
+const configLink = new HttpLink({ uri: `${__API_BASE_PATH__}/config`, fetch });
 
 const splitLink = split(
   (operation) => operation.getContext().purpose === 'config',

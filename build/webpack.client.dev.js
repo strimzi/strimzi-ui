@@ -23,6 +23,7 @@ const {
   withMiniCssExtractPlugin,
   withWebpackBundleAnalyzerPlugin,
   withTsconfigPathsPlugin,
+  withApiBasePath,
 } = plugins;
 const {
   withStylingModuleLoader,
@@ -56,6 +57,7 @@ const devSpecificConfig = {
       analyzerMode: 'static',
       reportFilename: `${BUNDLE_ANALYSER_DIR}/bundles.html`, // when in dev mode, produce a static html file
     }),
+    withApiBasePath(process.env.BASE_PATH || ''),
   ],
   resolve: {
     plugins: [withTsconfigPathsPlugin({ configFile: 'client/tsconfig.json' })],

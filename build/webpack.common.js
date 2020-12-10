@@ -64,6 +64,11 @@ const withNormalModuleReplacementPlugin = () =>
     resource.request = resource.request.replace('carbon', viewLayer);
   });
 
+const withApiBasePath = (basePath) =>
+  new webpack.DefinePlugin({
+    __API_BASE_PATH__: JSON.stringify(basePath),
+  });
+
 // common rules configuration
 const returnModuleRuleWithConfig = (defaultConfig = {}, defaultUse = []) => (
   customUse = [],
@@ -181,6 +186,7 @@ module.exports = {
     withMiniCssExtractPlugin,
     withWebpackBundleAnalyzerPlugin,
     withTsconfigPathsPlugin,
+    withApiBasePath,
   },
   moduleLoaders: {
     withStylingModuleLoader,
