@@ -62,6 +62,14 @@ Feature: client module
             | /protected.html     | none  | 200        |
             | /                   | none  | 200        |
 
+        Examples:
+            | Asset               | StatusCode |
+            | /index.html         | 404        |
+            | /images/picture.svg | 404        |
+            | /doesnotexist.html  | 404        |
+            | /someroute          | 404        |
+            | /protected.html     | 404        |
+            | /                   | 404        |
 
     Scenario Outline: With auth '<Auth>' - Critical configuration is templated into index.html so the client can bootstrap
         Given a 'client_only' server configuration

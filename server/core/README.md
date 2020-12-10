@@ -15,13 +15,13 @@ The core module will import and interact with all other modules to implement the
 The core module will import all modules' default export. The export is expected to contain two keys - `moduleName` and `addModule`, as per the `UIServerModule` interface. `addModule` is expected to be a function, which takes the following parameters:
 
 ```
-const { mountPoint, routerFromModule } = myModule(logGenerator, authMiddleware, serverConfig);
+const { mountPoint, routerFromModule } = myModule(logGenerator, authFunctions, serverConfig);
 ```
 
 Where:
 
 - `logGenerator` is a function which will return a logger to be used in `addModule` only to trace entry, exit and any helpful diagnostics while this module mounts
-- `authMiddleware` is an express middleware function to be inserted/used when a module's routes require a user to be authenticated to access them
+- `authFunctions` is an object containing authentication express middleware function to be inserted/used when a module's routes require a user to be authenticated to access them
 - `serverConfig` is the server's configuration at start up. If your module requires configuration at mount, it can be accessed here.
 
 This function is to return an object containing two items. The first is the context route this module will be mounted on (eg `/dev`). The second is an express [Router](https://expressjs.com/en/4x/api.html#router), which this module will have appended it's handlers to.

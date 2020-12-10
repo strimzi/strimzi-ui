@@ -27,11 +27,15 @@ module.exports = {
     config: true,
     log: true,
     mockapi: false,
+    security: true,
   },
   proxy: {
     ...mockadminServer,
     transport: {
       ...mockAdminCertificates,
+    },
+    authentication: {
+      type: 'none',
     },
   },
   ...devServer,

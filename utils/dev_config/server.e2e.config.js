@@ -27,6 +27,9 @@ module.exports = {
     transport: {
       ...mockAdminCertificates,
     },
+    authentication: {
+      type: 'none',
+    },
   },
   ...devServer,
 };

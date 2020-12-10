@@ -18,25 +18,23 @@ const modules = {
   config: false,
   log: false,
   mockapi: false,
+  security: false,
 };
 
-const mockapiModuleConfig: () => serverConfigType = () =>
+const singleModule: (module: string) => serverConfigType = (module) =>
   merge({}, defaultTestConfig(), {
-    modules: { ...modules, mockapi: true },
+    modules: { ...modules, ...{ [module]: true } },
   });
 
-const logModuleConfig: () => serverConfigType = () =>
-  merge({}, defaultTestConfig(), {
-    modules: { ...modules, log: true },
-  });
-
-const configModuleConfig: () => serverConfigType = () =>
-  merge({}, defaultTestConfig(), {
-    modules: { ...modules, config: true },
+const clientModuleConfig: () => serverConfigType = () =>
+  merge(singleModule('client'), {
+    client: {
+      publicDir: resolve(__dirname, './__test_fixtures__/client'),
+    },
   });
 
 const configModuleWithConfigOverrides: () => serverConfigType = () =>
-  merge({}, configModuleConfig(), {
+  merge(singleModule('config'), {
     client: {
       configOverrides: {
         version: '34.0.0',
@@ -52,35 +50,25 @@ const configModuleWithConfigOverrides: () => serverConfigType = () =>
     },
   });
 
-const clientModuleConfig: () => serverConfigType = () =>
-  merge({}, defaultTestConfig(), {
-    client: {
-      publicDir: resolve(__dirname, './__test_fixtures__/client'),
-    },
-    modules: { ...modules, client: true },
-  });
-
 const apiModuleConfig: () => serverConfigType = () =>
-  merge({}, defaultTestConfig(), {
+  merge(singleModule('api'), {
     proxy: {
       hostname: 'test-backend',
       port: 3434,
     },
-    modules: { ...modules, api: true },
   });
 
 const apiModuleConfigWithCustomContextRoot: () => serverConfigType = () =>
-  merge({}, defaultTestConfig(), {
+  merge(singleModule('api'), {
     proxy: {
       hostname: 'test-backend',
       port: 3434,
       contextRoot: '/myCustomContextRoot',
     },
-    modules: { ...modules, api: true },
   });
 
 const securedApiModuleConfig: () => serverConfigType = () =>
-  merge(apiModuleConfig(), {
+  merge(singleModule('api'), {
     proxy: {
       transport: {
         cert: 'mock certificate',
@@ -88,27 +76,30 @@ const securedApiModuleConfig: () => serverConfigType = () =>
     },
   });
 
+export const enableModule: (
+  module: string,
+  config: serverConfigType
+) => serverConfigType = (module, config) =>
+  merge({}, config, {
+    modules: { [module]: true },
+  });
+
 export const getConfigForName: (name: string) => serverConfigType = (name) => {
   switch (name) {
-  default:
-  case 'default':
-  case 'production':
-    return defaultTestConfig();
-  case 'mockapi_only':
-    return mockapiModuleConfig();
-  case 'log_only':
-    return logModuleConfig();
-  case 'config_only':
-    return configModuleConfig();
-  case 'config_only_with_config_overrides':
-    return configModuleWithConfigOverrides();
-  case 'client_only':
-    return clientModuleConfig();
-  case 'api_only':
-    return apiModuleConfig();
-  case 'api_secured_only':
-    return securedApiModuleConfig();
-  case 'api_with_custom_context_root':
-    return apiModuleConfigWithCustomContextRoot();
+    case 'default':
+    case 'production':
+      return defaultTestConfig();
+    case 'config_with_overrides':
+      return configModuleWithConfigOverrides();
+    case 'client':
+      return clientModuleConfig();
+    case 'api':
+      return apiModuleConfig();
+    case 'api_secured':
+      return securedApiModuleConfig();
+    case 'api_with_custom_context_root':
+      return apiModuleConfigWithCustomContextRoot();
+    default:
+      return singleModule(name);
   }
 };

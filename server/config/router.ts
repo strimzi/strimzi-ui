@@ -13,7 +13,7 @@ const moduleName = 'config';
 
 export const ConfigModule: UIServerModule = {
   moduleName,
-  addModule: (logger, authFn, config) => {
+  addModule: (logger, { checkAuth }, config) => {
     const { exit } = logger.entry('addModule');
     const routerForModule = express.Router();
 
@@ -22,7 +22,7 @@ export const ConfigModule: UIServerModule = {
     });
 
     routerForModule.use(
-      authFn,
+      checkAuth,
       bodyParser.json(),
       server.getMiddleware({ path: '/' })
     );

@@ -16,12 +16,12 @@ const moduleName = 'log';
 
 export const LogModule: UIServerModule = {
   moduleName,
-  addModule: (logger, authFn) => {
+  addModule: (logger, { checkAuth }) => {
     const { exit } = logger.entry('addModule');
     const routerForModule = express.Router();
 
     // implementation to follow
-    routerForModule.get('*', authFn, (req, res) => {
+    routerForModule.get('*', checkAuth, (req, res) => {
       const { isWs } = req as strimziUIRequestType;
       const { ws } = res as strimziUIResponseType;
       if (isWs) {
