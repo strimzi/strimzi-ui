@@ -361,8 +361,9 @@ describe('useRouteConfig tests', () => {
           icon: 'myicon.svg',
           leaves: [
             {
-              path: '/topics/:name/consumergroups',
-              name: 'Consumer Groups',
+              to: '/topics/:name/consumergroups',
+              key: 'link-ConsumerGroups.Topic',
+              children: 'Consumer Groups',
             },
           ],
         },

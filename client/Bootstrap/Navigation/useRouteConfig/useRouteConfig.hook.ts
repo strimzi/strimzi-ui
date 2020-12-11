@@ -34,8 +34,9 @@ const contextReducer = (acc, context, page, leaves) => {
     leaves.push({
       parent: `/${extractTopLevelPath(context.path)}`,
       child: {
-        path: context.path,
-        name: translatedName,
+        to: context.path,
+        key: generateKey(translatedName, 'link', context.properties),
+        children: translatedName,
       },
     });
   }

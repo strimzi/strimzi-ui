@@ -5,7 +5,10 @@
 import { Given, When, Then, Fusion } from 'jest-cucumber-fusion';
 import { RenderResult } from '@testing-library/react';
 import merge from 'lodash.merge';
-import { renderWithCustomConfigFeatureFlagContext } from 'utils/test';
+import {
+  renderWithCustomConfigFeatureFlagContext,
+  NavigationStatePlaceholder,
+} from 'utils/test';
 import { Home } from '.';
 import React, { ReactElement } from 'react';
 
@@ -25,7 +28,7 @@ const coreConfigFromContext = {
 };
 
 Given('a Home component', () => {
-  component = <Home />;
+  component = <Home navigationState={NavigationStatePlaceholder} />;
 });
 
 When('it is rendered', () => {

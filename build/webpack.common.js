@@ -40,6 +40,7 @@ const withHTMLPlugin = returnPluginWithConfig(HtmlPlugin, {
   bootstrapConfigInsert: '{{bootstrapConfigs}}', // config insert for client bootstrap data
   favicon: `${IMAGES_DIR}/favicon.ico`, // favicon for this page
   inject: true,
+  base: '/',
 });
 
 const withMiniCssExtractPlugin = returnPluginWithConfig(MiniCssExtractPlugin, {

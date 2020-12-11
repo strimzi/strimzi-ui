@@ -5,10 +5,11 @@
 import React, { FunctionComponent } from 'react';
 import get from 'lodash.get';
 import image from 'Images/logo.png';
+import { PageComponentProperties } from 'Bootstrap/Navigation/types';
 import './style.scss';
 import { useConfigFeatureFlag, useLogger } from 'Hooks';
 
-const Home: FunctionComponent = ({ children }) => {
+const Home: FunctionComponent<PageComponentProperties> = ({ children }) => {
   const { client, featureFlags, isComplete } = useConfigFeatureFlag();
   const version = get(client, 'about.version', '');
   // use the feature flag from context - could also use the `FeatureFlag` component - this just shows alternative usage
