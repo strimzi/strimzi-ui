@@ -21,11 +21,10 @@ import {
   ConfigFeatureFlagProvider,
   ConfigFeatureFlagConsumer,
 } from './Context';
+import { mockData, mockRequests } from './ConfigFeatureFlag.testassets';
 import {
   defaultClientConfig,
   defaultConfigFeatureFlagValue,
-  mockData,
-  mockRequests,
 } from './ConfigFeatureFlag.assets';
 
 import { ConfigFeatureFlagType } from './ConfigFeatureFlag.types';
