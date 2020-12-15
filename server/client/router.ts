@@ -32,22 +32,19 @@ export const ClientModule: UIServerModule = {
     // add the auth middleware to all non public files
     protectedFiles.forEach((file) => routerForModule.get(`${file}`, authFn));
 
-    // return index.html, with configuration templated in
+    // Direct request for index, serve it (behind auth check)
     hasIndexFile &&
-      routerForModule.get('/index.html', renderTemplate(indexFile));
+      routerForModule.get('/index.html', authFn, renderTemplate(indexFile));
 
     // host all files from the client dir
     routerForModule.get(
       '*',
-      expressStaticGzip(builtClientDir, {}),
+      expressStaticGzip(builtClientDir, { index: false }),
       express.static(builtClientDir, { index: false })
     );
 
-    // if no match, not a file (path contains '.'), and we have an index.html file, redirect to it (ie return index so client navigation logic kicks in). Else do nothing (404 unless another module handles it)
-    hasIndexFile &&
-      routerForModule.get(/^((?!\.).)+$/, (req, res) =>
-        res.redirect(`/index.html`)
-      );
+    // If no match and we have an index, serve it (behind auth check)
+    hasIndexFile && routerForModule.get('*', authFn, renderTemplate(indexFile));
 
     return exit({ mountPoint: '/', routerForModule });
   },
