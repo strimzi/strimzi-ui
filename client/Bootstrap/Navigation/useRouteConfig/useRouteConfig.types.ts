@@ -18,7 +18,9 @@ type PageProperties = {
   mode?: string;
 };
 
-type PageConfigContext = {
+type Component = FunctionComponent | (() => FunctionComponent);
+
+export type PageConfigContext = {
   /** URL path for a page */
   path: string;
   /** Display name of a page */
@@ -59,7 +61,7 @@ type Route = {
   /** Identifying key */
   key: string;
   /** Component to be rendered when this route is resovled */
-  componentForRoute: FunctionComponent | (() => FunctionComponent);
+  componentForRoute: Component;
 };
 
 /** Page metadata */
@@ -88,8 +90,16 @@ export type PageConfig = Record<string, Page>;
 
 /** Type of a page which is part of a page config */
 export type Page = {
-  contentComponent: FunctionComponent | (() => FunctionComponent);
+  contentComponent: Component;
   contexts: Array<PageConfigContext>;
+};
+
+/** Pageconfig that has been flattened */
+export type FlatPageConfig = Array<FlatPage>;
+
+/** A page that has been flattened */
+export type FlatPage = PageConfigContext & {
+  contentComponent: Component;
 };
 
 /** Type of output from useRouteConfig */
@@ -97,13 +107,5 @@ export type RouterConfig = {
   links: Array<Link>;
   routes: Array<Route>;
   meta: Map<string, Meta> | Record<string, unknown>;
-};
-
-/** Type describing a relationship between a child nav and it's parent nav */
-export type Leaf = {
-  parent: string;
-  child: {
-    path: string;
-    name: string;
-  };
+  isComplete: boolean;
 };

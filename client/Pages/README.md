@@ -40,7 +40,7 @@ export const Topic { // for purposes of example, a Topic page/capability
             properties: {},
             requiresMinimum: {
                 backendSupportFor: {
-                    Topic: { read} // page requires the backend to support the ability to 'read' a 'Topic' at minimum to function
+                    Topic: { read } // page requires the backend to support the ability to 'read' a 'Topic' at minimum to function
                 },
                 authorizationOf: {
                     Topic: { read }, // user requires minimum Topic 'read' privilege to make use of this page

@@ -10,7 +10,7 @@ const commonConfig = require('../test_common/jest.common.config');
 
 const config = {
   setupFilesAfterEnv: ['<rootDir>/../test_common/jest_rtl_setup.ts'],
-  testMatch: ['**/*.(spec|steps).[jt]s?(x)'],
+  testMatch: ['<rootDir>/**/*.(spec|steps).[jt]s?(x)'],
   coverageDirectory: '<rootDir>/../coverage/client',
   moduleNameMapper: {
     ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
@@ -29,6 +29,7 @@ const config = {
     // Wrapper around graphql - not something we need/wish to test
     '!Bootstrap/GraphQLClient/**',
   ],
+  roots: ['<rootDir>', '<rootDir>/..'],
 };
 
 module.exports = merge({}, commonConfig, config);
