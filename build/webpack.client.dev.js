@@ -34,6 +34,7 @@ const { DEVELOPMENT, BUILD_DIR, BUNDLE_ANALYSER_DIR } = CONSTANTS;
 
 const devSpecificConfig = {
   mode: DEVELOPMENT,
+  devtool: 'eval-source-map',
   module: {
     rules: [
       withStylingModuleLoader(['style-loader']),
