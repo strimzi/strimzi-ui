@@ -10,6 +10,7 @@ Given('I am on the strimzi-ui homepage', () => {
 
 Then(`the welcome message appears`, () => {
   cy.get('#root').contains(`Welcome to the Strimzi UI`);
+  cy.testA11y("Checking accessibility for home page");
 });
 
 And(`version information about this UI is displayed`, () => {
