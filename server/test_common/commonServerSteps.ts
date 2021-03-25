@@ -4,6 +4,7 @@
  */
 import request from 'supertest';
 import { returnExpress } from 'core';
+import { mocked } from 'ts-jest/utils';
 import { Given, When, And, Then } from 'jest-cucumber-fusion';
 import {
   serverConfigType,
@@ -21,6 +22,8 @@ import { requests } from './testGQLRequests';
 
 import MockedWebSocket from 'ws';
 jest.mock('ws');
+jest.mock('../placeholderFunctionsToReplace');
+import { authFunction } from '../placeholderFunctionsToReplace';
 
 type supertestRequestType = request.SuperTest<request.Test>;
 
@@ -47,6 +50,8 @@ const { resetWorld, stepWhichUpdatesWorld, stepWithWorld } = worldGenerator(
 
 beforeEach(() => {
   resetWorld();
+  jest.resetAllMocks();
+  mocked(authFunction).mockReturnValue((_req, _res, next) => next());
 });
 
 Given(
@@ -60,13 +65,16 @@ Given(
 );
 
 And(
-  'Authentication is required',
-  stepWhichUpdatesWorld((world) => {
+  /^'(\S+)' authentication is required$/,
+  stepWhichUpdatesWorld((world, auth) => {
+    if ((auth as string) !== 'none') {
+      mocked(authFunction).mockReturnValue((_req, res) => res.sendStatus(511));
+    }
     const { configuration } = world;
     return {
       ...world,
       configuration: merge(configuration, {
-        authentication: { strategy: 'oauth' },
+        authentication: { strategy: auth },
       }),
     };
   })
@@ -83,6 +91,10 @@ And(
     };
   })
 );
+
+And('I am authenticated', () => {
+  mocked(authFunction).mockReturnValue((_req, _res, next) => next());
+});
 
 And(
   'I enable WebSocket connections on the Strimzi-UI server',
