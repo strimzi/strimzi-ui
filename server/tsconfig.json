@@ -3,10 +3,11 @@
   "compilerOptions": {
     "module": "CommonJS",
     "outDir": "../js/server",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
       "ui-config/*": ["../config/*"]
     }
   },
-  "include": ["."]
+  "include": ["."],
+  "typeRoots": ["./typing", "../node_modules/@types"]
 }

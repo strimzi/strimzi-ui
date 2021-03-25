@@ -27,11 +27,20 @@ module.exports = {
     config: true,
     log: true,
     mockapi: false,
+    security: true,
   },
   proxy: {
     ...mockadminServer,
     transport: {
       ...mockAdminCertificates,
+    },
+    authentication: {
+      type: 'oauth',
+      discoveryURL:
+        'http://localhost:8080/auth/realms/master/.well-known/openid-configuration',
+      clientID: 'test',
+      clientSecret: '54c6a7bd-7c0e-47f4-a5bd-55d4df515223',
+      callbackURL: 'http://localhost:3000/auth/callback',
     },
   },
   ...devServer,

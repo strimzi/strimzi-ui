@@ -7,15 +7,26 @@ import WebSocket from 'ws';
 import { SecureVersion } from 'tls';
 import { Level, Logger, LoggerOptions } from 'pino';
 import { exposedClientType, exposedFeatureFlagsType } from 'ui-config/types';
+import { Authentication } from 'security';
 
-export type supportedAuthenticationStrategyTypes = 'none' | 'scram' | 'oauth';
+export enum authenticationStrategies {
+  NONE = 'none',
+  SCRAM = 'scram',
+  OAUTH = 'oauth',
+}
 
-export type authenticationConfigType = {
+export interface authenticationConfig {
   /** What authentication strategy to use to authenticate users */
-  strategy: supportedAuthenticationStrategyTypes;
-  /** Any additional configuration required for the provided authentication strategy */
-  configuration?: Record<string, unknown>;
-};
+  type: authenticationStrategies;
+}
+
+export interface OAuthConfig extends authenticationConfig {
+  type: authenticationStrategies.OAUTH;
+  discoveryURL: string;
+  clientID: string;
+  clientSecret: string;
+  callbackURL: string;
+}
 
 type sslCertificateType = {
   /** certificate in PEM format */
@@ -50,7 +61,7 @@ type moduleConfigType = {
   mockapi: boolean;
 };
 
-type proxyConfigType = {
+export type proxyConfigType = {
   /** The Hostname of the backend server to send API requests to */
   hostname: string;
   /** The port number of the backend server to send API requests to */
@@ -59,6 +70,8 @@ type proxyConfigType = {
   contextRoot: string;
   /** SSL transport configuration */
   transport: sslCertificateType;
+  /** authentication configuration */
+  authentication: authenticationConfig;
 };
 
 type sessionConfigType = {
@@ -67,8 +80,6 @@ type sessionConfigType = {
 };
 
 export type serverConfigType = {
-  /** authentication configuration */
-  authentication: authenticationConfigType;
   /** client (browser) facing configuration */
   client: clientConfigType;
   /** feature flag configuration overrides (for both client and server) */
@@ -115,7 +126,7 @@ interface addModule {
   /** function called to add a module to the UI server */
   (
     mountLogger: entryExitLoggerType,
-    authFunction: expressMiddleware,
+    authentication: Authentication,
     configAtServerStart: serverConfigType
   ): {
     /** the root/mounting point for requests made to this module */
@@ -132,14 +143,6 @@ export type UIServerModule = {
   addModule: addModule;
 };
 
-export interface expressMiddleware {
-  /** typing of a general piece of express middleware */
-  (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ): void;
-}
 /** the request object provided on UI server request. Core express request plus additions */
 export type strimziUIRequestType = express.Request & {
   /** indicates this request is a websocket request (and that the response will have a ws object to interact with) */

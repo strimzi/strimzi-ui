@@ -3,10 +3,10 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 import merge from 'lodash.merge';
-import { And, Then, Fusion } from 'jest-cucumber-fusion';
+import { And, Fusion, Then } from 'jest-cucumber-fusion';
 import {
-  stepWithWorld,
   stepWhichUpdatesWorld,
+  stepWithWorld,
 } from 'test_common/commonServerSteps';
 
 And(
@@ -24,23 +24,15 @@ And(
 );
 
 And('There are files to serve', () => {
-  // NO_OP - the `client_only` configuration is already configured to serve fixture files
+  // NO_OP - the `client` configuration is already configured to serve fixture files
 });
 
 Then(
   /I get the expected status code '(.+)' response/,
-  stepWithWorld(async (world, statusCode) => {
+  stepWithWorld((world, statusCode) => {
+    const expectedStatus = parseInt(statusCode as string);
     const { request } = world;
-    await request.then(
-      (res) => {
-        const { status } = res;
-        const expectedStatus = parseInt(statusCode as string);
-        expect(status).toBe(expectedStatus);
-      },
-      (err) => {
-        throw err;
-      }
-    );
+    return request.expect(expectedStatus);
   })
 );
 
@@ -48,7 +40,7 @@ Then(
   'the file is returned as with the expected configuration included',
   stepWithWorld(async (world) => {
     const { request, configuration } = world;
-    const configuredAuthType = configuration.authentication.strategy;
+    const configuredAuthType = configuration.proxy.authentication.type;
 
     await request.then(
       (res) => {

@@ -4,13 +4,15 @@
  */
 import request from 'supertest';
 import { returnExpress } from 'core';
-import { Given, When, And, Then } from 'jest-cucumber-fusion';
+import nock from 'nock';
+import { Given, When, And, Then, CallBack } from 'jest-cucumber-fusion';
 import {
   serverConfigType,
   strimziUIRequestType,
   strimziUIResponseType,
+  authenticationStrategies,
 } from 'types';
-import { getConfigForName } from './testConfigs';
+import { getConfigForName, enableModule } from './testConfigs';
 import express from 'express';
 import merge from 'lodash.merge';
 import {
@@ -49,37 +51,100 @@ beforeEach(() => {
   resetWorld();
 });
 
-Given(
-  /a '(.+)' server configuration/,
+const withModule: [RegExp, CallBack] = [
+  /^a '(.+)' module$/,
+  stepWhichUpdatesWorld((world, module) => {
+    const { configuration } = world;
+
+    return {
+      ...world,
+      configuration: enableModule(
+        module as string,
+        configuration as serverConfigType
+      ),
+    };
+  }),
+];
+
+Given(...withModule);
+And(...withModule);
+
+const withConfig: [RegExp, CallBack] = [
+  /^a server with a '(.+)' configuration$/,
   stepWhichUpdatesWorld((world, config) => {
     return {
       ...world,
       configuration: getConfigForName(config as string),
     };
+  }),
+];
+
+Given(...withConfig);
+And(...withConfig);
+
+Given(
+  'an Application',
+  stepWhichUpdatesWorld((world) => {
+    world.context.app = express();
+    return world;
   })
 );
 
 And(
-  'Authentication is required',
-  stepWhichUpdatesWorld((world) => {
-    const { configuration } = world;
+  /^'(\S+)' authentication is required$/,
+  stepWhichUpdatesWorld((world, auth) => {
+    let authentication = {
+      type: auth as authenticationStrategies,
+    };
+
+    if ((auth as authenticationStrategies) === authenticationStrategies.OAUTH) {
+      const authServer = 'http://oauth-server.com';
+      const oauthOptions = {
+        clientID: 'client',
+        clientSecret: 'secret',
+        callbackURL: 'http://callback.com',
+        discoveryURL: authServer,
+      };
+      authentication = { ...authentication, ...oauthOptions };
+      nock(authServer).get('/').reply(200, {
+        authorization_endpoint: authServer,
+        issuer: authServer,
+        token_endpoint: authServer,
+        end_session_endpoint: authServer,
+      });
+    }
+    const configuration = merge(world.configuration, {
+      proxy: {
+        authentication,
+      },
+    });
     return {
       ...world,
-      configuration: merge(configuration, {
-        authentication: { strategy: 'oauth' },
-      }),
+      configuration,
     };
   })
 );
 
 And(
   'I run an instance of the Strimzi-UI server',
-  stepWhichUpdatesWorld((world) => {
-    const app = returnExpress(() => world.configuration);
+  stepWhichUpdatesWorld(async (world) => {
+    const app = await returnExpress(() => world.configuration);
     return {
       ...world,
       app,
       server: request(app),
+    };
+  })
+);
+
+And(
+  'all requests use the same session',
+  stepWhichUpdatesWorld((world) => {
+    const { app } = world;
+    return {
+      ...world,
+      app,
+      server: request.agent(app),
     };
   })
 );
@@ -109,21 +174,30 @@ And(
   })
 );
 
-When(
+const httpRequest: [RegExp, CallBack] = [
   /^I make a '(.+)' request to '(.+)'$/,
-  stepWhichUpdatesWorld((world, method, endpoint) => {
+  stepWhichUpdatesWorld(async (world, method, endpoint) => {
     const { server } = world;
+    if (world.request) {
+      await world.request;
+    }
     return {
       ...world,
       request: server[method as string](endpoint),
     };
-  })
-);
+  }),
+];
+
+When.call(null, ...httpRequest);
+And.call(null, ...httpRequest);
 
 When(
   /^I make a '(.+)' gql request to '(.+)'$/,
-  stepWhichUpdatesWorld((world, requestName, endpoint) => {
+  stepWhichUpdatesWorld(async (world, requestName, endpoint) => {
     const { server } = world;
+    if (world.request) {
+      await world.request;
+    }
 
     const query = requests[requestName as string] || {};
 
@@ -206,5 +280,57 @@ const getMockedWebSocket: () => MockedWebSocket = () => {
 
   return websocket;
 };
+
+Then(
+  /I get the expected status code '(.+)' response$/,
+  stepWithWorld(async (world, statusCode) => {
+    const expectedStatus = parseInt(statusCode as string);
+    const { request } = world;
+    return request.expect(expectedStatus);
+  })
+);
+
+Then(
+  /I get the expected status code '(.+)' response and body '(.+)'$/,
+  stepWithWorld(async (world, statusCode, response) => {
+    const expectedStatus = parseInt(statusCode as string);
+    const { request } = world;
+    return request.expect(expectedStatus, response as string);
+  })
+);
+
+And(
+  'the scram authentication accepts credentials',
+  stepWithWorld((world) => {
+    const { hostname, contextRoot, port } = world.configuration.proxy;
+    nock(`http://${hostname}:${port}`).post(contextRoot).reply(200, {});
+  })
+);
+And(
+  'the scram authentication rejects credentials',
+  stepWithWorld((world) => {
+    const { hostname, contextRoot, port } = world.configuration.proxy;
+    nock(`http://${hostname}:${port}`)
+      .post(contextRoot)
+      .reply(200, { errors: ['unauth'] });
+  })
+);
+
+When(
+  /^I send credentials to endpoint '(.+)'$/,
+  stepWhichUpdatesWorld(async (world, endpoint) => {
+    const { server } = world;
+    if (world.request) {
+      await world.request;
+    }
+    return {
+      ...world,
+      request: server.post(endpoint as string).send({
+        username: 'user',
+        password: 'password',
+      }),
+    };
+  })
+);
 
 export { stepWhichUpdatesWorld, stepWithWorld };

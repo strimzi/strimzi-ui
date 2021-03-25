@@ -25,7 +25,6 @@ const publicFiles = [
   'images/*',
   'fonts/*',
   'favicon.ico',
-  'index.html',
   'main.css',
   'main.bundle.js',
   'main.bundle.js.gz',
@@ -79,10 +78,9 @@ export const renderTemplate: (indexTemplate: string) => (req, res) => void = (
 ) => (req, res) => {
   const { entry, debug } = res.locals.strimziuicontext.logger;
   const { exit } = entry('renderTemplate');
-  const { authentication } = res.locals.strimziuicontext
-    .config as serverConfigType;
+  const { proxy } = res.locals.strimziuicontext.config as serverConfigType;
   const bootstrapConfigs = {
-    authType: authentication.strategy,
+    authType: proxy.authentication.type,
   };
   debug('Templating bootstrap config containing %o', bootstrapConfigs);
   res.send(

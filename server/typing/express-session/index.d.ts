@@ -2,6 +2,9 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-/* eslint-disable */
-import './commonStepdefs';
-import * as commonServerStepDefinitions from '../../server/test_common/commonServerSteps';
+import 'express-session';
+declare module 'express-session' {
+  interface SessionData {
+    originalURL?: string;
+  }
+}

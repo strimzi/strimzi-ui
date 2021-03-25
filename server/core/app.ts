@@ -6,21 +6,22 @@ import express from 'express';
 import helmet from 'helmet';
 import * as availableModules from './modules';
 import { serverConfigType, UIServerModule } from 'types';
-import { authFunction } from 'placeholderFunctionsToReplace';
 import expressSession, { SessionOptions } from 'express-session';
+import bodyParser from 'body-parser';
 import {
   generateLogger,
   generateHttpLogger,
   STRIMZI_UI_REQUEST_ID_HEADER,
 } from 'logging';
+import { bootstrapAuthentication } from 'security';
 
 export const returnExpress: (
   getConfig: () => serverConfigType
-) => express.Application = (getConfig) => {
+) => Promise<express.Application> = async (getConfig) => {
   const logger = generateLogger('core');
   const app = express();
 
-  const { session } = getConfig();
+  const { session: sessionConfig, proxy: proxyConfig } = getConfig();
 
   // add helmet middleware
   app.use(helmet());
@@ -31,12 +32,15 @@ export const returnExpress: (
   //Add session middleware
   const sessionOpts: SessionOptions = {
     secret: 'CHANGEME', //TODO replace with value from config https://github.com/strimzi/strimzi-ui/issues/111
-    name: session.name,
+    name: sessionConfig.name,
     cookie: {
       maxAge: 1000 * 3600 * 24 * 30, //30 days as a starting point //TODO replace with value from config https://github.com/strimzi/strimzi-ui/issues/111
     },
   };
   app.use(expressSession(sessionOpts));
+  app.use(bodyParser.json());
+
+  const authentication = await bootstrapAuthentication(app, proxyConfig);
 
   // for each module, call the function to add it to the routing table
   const routingTable = Object.values(availableModules).reduce(
@@ -51,7 +55,7 @@ export const returnExpress: (
       const config = getConfig();
       const { mountPoint, routerForModule } = addModule(
         generateLogger(moduleName),
-        authFunction(config.authentication),
+        authentication,
         config
       );
       logger.info(`Mounted module '${moduleName}' on '${mountPoint}'`);
