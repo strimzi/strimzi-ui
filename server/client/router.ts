@@ -11,7 +11,7 @@ const moduleName = 'client';
 
 export const ClientModule: UIServerModule = {
   moduleName,
-  addModule: (logger, authFn, serverConfig) => {
+  addModule: (logger, { checkAuth }, serverConfig) => {
     const { publicDir } = serverConfig.client;
     const { exit } = logger.entry('addModule', publicDir);
     const routerForModule = express.Router();
@@ -30,7 +30,8 @@ export const ClientModule: UIServerModule = {
     logger.debug(`Client has index.html to serve? ${hasIndexFile}`);
 
     // add the auth middleware to all non public files
-    protectedFiles.forEach((file) => routerForModule.get(`${file}`, authFn));
+    protectedFiles.forEach((file) => routerForModule.get(`${file}`, checkAuth));
+    routerForModule.get('/', checkAuth);
 
     // return index.html, with configuration templated in
     hasIndexFile &&
@@ -45,9 +46,10 @@ export const ClientModule: UIServerModule = {
 
     // if no match, not a file (path contains '.'), and we have an index.html file, redirect to it (ie return index so client navigation logic kicks in). Else do nothing (404 unless another module handles it)
     hasIndexFile &&
-      routerForModule.get(/^((?!\.).)+$/, (req, res) =>
-        res.redirect(`/index.html`)
-      );
+      routerForModule.get(/^((?!\.).)+$/, (req, res) => {
+        logger.info('Redirecting to index');
+        res.redirect(`/`);
+      });
 
     return exit({ mountPoint: '/', routerForModule });
   },

@@ -12,7 +12,7 @@ const rulesets = [
 
 const customRules = {
   // prefer spaces (2) over tabs for indentation - tab width can be changed, space cannot
-  indent: ['error', 2],
+  indent: ['error', 2, { SwitchCase: 1 }],
   // all lines to have semicolons to end statements
   semi: ['error', 'always'],
 };
